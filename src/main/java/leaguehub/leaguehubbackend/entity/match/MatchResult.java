@@ -17,6 +17,8 @@ public class MatchResult extends BaseTimeEntity {
 
     private Integer roundRank;
 
+    private String matchCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id")
     private Match match;
