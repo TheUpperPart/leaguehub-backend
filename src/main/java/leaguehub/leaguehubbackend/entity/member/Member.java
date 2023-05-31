@@ -1,6 +1,7 @@
-package leaguehub.leaguehubbackend.entity;
+package leaguehub.leaguehubbackend.entity.member;
 
 import jakarta.persistence.*;
+import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,5 +20,7 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     private String profileImageUrl;
+
+    private LoginProvider loginProvider;
 
 }
