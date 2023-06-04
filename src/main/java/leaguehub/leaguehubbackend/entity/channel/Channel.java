@@ -5,6 +5,8 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +17,7 @@ import java.util.UUID;
 import static leaguehub.leaguehubbackend.entity.participant.Participant.createHostChannel;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Channel extends BaseTimeEntity {
 
@@ -32,7 +34,6 @@ public class Channel extends BaseTimeEntity {
     private Category category;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private Integer maxPlayer;
 
     private Integer realPlayer;
@@ -61,19 +62,18 @@ public class Channel extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel")
     private List<ChannelBoard> channelBoards = new ArrayList<>();
 
-
     public static Channel createChannel(CreateChannelDto createChannelDto, Member member) {
         Channel channel = new Channel();
         channel.title = createChannelDto.getTitle();
-        channel.category = createChannelDto.getGame();
+        channel.category = Category.getByNumber(createChannelDto.getGame());
         channel.maxPlayer = createChannelDto.getParticipationNum();
         channel.realPlayer = 0;
-        channel.participant.add(createHostChannel(member));
+        channel.participant.add(createHostChannel(member, channel));
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(createChannelDto.getTournament());
         channel.participationLink = createParticipationLink();
         channel.accessCode = createAccessCode();
-        channel.channelBoards = ChannelBoard.createDefalutBoard();
+        channel.channelBoards = ChannelBoard.createDefaultBoard();
         channel.channelImageUrl = createChannelDto.getChannelImageUrl();
         channel.channelRule = ChannelRule.createChannelRule(createChannelDto.getTierMax()
                 , createChannelDto.getTier()
@@ -82,6 +82,27 @@ public class Channel extends BaseTimeEntity {
 
 
         return channel;
+    }
+
+    @Builder
+    public Channel(String title, Category category,
+                   Integer maxPlayer, Integer realPlayer,
+                   String participationLink, String accessCode,
+                   MatchFormat matchFormat, ChannelStatus channelStatus,
+                   String channelImageUrl, ChannelRule channelRule,
+                   List<Participant> participant, List<ChannelBoard> channelBoards) {
+        this.title = title;
+        this.category = category;
+        this.maxPlayer = maxPlayer;
+        this.realPlayer = realPlayer;
+        this.participationLink = participationLink;
+        this.accessCode = accessCode;
+        this.matchFormat = matchFormat;
+        this.channelStatus = channelStatus;
+        this.channelImageUrl = channelImageUrl;
+        this.channelRule = channelRule;
+        this.participant = participant;
+        this.channelBoards = channelBoards;
     }
 
     private static String createAccessCode() {

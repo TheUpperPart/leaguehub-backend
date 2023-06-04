@@ -5,6 +5,9 @@ import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -23,5 +26,11 @@ public class ChannelBoard extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
+
+    public static List<ChannelBoard> createDefaultBoard() {
+        List<ChannelBoard> channelBoardList = new ArrayList<>();
+
+        return channelBoardList;
+    }
 
 }
