@@ -62,6 +62,8 @@ public class Channel extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel")
     private List<ChannelBoard> channelBoards = new ArrayList<>();
 
+    //-- 비즈니스 로직 --//
+
     public static Channel createChannel(CreateChannelDto createChannelDto, Member member) {
         Channel channel = new Channel();
         channel.title = createChannelDto.getTitle();
@@ -74,7 +76,7 @@ public class Channel extends BaseTimeEntity {
         channel.participationLink = createParticipationLink();
         channel.accessCode = createAccessCode();
         channel.channelBoards = ChannelBoard.createDefaultBoard();
-        channel.channelImageUrl = createChannelDto.getChannelImageUrl();
+        channel.channelImageUrl = channel.validateChannelImageUrl(createChannelDto.getChannelImageUrl());
         channel.channelRule = ChannelRule.createChannelRule(createChannelDto.getTierMax()
                 , createChannelDto.getTier()
                 , createChannelDto.getPlayCount()
@@ -115,5 +117,14 @@ public class Channel extends BaseTimeEntity {
         String link = "";
 
         return link;
+    }
+
+    //채널 이미지 Url에 대한 정보가 없으면 기본 채널 이미지를 반환한다.
+    private String validateChannelImageUrl(String channelImageUrl) {
+        if (channelImageUrl == null) {
+            channelImageUrl = ""; //Default 값
+        }
+
+        return channelImageUrl;
     }
 }
