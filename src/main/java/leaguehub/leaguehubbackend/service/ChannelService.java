@@ -1,6 +1,5 @@
 package leaguehub.leaguehubbackend.service;
 
-import leaguehub.leaguehubbackend.dto.CreateChannelResponseDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -30,11 +29,15 @@ public class ChannelService {
      * @return channel.Id
      */
     @Transactional
-    public CreateChannelResponseDto createChannel(CreateChannelDto createChannelDto, String personalId) {
+    public Long createChannel(CreateChannelDto createChannelDto, String personalId) {
+
         Member member = memberRepository.findMemberByPersonalId(personalId)
                 .orElseThrow(MemberNotFoundException::new);
 
         Channel channel = Channel.createChannel(createChannelDto, member);
 
+        channelRepository.save(channel);
+
+        return channel.getId();
     }
 }
