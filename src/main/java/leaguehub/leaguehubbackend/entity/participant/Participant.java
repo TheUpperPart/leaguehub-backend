@@ -39,4 +39,7 @@ public class Participant extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
+    public static Participant createHostChannel(Member member) {
+
+    }
 }
