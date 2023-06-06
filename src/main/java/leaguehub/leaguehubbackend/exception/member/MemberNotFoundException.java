@@ -12,8 +12,10 @@ public class MemberNotFoundException extends EntityNotFoundException {
 
     public MemberNotFoundException() {
         super(MEMBER_NOT_FOUND.getMessage());
-        exceptionCode = MEMBER_NOT_FOUND;
+        this.exceptionCode = MEMBER_NOT_FOUND;
     }
 
-
+    public ExceptionCode getExceptionCode() {
+        return exceptionCode;
+    }
 }
