@@ -52,14 +52,14 @@ public class Channel extends BaseTimeEntity {
 
     private String channelImageUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_rule_id")
     private ChannelRule channelRule;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel", cascade = CascadeType.ALL)
     private List<Participant> participant = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel", cascade = CascadeType.ALL)
     private List<ChannelBoard> channelBoards = new ArrayList<>();
 
     //-- 비즈니스 로직 --//
@@ -82,33 +82,11 @@ public class Channel extends BaseTimeEntity {
                 , createChannelDto.getPlayCount()
                 , createChannelDto.getPlayCountMin());
 
-
         return channel;
     }
 
-    @Builder
-    public Channel(String title, Category category,
-                   Integer maxPlayer, Integer realPlayer,
-                   String participationLink, String accessCode,
-                   MatchFormat matchFormat, ChannelStatus channelStatus,
-                   String channelImageUrl, ChannelRule channelRule,
-                   List<Participant> participant, List<ChannelBoard> channelBoards) {
-        this.title = title;
-        this.category = category;
-        this.maxPlayer = maxPlayer;
-        this.realPlayer = realPlayer;
-        this.participationLink = participationLink;
-        this.accessCode = accessCode;
-        this.matchFormat = matchFormat;
-        this.channelStatus = channelStatus;
-        this.channelImageUrl = channelImageUrl;
-        this.channelRule = channelRule;
-        this.participant = participant;
-        this.channelBoards = channelBoards;
-    }
-
     private static String createAccessCode() {
-        String accessCode = UUID.randomUUID().toString().substring(6);
+        String accessCode = UUID.randomUUID().toString().substring(0, 7);
 
         return accessCode;
     }
