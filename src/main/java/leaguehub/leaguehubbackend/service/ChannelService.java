@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.exception.member.MemberNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.*;
 import leaguehub.leaguehubbackend.repository.member.*;
 import leaguehub.leaguehubbackend.repository.particiapnt.*;
+import leaguehub.leaguehubbackend.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,12 @@ public class ChannelService {
     /**
      *
      * @param createChannelDto
-     * @param personalId
-     * @return channel.Id
+     * @return
      */
     @Transactional
-    public Long createChannel(CreateChannelDto createChannelDto, String personalId) {
+    public Long createChannel(CreateChannelDto createChannelDto) {
+
+        String personalId = UserUtil.getUserPersonalId();
 
         Member member = memberRepository.findMemberByPersonalId(personalId)
                 .orElseThrow(MemberNotFoundException::new);

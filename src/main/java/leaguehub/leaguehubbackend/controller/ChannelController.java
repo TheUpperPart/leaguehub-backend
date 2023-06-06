@@ -35,8 +35,7 @@ public class ChannelController {
             throw new RuntimeException();
         }
 
-        String personalId = "";
-        channelService.createChannel(createChannelDto, personalId);
+        channelService.createChannel(createChannelDto);
 
         return new ResponseEntity<>("League successfully created", HttpStatus.OK);
     }
