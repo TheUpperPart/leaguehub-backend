@@ -1,27 +1,31 @@
 package leaguehub.leaguehubbackend.dto.channel;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import leaguehub.leaguehubbackend.entity.channel.Category;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class CreateChannelDto {
 
-    @NotNull
+    @NotEmpty
+    @JsonProperty("category")
     private int game;
 
-    @NotNull
+    @NotEmpty
+    @JsonProperty("matchformat")
     private Integer tournament;
 
-    @NotNull
+    @NotEmpty
     private String title;
 
-    @NotNull
+    @NotEmpty
     private Integer participationNum;
 
-    @NotNull
+    @NotEmpty
     private Boolean tier;
 
     private String tierMax;
@@ -29,9 +33,11 @@ public class CreateChannelDto {
     @NotBlank
     private String channelImageUrl;
 
-    @NotNull
+    @NotEmpty
+    @JsonProperty("playcount")
     private Boolean playCount;
 
+    @JsonProperty("playcountMin")
     private Integer playCountMin;
 
     @Builder
