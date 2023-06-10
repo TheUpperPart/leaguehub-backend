@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.entity.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.channel.ChannelCreateException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -51,6 +51,7 @@ class ChannelTest {
         assertThat(findChannel.get().getRealPlayer()).isEqualTo(0);
         assertThat(findChannel.get().getCategory()).isEqualTo(Category.getByNumber(channelDto.getGame()));
         assertThat(findChannel.get().getChannelRule().getLimitedPlayCount()).isEqualTo(Integer.MAX_VALUE);
+        assertThat(findChannel.get().getChannelBoards().size()).isEqualTo(3);
     }
 
     @Test
@@ -72,7 +73,8 @@ class ChannelTest {
         assertThat(findChannel.get().getRealPlayer()).isEqualTo(0);
         assertThat(findChannel.get().getCategory()).isEqualTo(Category.getByNumber(channelDto.getGame()));
         assertThat(findChannel.get().getChannelRule().getLimitedPlayCount()).isEqualTo(channelDto.getPlayCountMin());
-        assertThat(channel.getParticipationLink()).isEqualTo("http://localhost:8080/" + channel.getId());
+        assertThat(findChannel.get().getParticipationLink()).isEqualTo("http://localhost:8080/" + channel.getId());
+        assertThat(findChannel.get().getChannelBoards().size()).isEqualTo(3);
     }
 
     @Test

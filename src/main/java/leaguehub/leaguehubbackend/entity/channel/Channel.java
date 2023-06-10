@@ -5,9 +5,8 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.exception.channel.ChannelCreateException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -75,7 +74,7 @@ public class Channel extends BaseTimeEntity {
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(createChannelDto.getTournament());
         channel.accessCode = createAccessCode();
-        channel.channelBoards = ChannelBoard.createDefaultBoard();
+        channel.channelBoards = ChannelBoard.createDefaultBoard(channel);
         channel.channelImageUrl = channel.validateChannelImageUrl(createChannelDto.getChannelImageUrl());
         channel.channelRule = ChannelRule.createChannelRule(createChannelDto.getTierMax()
                 , createChannelDto.getTier()
