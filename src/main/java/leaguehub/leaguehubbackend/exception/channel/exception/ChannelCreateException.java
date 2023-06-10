@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.exception.channel;
+package leaguehub.leaguehubbackend.exception.channel.exception;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 

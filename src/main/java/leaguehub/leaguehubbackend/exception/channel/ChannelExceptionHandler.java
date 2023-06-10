@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.exception.channel;
 
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
