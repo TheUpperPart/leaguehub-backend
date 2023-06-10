@@ -5,6 +5,7 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.exception.channel.ChannelCreateException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,7 +74,6 @@ public class Channel extends BaseTimeEntity {
         channel.participant.add(createHostChannel(member, channel));
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(createChannelDto.getTournament());
-        channel.participationLink = createParticipationLink();
         channel.accessCode = createAccessCode();
         channel.channelBoards = ChannelBoard.createDefaultBoard();
         channel.channelImageUrl = channel.validateChannelImageUrl(createChannelDto.getChannelImageUrl());
@@ -82,7 +82,17 @@ public class Channel extends BaseTimeEntity {
                 , createChannelDto.getPlayCount()
                 , createChannelDto.getPlayCountMin());
 
+        validateChannelData(channel);
+
         return channel;
+    }
+
+    private static void validateChannelData(Channel channel) {
+        if(channel.getCategory() == null) {
+            throw new ChannelCreateException();
+        } else if (channel.getMatchFormat() == null) {
+            throw new ChannelCreateException();
+        }
     }
 
     private static String createAccessCode() {
@@ -91,10 +101,8 @@ public class Channel extends BaseTimeEntity {
         return accessCode;
     }
 
-    private static String createParticipationLink() {
-        String link = "";
-
-        return link;
+    public static void createParticipationLink(Channel channel) {
+        channel.participationLink = "http://localhost:8080/" + channel.getId();
     }
 
     //채널 이미지 Url에 대한 정보가 없으면 기본 채널 이미지를 반환한다.

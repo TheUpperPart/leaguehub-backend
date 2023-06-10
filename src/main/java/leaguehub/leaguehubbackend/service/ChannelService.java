@@ -37,8 +37,8 @@ public class ChannelService {
                 .orElseThrow(MemberNotFoundException::new);
 
         Channel channel = Channel.createChannel(createChannelDto, member);
-
         channelRepository.save(channel);
+        Channel.createParticipationLink(channel);
 
         return channel.getId();
     }

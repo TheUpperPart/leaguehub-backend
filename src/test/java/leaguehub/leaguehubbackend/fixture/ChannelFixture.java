@@ -18,12 +18,56 @@ public class ChannelFixture {
         return createChannelDto;
     }
 
+    public static CreateChannelDto createAllPropertiesChannelDto() {
+        CreateChannelDto createChannelDto = CreateChannelDto.builder()
+                .game(0)
+                .title("test")
+                .tournament(0)
+                .participationNum(16)
+                .tier(true)
+                .tierMax("Sliver")
+                .playCount(true)
+                .playCountMin(100)
+                .build();
+
+
+        return createChannelDto;
+    }
+
     public static CreateChannelDto bindingResultCheck() {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
                 .game(0)
                 .tournament(0)
                 .participationNum(16)
                 .tier(false)
+                .build();
+
+
+        return createChannelDto;
+    }
+
+    public static CreateChannelDto invalidatedCategoryData() {
+        CreateChannelDto createChannelDto = CreateChannelDto.builder()
+                .game(12)
+                .title("test")
+                .tournament(0)
+                .participationNum(16)
+                .tier(false)
+                .playCount(false)
+                .build();
+
+
+        return createChannelDto;
+    }
+
+    public static CreateChannelDto invalidatedTournamentData() {
+        CreateChannelDto createChannelDto = CreateChannelDto.builder()
+                .game(0)
+                .title("test")
+                .tournament(12)
+                .participationNum(16)
+                .tier(false)
+                .playCount(false)
                 .build();
 
 

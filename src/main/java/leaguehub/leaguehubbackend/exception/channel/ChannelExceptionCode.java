@@ -15,7 +15,8 @@ public enum ChannelExceptionCode implements ExceptionCode {
     INELIGIBLE_PARTICIPANT_REQUEST(BAD_REQUEST, "CH-C-002", "정해진 대회 룰에 적합하지 않는 대회 참가 요청입니다."),
     INVALID_JOIN_REQUEST(BAD_REQUEST, "CH-C-003", "유효하지 않은 참가 링크입니다."),
     INVALID_CHANNEL_IMAGE(BAD_REQUEST, "CH-C-004", "유효하지 않은 이미지입니다."),
-    INVALID_ACCESS_CODE(BAD_REQUEST, "CH-C-005", "유효하지 않은 대회 참가 코드입니다.");
+    INVALID_ACCESS_CODE(BAD_REQUEST, "CH-C-005", "유효하지 않은 대회 참가 코드입니다."),
+    INVALID_CREATE_CHANNEL(BAD_REQUEST, "CH-C-006", " 유효하지 않은 대회 채널 생성입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
