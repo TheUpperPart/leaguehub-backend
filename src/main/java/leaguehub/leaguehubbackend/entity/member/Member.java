@@ -29,9 +29,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Participant> participant = new ArrayList<>();
-
     @Builder
     public Member(String personalId, String nickname, String profileImageUrl, LoginProvider loginProvider) {
         this.personalId = personalId;

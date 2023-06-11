@@ -1,6 +1,8 @@
 package leaguehub.leaguehubbackend.entity.participant;
 
+import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -8,7 +10,7 @@ import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
-import leaguehub.leaguehubbackend.service.ChannelService;
+import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +43,15 @@ class ParticipantTest {
     public void createHostTest() throws Exception {
 
         Member member = memberRepository.save(UserFixture.createMember());
-
-        Channel channel = Channel.createChannel(ChannelFixture.createChannelDto(), member);
-        Channel savedChannel = channelRepository.save(channel);
-
-        List<Participant> participantList = savedChannel.getParticipant();
-        Participant participant = participantList.get(0);
-        Participant findParticipant = participantRepository.findParticipantById(participant.getId());
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesChannelDto();
+        Channel channel = Channel.createChannel(channelDto);
+        channelRepository.save(channel);
+        Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
+        channel.createParticipationLink();
 
 
-        assertThat(participantList.size()).isEqualTo(1);
-        assertThat(findParticipant.getId()).isEqualTo(participant.getId());
-        assertThat(findParticipant.getMember()).isEqualTo(member);
+        assertThat(participantRepository.findAll().size()).isEqualTo(1);
+        assertThat(participant.getChannel()).isEqualTo(channel);
         assertThat(participant.getMember()).isEqualTo(member);
         assertThat(participant.getRole()).isEqualTo(Role.HOST);
         assertThat(participant.getGameId()).isEqualTo(GlobalConstant.NO_DATA.getData());

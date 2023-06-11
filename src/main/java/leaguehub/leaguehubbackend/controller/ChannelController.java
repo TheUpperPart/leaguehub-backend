@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.controller;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.service.ChannelService;
+import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

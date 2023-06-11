@@ -56,52 +56,46 @@ public class Channel extends BaseTimeEntity {
     @JoinColumn(name = "channel_rule_id")
     private ChannelRule channelRule;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel", cascade = CascadeType.ALL)
-    private List<Participant> participant = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channel", cascade = CascadeType.ALL)
-    private List<ChannelBoard> channelBoards = new ArrayList<>();
 
     //-- 비즈니스 로직 --//
 
-    public static Channel createChannel(CreateChannelDto createChannelDto, Member member) {
+    public static Channel createChannel(CreateChannelDto createChannelDto) {
         Channel channel = new Channel();
         channel.title = createChannelDto.getTitle();
         channel.category = Category.getByNumber(createChannelDto.getGame());
         channel.maxPlayer = createChannelDto.getParticipationNum();
         channel.realPlayer = 0;
-        channel.participant.add(createHostChannel(member, channel));
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(createChannelDto.getTournament());
-        channel.accessCode = createAccessCode();
-        channel.channelBoards = ChannelBoard.createDefaultBoard(channel);
+        channel.accessCode = channel.createAccessCode();
         channel.channelImageUrl = channel.validateChannelImageUrl(createChannelDto.getChannelImageUrl());
         channel.channelRule = ChannelRule.createChannelRule(createChannelDto.getTierMax()
                 , createChannelDto.getTier()
                 , createChannelDto.getPlayCount()
                 , createChannelDto.getPlayCountMin());
 
-        validateChannelData(channel);
+        channel.validateChannelData();
 
         return channel;
     }
 
-    private static void validateChannelData(Channel channel) {
-        if(channel.getCategory() == null) {
+    private void validateChannelData() {
+        if(this.getCategory() == null) {
             throw new ChannelCreateException();
-        } else if (channel.getMatchFormat() == null) {
+        } else if (this.getMatchFormat() == null) {
             throw new ChannelCreateException();
         }
     }
 
-    private static String createAccessCode() {
+    private String createAccessCode() {
         String accessCode = UUID.randomUUID().toString().substring(0, 7);
 
         return accessCode;
     }
 
-    public static void createParticipationLink(Channel channel) {
-        channel.participationLink = "http://localhost:8080/" + channel.getId();
+    public void createParticipationLink() {
+        this.participationLink = "http://localhost:8080/" + this.getId();
     }
 
     //채널 이미지 Url에 대한 정보가 없으면 기본 채널 이미지를 반환한다.
@@ -112,4 +106,5 @@ public class Channel extends BaseTimeEntity {
 
         return channelImageUrl;
     }
+
 }
