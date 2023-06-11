@@ -1,12 +1,11 @@
-package leaguehub.leaguehubbackend.service;
+package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.member.MemberNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.*;
-import leaguehub.leaguehubbackend.repository.member.*;
-import leaguehub.leaguehubbackend.repository.particiapnt.*;
+import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,13 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final MemberRepository memberRepository;
-    private final ParticipantRepository participantRepository;
-    private final ChannelBoardRepository channelBoardRepository;
-    private final ChannelRuleRepository channelRuleRepository;
+    private final MemberService memberService;
 
     /**
-     *
      * @param createChannelDto
      * @return
      */
@@ -33,8 +28,7 @@ public class ChannelService {
 
         String personalId = UserUtil.getUserPersonalId();
 
-        Member member = memberRepository.findMemberByPersonalId(personalId)
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = memberService.validateMember(personalId);
 
         Channel channel = Channel.createChannel(createChannelDto, member);
         channelRepository.save(channel);
@@ -42,4 +36,11 @@ public class ChannelService {
 
         return channel.getId();
     }
+
+    public Channel validateChannel(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(ChannelNotFoundException::new);
+        return channel;
+    }
+
 }

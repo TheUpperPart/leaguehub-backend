@@ -1,6 +1,8 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
+import leaguehub.leaguehubbackend.dto.channel.CreateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,4 +55,21 @@ public class ChannelBoard extends BaseTimeEntity {
     }
 
 
+    public static ChannelBoard createChannelBoard(Channel channel,
+                                                  CreateChannelBoardDto createChannelBoardDto) {
+        ChannelBoard channelBoard = new ChannelBoard();
+        channelBoard.channel = channel;
+        channelBoard.title = createChannelBoardDto.getTitle();
+        channelBoard.content = createChannelBoardDto.getContent();
+
+        return channelBoard;
+    }
+
+    public static ChannelBoard updateChannelBoard(ChannelBoard channelBoard,
+                                                  UpdateChannelDto updateChannelDto) {
+        channelBoard.title = updateChannelDto.getTitle();
+        channelBoard.content = updateChannelDto.getContent();
+
+        return channelBoard;
+    }
 }
