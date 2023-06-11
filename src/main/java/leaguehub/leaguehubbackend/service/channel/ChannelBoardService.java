@@ -8,7 +8,6 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
-
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -39,20 +37,19 @@ public class ChannelBoardService {
 
         Participant participant = participantRepository.findParticipantByMemberId(member.getId());
 
-        if(participant.getRole() == Role.HOST && participant.getChannel() == channel) {
+        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
             channelBoardRepository.
                     save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto));
         }
     }
 
     @Transactional
-    public ChannelBoard readChannelBoard(ChannelBoardDto readChannelBoardDto) {
+    public List<ChannelBoard> readChannelBoard(ChannelBoardDto readChannelBoardDto) {
         Channel channel = channelService.validateChannel(readChannelBoardDto.getChannelId());
-        ChannelBoard channelBoard = validateChannelBoard(readChannelBoardDto.getChannelBoardId());
 
-        validateChannelAndChannelBoard(channel, channelBoard);
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
-        return channelBoard;
+        return channelBoards;
     }
 
     @Transactional
@@ -66,7 +63,7 @@ public class ChannelBoardService {
 
         Participant participant = participantRepository.findParticipantByMemberId(member.getId());
 
-        if(participant.getRole() == Role.HOST && participant.getChannel() == channel) {
+        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
             channelBoardRepository.
                     save(channelBoard.updateChannelBoard(updateChannelBoardDto));
         }
@@ -84,7 +81,7 @@ public class ChannelBoardService {
 
         Participant participant = participantRepository.findParticipantByMemberId(member.getId());
 
-        if(participant.getRole() == Role.HOST && participant.getChannel() == channel) {
+        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
             channelBoardRepository.deleteById(channelBoard.getId());
         }
     }
@@ -95,7 +92,7 @@ public class ChannelBoardService {
     }
 
     private void validateChannelAndChannelBoard(Channel channel, ChannelBoard channelBoard) {
-        if(channel != channelBoard.getChannel()) {
+        if (channel != channelBoard.getChannel()) {
             throw new ChannelBoardNotFoundException();
         }
     }

@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
@@ -24,6 +25,7 @@ public class ChannelRule extends BaseTimeEntity {
 
     private Boolean playCount;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
@@ -35,13 +37,13 @@ public class ChannelRule extends BaseTimeEntity {
         channelRule.playCount = playCount;
         channelRule.tier = tier;
 
-        if(tier == true) {
+        if (tier == true) {
             channelRule.limitedTier = tierMax;
         } else {
             channelRule.limitedTier = GlobalConstant.NO_DATA.getData();
         }
 
-        if(playCount == true) {
+        if (playCount == true) {
             channelRule.limitedPlayCount = playCountMin;
         } else {
             channelRule.limitedPlayCount = Integer.MAX_VALUE;

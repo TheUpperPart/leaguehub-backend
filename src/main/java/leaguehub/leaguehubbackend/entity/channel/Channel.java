@@ -3,18 +3,12 @@ package leaguehub.leaguehubbackend.entity.channel;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import static leaguehub.leaguehubbackend.entity.participant.Participant.createHostChannel;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -57,7 +51,6 @@ public class Channel extends BaseTimeEntity {
     private ChannelRule channelRule;
 
 
-
     //-- 비즈니스 로직 --//
 
     public static Channel createChannel(CreateChannelDto createChannelDto) {
@@ -81,7 +74,7 @@ public class Channel extends BaseTimeEntity {
     }
 
     private void validateChannelData() {
-        if(this.getCategory() == null) {
+        if (this.getCategory() == null) {
             throw new ChannelCreateException();
         } else if (this.getMatchFormat() == null) {
             throw new ChannelCreateException();

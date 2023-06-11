@@ -6,7 +6,8 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.repository.channel.*;
+import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.UserUtil;
@@ -47,7 +48,6 @@ public class ChannelService {
                 .orElseThrow(ChannelNotFoundException::new);
         return channel;
     }
-
 
 
 }
