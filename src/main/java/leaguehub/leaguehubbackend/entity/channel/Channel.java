@@ -53,20 +53,22 @@ public class Channel extends BaseTimeEntity {
 
     //-- 비즈니스 로직 --//
 
-    public static Channel createChannel(CreateChannelDto createChannelDto) {
+    public static Channel createChannel(String title, Integer category, int maxPlayer,
+                                        Integer matchFormat, String channelImageUrl,
+                                        boolean tier, String tierMax, boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
-        channel.title = createChannelDto.getTitle();
-        channel.category = Category.getByNumber(createChannelDto.getGame());
-        channel.maxPlayer = createChannelDto.getParticipationNum();
+        channel.title = title;
+        channel.category = Category.getByNumber(category);
+        channel.maxPlayer = maxPlayer;
         channel.realPlayer = 0;
         channel.channelStatus = ChannelStatus.PREPARING;
-        channel.matchFormat = MatchFormat.getByNumber(createChannelDto.getTournament());
+        channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.accessCode = channel.createAccessCode();
-        channel.channelImageUrl = channel.validateChannelImageUrl(createChannelDto.getChannelImageUrl());
-        channel.channelRule = ChannelRule.createChannelRule(createChannelDto.getTierMax()
-                , createChannelDto.getTier()
-                , createChannelDto.getPlayCount()
-                , createChannelDto.getPlayCountMin());
+        channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
+        channel.channelRule = ChannelRule.createChannelRule(tierMax
+                , tier
+                , playCount
+                , playCountMin);
 
         channel.validateChannelData();
 

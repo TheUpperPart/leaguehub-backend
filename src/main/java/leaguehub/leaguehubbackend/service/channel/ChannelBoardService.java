@@ -39,7 +39,8 @@ public class ChannelBoardService {
 
         if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
             channelBoardRepository.
-                    save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto));
+                    save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto.getTitle(),
+                            createChannelBoardDto.getContent()));
         }
     }
 
@@ -65,7 +66,8 @@ public class ChannelBoardService {
 
         if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
             channelBoardRepository.
-                    save(channelBoard.updateChannelBoard(updateChannelBoardDto));
+                    save(channelBoard.updateChannelBoard(updateChannelBoardDto.getTitle(),
+                            updateChannelBoardDto.getContent()));
         }
 
     }

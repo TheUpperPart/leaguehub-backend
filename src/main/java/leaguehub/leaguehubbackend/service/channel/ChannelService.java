@@ -36,7 +36,12 @@ public class ChannelService {
 
         Member member = memberService.validateMember(personalId);
 
-        Channel channel = Channel.createChannel(createChannelDto);
+        Channel channel = Channel.createChannel(createChannelDto.getTitle(),
+                createChannelDto.getGame(), createChannelDto.getParticipationNum(),
+                createChannelDto.getTournament(), createChannelDto.getChannelImageUrl(),
+                createChannelDto.getTier(), createChannelDto.getTierMax(),
+                createChannelDto.getPlayCount(),
+                createChannelDto.getPlayCountMin());
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));

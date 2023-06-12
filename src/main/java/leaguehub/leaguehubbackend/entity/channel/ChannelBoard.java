@@ -56,18 +56,18 @@ public class ChannelBoard extends BaseTimeEntity {
 
 
     public static ChannelBoard createChannelBoard(Channel channel,
-                                                  CreateChannelBoardDto createChannelBoardDto) {
+                                                  String title, String content) {
         ChannelBoard channelBoard = new ChannelBoard();
         channelBoard.channel = channel;
-        channelBoard.title = createChannelBoardDto.getTitle();
-        channelBoard.content = createChannelBoardDto.getContent();
+        channelBoard.title = title;
+        channelBoard.content = content;
 
         return channelBoard;
     }
 
-    public ChannelBoard updateChannelBoard(UpdateChannelBoardDto updateChannelBoardDto) {
-        this.title = updateChannelBoardDto.getTitle();
-        this.content = updateChannelBoardDto.getContent();
+    public ChannelBoard updateChannelBoard(String title, String content) {
+        this.title = title;
+        this.content = content;
 
         return this;
     }

@@ -46,7 +46,12 @@ class ChannelTest {
         //given
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        Channel channel = Channel.createChannel(channelDto);
+        Channel channel = Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin());
         channelRepository.save(channel);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
@@ -72,7 +77,12 @@ class ChannelTest {
         //given
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesChannelDto();
-        Channel channel = Channel.createChannel(channelDto);
+        Channel channel = Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin());
         channelRepository.save(channel);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
@@ -97,7 +107,12 @@ class ChannelTest {
     public void 유효하지않는_채널_테스트_게임카테고리() throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.invalidatedCategoryData();
-        assertThatThrownBy(() -> Channel.createChannel(channelDto))
+        assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);
     }
 
@@ -105,7 +120,12 @@ class ChannelTest {
     public void 유효하지않는_채널_테스트_토너먼트형식() throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.invalidatedTournamentData();
-        assertThatThrownBy(() -> Channel.createChannel(channelDto))
+        assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);
     }
 
