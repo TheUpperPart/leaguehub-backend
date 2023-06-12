@@ -38,7 +38,7 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public static Member fromKakaoUserDto(KakaoUserDto kakaoUserDto) {
+    public static Member kakaoUserToMember(KakaoUserDto kakaoUserDto) {
         return Member.builder()
                 .personalId(String.valueOf(kakaoUserDto.getId()))
                 .nickname(kakaoUserDto.getProperties().getNickname())
