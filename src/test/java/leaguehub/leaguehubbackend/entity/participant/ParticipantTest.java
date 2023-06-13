@@ -44,7 +44,12 @@ class ParticipantTest {
 
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesChannelDto();
-        Channel channel = Channel.createChannel(channelDto);
+        Channel channel = Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin());
         channelRepository.save(channel);
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
         channel.createParticipationLink();
