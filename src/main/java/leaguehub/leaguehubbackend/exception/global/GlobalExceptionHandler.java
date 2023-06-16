@@ -1,7 +1,6 @@
-package leaguehub.leaguehubbackend.exception.kakao;
+package leaguehub.leaguehubbackend.exception.global;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-public class KakaoExceptionHandler {
+public class GlobalExceptionHandler {
 
-    @ExceptionHandler(KakaoInvalidCodeException.class)
-    public ResponseEntity<ExceptionResponse> kakaoInvalidCodeException(
+    @ExceptionHandler(GlobalServerErrorException.class)
+    public ResponseEntity<ExceptionResponse> internalServerErrorException(
             KakaoInvalidCodeException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
