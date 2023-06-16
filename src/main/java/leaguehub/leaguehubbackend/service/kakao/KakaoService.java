@@ -1,12 +1,9 @@
 package leaguehub.leaguehubbackend.service.kakao;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenRequestDto;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
-import leaguehub.leaguehubbackend.exception.global.GlobalErrorCode;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
@@ -18,7 +15,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import org.springframework.http.HttpStatus;
 @Service
 public class KakaoService {
 
