@@ -49,8 +49,10 @@ public class KakaoController {
         memberService.findMemberByPersonalId(String.valueOf(userDto.getId()))
                 .orElseGet(() -> memberService.saveMember(userDto).orElseThrow(GlobalServerErrorException::new));
 
-        LoginMemberResponse loginMemberResponse = jwtService.createTokens(userDto);
+        LoginMemberResponse loginMemberResponse = jwtService.createTokens(String.valueOf(userDto.getId()));
 
         return ResponseEntity.ok(loginMemberResponse);
     }
+
+
 }
