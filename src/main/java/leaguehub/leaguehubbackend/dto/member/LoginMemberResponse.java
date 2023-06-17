@@ -9,8 +9,6 @@ public class LoginMemberResponse {
     private String nickName;
     private String profileUrl;
     private String accessToken;
-    private Long accessTokenExpirationTime;
     private String refreshToken;
-    private Long refreshTokenExpirationTime;
 }
 
