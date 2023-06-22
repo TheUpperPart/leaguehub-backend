@@ -12,18 +12,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ChannelController {
 
     private final ChannelService channelService;
 
-    @PostMapping("/api/channel")
+    @PostMapping("/channel")
     public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto
             , BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
