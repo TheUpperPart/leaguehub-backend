@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class ParticipantService {
 
-    private final String RGAPI = "?api_key=RGAPI-3e4095a9-91ad-413d-b716-b60b17a8aedd";
 
 
     public String getSummonerId(String nickname){
