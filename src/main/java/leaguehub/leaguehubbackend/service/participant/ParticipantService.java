@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -12,6 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class ParticipantService {
 
+    @Value("${riot-api-key}")
+    private String riot_api_key;
 
 
     public String getSummonerId(String nickname){
@@ -19,7 +22,7 @@ public class ParticipantService {
 
         WebClient webClient = WebClient.create();
         JSONObject summonerDetail = webClient.get()
-                .uri(summonerUrl + nickname + RGAPI)
+                .uri(summonerUrl + nickname + riot_api_key)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError()
                                 || status.is5xxServerError()
@@ -44,7 +47,7 @@ public class ParticipantService {
         JSONParser jsonParser = new JSONParser();
         WebClient webClient = WebClient.create();
         JSONArray summonerDetails = webClient.get()
-                .uri(tierUrl + gameId + RGAPI)
+                .uri(tierUrl + gameId + riot_api_key)
                 .retrieve()
                 .bodyToMono(JSONArray.class)
                 .block();
