@@ -1,6 +1,8 @@
 package leaguehub.leaguehubbackend.service.participant;
 
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -8,6 +10,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -21,14 +24,13 @@ public class ParticipantService {
         String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
 
         WebClient webClient = WebClient.create();
+
         JSONObject summonerDetail = webClient.get()
                 .uri(summonerUrl + nickname + riot_api_key)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError()
                                 || status.is5xxServerError()
-                        , response ->
-                                response.bodyToMono(String.class)
-                                        .map(RuntimeException::new))
+                        , response -> Mono.error(new ParticipantGameIdNotFoundException()))
                 .bodyToMono(JSONObject.class)
                 .block();
 
@@ -38,6 +40,7 @@ public class ParticipantService {
     }
 
 
+    @SneakyThrows
     public String getTier(String nickname){
 
         String gameId = getSummonerId(nickname);
@@ -54,15 +57,14 @@ public class ParticipantService {
 
         String arraytoString = summonerDetails.toJSONString();
 
-        try {
-            String jsonToString = arraytoString.replaceAll("[\\[\\[\\]]", "");
-            JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
+        String jsonToString = arraytoString.replaceAll("[\\[\\[\\]]", "");
 
-            return summonerDetail.get("tier").toString() + " " + summonerDetail.get("rank").toString();
-
-        } catch (ParseException e) {
+        if(jsonToString.isEmpty())
             return "unranked";
-        }
+
+        JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
+
+        return summonerDetail.get("tier").toString() + " " + summonerDetail.get("rank").toString();
 
     }
 }
