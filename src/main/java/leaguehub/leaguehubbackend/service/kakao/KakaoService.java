@@ -6,8 +6,7 @@ import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 @Service
+@RequiredArgsConstructor
 public class KakaoService {
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -30,11 +30,7 @@ public class KakaoService {
     @Value("${KAKAO_USERINFO_REQUEST_URI}")
     private String kakaoUserInfoRequestUri;
 
-    @Autowired
-    MemberRepository memberRepository;
-
-    @Autowired
-    private WebClient webClient;
+    private final WebClient webClient;
 
     /**
      * 카카오로 부터 토큰을 받는 함수

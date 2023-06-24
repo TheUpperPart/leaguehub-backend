@@ -10,7 +10,6 @@ import leaguehub.leaguehubbackend.service.kakao.KakaoService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,14 +24,11 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class KakaoController {
 
-    @Autowired
-    private KakaoService kakaoService;
+    private final KakaoService kakaoService;
 
-    @Autowired
-    private MemberService memberService;
+    private final MemberService memberService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
     @GetMapping("/app/login/kakao")
     public ResponseEntity<LoginMemberResponse> handleKakaoLogin(@RequestHeader HttpHeaders headers) {
