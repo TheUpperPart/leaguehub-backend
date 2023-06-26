@@ -77,12 +77,12 @@ public class JwtService {
      */
     public Optional<String> extractPersonalId(String accessToken) {
         try {
-            Long nickname = JWT.require(Algorithm.HMAC512(secretKey))
+            String personalId = JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
                     .verify(accessToken)
                     .getClaim("personalId")
-                    .asLong();
-            return Optional.ofNullable(nickname != null ? String.valueOf(nickname) : null);
+                    .asString();
+            return Optional.ofNullable(personalId);
         } catch (Exception e) {
             log.error("액세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
@@ -106,9 +106,9 @@ public class JwtService {
      */
     public boolean isTokenValid(String token) {
         try {
-            log.info("토큰 유효함");
             // 토큰 유효성 검증
             JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
+            log.info("토큰 유효함");
             return true;
         } catch (Exception e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
