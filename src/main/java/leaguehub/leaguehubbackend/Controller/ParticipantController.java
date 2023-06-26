@@ -2,10 +2,7 @@ package leaguehub.leaguehubbackend.Controller;
 
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -13,11 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ParticipantController {
 
-    ParticipantService participantService;
+    private final ParticipantService participantService;
 
-    @GetMapping("/channel/getTier/{nickname}")
-    public String getTier(@PathVariable("nickname") String nickname){
+    @GetMapping("/stat")
+    public String getTier(@RequestParam(value = "gameid") String nickname,
+                          @RequestParam(value = "gamecategory") Integer category){
 
-        return participantService.getTier(nickname);
+        return participantService.selectGameCategory(nickname, category);
     }
 }
