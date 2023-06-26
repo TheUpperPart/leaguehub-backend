@@ -21,6 +21,10 @@ public class Match extends BaseTimeEntity {
 
     private Integer matchRound;
 
+    private String matchName;
+
+    private String matchPasswd;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;

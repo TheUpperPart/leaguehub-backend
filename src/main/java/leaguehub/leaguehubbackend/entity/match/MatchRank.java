@@ -22,4 +22,13 @@ public class MatchRank extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_result_id")
     private MatchResult matchResult;
+
+    public static MatchRank createMatchRank(String participant, String placement, MatchResult matchResult){
+        MatchRank matchRank = new MatchRank();
+        matchRank.participant = participant;
+        matchRank.placement = placement;
+        matchRank.matchResult = matchResult;
+
+        return matchRank;
+    }
 }

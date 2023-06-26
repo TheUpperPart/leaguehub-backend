@@ -17,10 +17,18 @@ public class MatchResult extends BaseTimeEntity {
 
     private Integer roundRank;
 
+    @Column(name = "match_code")
     private String matchCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id")
     private Match match;
 
+    public static MatchResult createMatchResult(String matchCode,Match match){
+        MatchResult matchResult = new MatchResult();
+        matchResult.matchCode = matchCode;
+        matchResult.match = match;
+
+        return matchResult;
+    }
 }
