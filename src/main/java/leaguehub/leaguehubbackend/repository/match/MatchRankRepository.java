@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MatchRankRepository extends JpaRepository <MatchRank, Long> {
 
+    List<MatchRank> findByMatchResult_Id(Long id);
 }
