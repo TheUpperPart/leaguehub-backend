@@ -3,7 +3,9 @@ package leaguehub.leaguehubbackend.entity.member;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
+
 import lombok.*;
+
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +30,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
+
     @Enumerated(EnumType.STRING)
     private BaseRole baseRole;
 
@@ -43,5 +46,6 @@ public class Member extends BaseTimeEntity {
                 .baseRole(BaseRole.USER)
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
+
     }
 }
