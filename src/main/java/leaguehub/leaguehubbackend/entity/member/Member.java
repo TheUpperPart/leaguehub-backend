@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.entity.member;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,11 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
+    @Builder
+    public Member(String personalId, String nickname, String profileImageUrl, LoginProvider loginProvider) {
+        this.personalId = personalId;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.loginProvider = loginProvider;
+    }
 }
