@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
-import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchRank;
 import leaguehub.leaguehubbackend.entity.match.MatchResult;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
@@ -34,6 +33,10 @@ public class MatchRankService {
     @Value("${riot-api-key-2}")
     private String riot_api_key_2;
 
+    private final WebClient webClient;
+    private final JSONParser jsonParser;
+
+    private final MatchResultService matchResultService;
     private final MatchRepository matchRepository;
     private final MatchRankRepository matchRankRepository;
     private final MatchResultRepository matchResultRepository;
@@ -46,7 +49,6 @@ public class MatchRankService {
     public String getSummonerPuuid(String name) {
         String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
 
-        WebClient webClient = WebClient.create();
 
         JSONObject summonerDetail = webClient.get()
                 .uri(summonerUrl + name + riot_api_key_1)
@@ -73,8 +75,6 @@ public class MatchRankService {
         String Option = "/ids?start=0&endTime=" + endTime + "&startTime=" + statTime + "&count=1";
 
 
-        WebClient webClient = WebClient.create();
-
         JSONArray matchArray = webClient.get()
                 .uri(matchUrl + puuid + Option + riot_api_key_2)
                 .retrieve()
@@ -89,22 +89,11 @@ public class MatchRankService {
     }
 
 
-    /**
-     * 최근 매치 id로 경기 세부사항 추출
-     * @param matchResponseDto
-     * @return matchRankResultDto
-     */
     @SneakyThrows
-    public void setMatchDetail(MatchResponseDto matchResponseDto) {
+    public JSONObject responseMatchDetail(String matchId){
         String matchDetailUrl = "https://asia.api.riotgames.com/tft/match/v1/matches/";
 
-        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
-        String matchId = getMatch(puuid);
-
-        JSONParser jsonParser = new JSONParser();
-        WebClient webClient = WebClient.create();
-
-        JSONObject matchDetailJSON = (JSONObject) jsonParser.parse
+        return (JSONObject) jsonParser.parse
                 (webClient
                         .get()
                         .uri(matchDetailUrl + matchId + riot_api_key_1)
@@ -112,13 +101,25 @@ public class MatchRankService {
                         .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new GlobalServerErrorException()))
                         .bodyToMono(JSONObject.class)
                         .block().toJSONString());
+    }
 
 
-        Match match = matchRepository.findByMatchNameAndMatchPasswd(
+    /**
+     * 최근 매치 id로 경기 세부사항 추출
+     * @param matchResponseDto
+     * @return matchRankResultDto
+     */
+    @SneakyThrows
+    public void setMatchRank(MatchResponseDto matchResponseDto) {
+        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
+        String matchId = getMatch(puuid);
+
+        JSONObject matchDetailJSON = responseMatchDetail(matchId);
+
+        MatchResult matchResult = matchResultService.createMatchResult(
                 matchResponseDto.getMatchName(),
-                matchResponseDto.getMatchPasswd());
-        MatchResult matchResult = MatchResult.createMatchResult(matchId, match);
-        matchResultRepository.save(matchResult);
+                matchResponseDto.getMatchPasswd(),
+                matchId);
 
         JSONObject jsonObject = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
         JSONArray jsonArray = (JSONArray) jsonParser.parse(jsonObject.get("participants").toString());

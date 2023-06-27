@@ -20,7 +20,7 @@ public class MatchController {
     @PostMapping("/match/matchResult")
     public ResponseEntity createMatchRank(@RequestBody MatchResponseDto matchResponseDto){
 
-        matchRankService.setMatchDetail(matchResponseDto);
+        matchRankService.setMatchRank(matchResponseDto);
 
         return new ResponseEntity<>("매치 결과가 생성되었습니다.", HttpStatus.CREATED);
     }

@@ -20,6 +20,10 @@ public class ParticipantService {
     @Value("${riot-api-key-1}")
     private String riot_api_key;
 
+    private final WebClient webClient;
+
+    private final JSONParser jsonParser;
+
     public String selectGameCategory(String gameId, Integer category){
         String tier = "";
         if(category.equals(0))
@@ -35,8 +39,6 @@ public class ParticipantService {
      */
     public String getSummonerId(String nickname){
         String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
-
-        WebClient webClient = WebClient.create();
 
         JSONObject summonerDetail = webClient.get()
                 .uri(summonerUrl + nickname + riot_api_key)
@@ -62,8 +64,7 @@ public class ParticipantService {
 
         String tierUrl = "https://kr.api.riotgames.com/tft/league/v1/entries/by-summoner/";
 
-        JSONParser jsonParser = new JSONParser();
-        WebClient webClient = WebClient.create();
+
         JSONArray summonerDetails = webClient.get()
                 .uri(tierUrl + gameId + riot_api_key)
                 .retrieve()
