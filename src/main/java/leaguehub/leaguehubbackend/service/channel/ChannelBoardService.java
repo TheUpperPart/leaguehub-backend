@@ -44,7 +44,7 @@ public class ChannelBoardService {
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
         List<ChannelBoardDto> channelBoardDtoList = channelBoards.stream()
-                .map(channelBoard -> new ChannelBoardDto())
+                .map(channelBoard -> new ChannelBoardDto(channelBoard.getId(), channelBoard.getTitle()))
                 .collect(Collectors.toList());
 
         return channelBoardDtoList;
