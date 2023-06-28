@@ -1,8 +1,6 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
