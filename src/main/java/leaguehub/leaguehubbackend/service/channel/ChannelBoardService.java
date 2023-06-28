@@ -1,23 +1,20 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.RequestCreateChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,62 +27,37 @@ public class ChannelBoardService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public void createChannelBoard(CreateChannelBoardDto createChannelBoardDto) {
-        String personalId = UserUtil.getUserPersonalId();
-        Member member = memberService.validateMember(personalId);
-        Channel channel = channelService.validateChannel(createChannelBoardDto.getChannelId());
+    public void createChannelBoard(Long channelId, RequestCreateChannelBoardDto request) {
 
-        Participant participant = participantRepository.findParticipantByMemberId(member.getId());
-
-        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
-            channelBoardRepository.
-                    save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto.getTitle(),
-                            createChannelBoardDto.getContent()));
-        }
     }
 
+    /**
+     * 채널 로딩 시점에서 불러오는 채널 게시판(내용은 반환하지 않음.)
+     *
+     * @param channelId
+     * @return List
+     */
     @Transactional
-    public List<ChannelBoard> readChannelBoard(ChannelBoardDto readChannelBoardDto) {
-        Channel channel = channelService.validateChannel(readChannelBoardDto.getChannelId());
+    public List<ChannelBoardDto> findChannelBoards(Long channelId) {
+        Channel channel = channelService.validateChannel(channelId);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
-        return channelBoards;
+        List<ChannelBoardDto> channelBoardDtoList = channelBoards.stream()
+                .map(channelBoard -> new ChannelBoardDto())
+                .collect(Collectors.toList());
+
+        return channelBoardDtoList;
     }
 
     @Transactional
-    public void updateChannelBoard(UpdateChannelBoardDto updateChannelBoardDto) {
-        String personalId = UserUtil.getUserPersonalId();
-        Member member = memberService.validateMember(personalId);
-        Channel channel = channelService.validateChannel(updateChannelBoardDto.getChannelId());
-        ChannelBoard channelBoard = validateChannelBoard(updateChannelBoardDto.getChannelBoardId());
-
-        validateChannelAndChannelBoard(channel, channelBoard);
-
-        Participant participant = participantRepository.findParticipantByMemberId(member.getId());
-
-        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
-            channelBoardRepository.
-                    save(channelBoard.updateChannelBoard(updateChannelBoardDto.getTitle(),
-                            updateChannelBoardDto.getContent()));
-        }
+    public void updateChannelBoard(UpdateChannelBoardDto update) {
 
     }
 
     @Transactional
-    public void deleteChannelBoard(ChannelBoardDto deleteChannelBoardDto) {
-        String personalId = UserUtil.getUserPersonalId();
-        Member member = memberService.validateMember(personalId);
-        Channel channel = channelService.validateChannel(deleteChannelBoardDto.getChannelId());
-        ChannelBoard channelBoard = validateChannelBoard(deleteChannelBoardDto.getChannelBoardId());
+    public void deleteChannelBoard(ChannelBoardDto channelBoardDto, Long channelId) {
 
-        validateChannelAndChannelBoard(channel, channelBoard);
-
-        Participant participant = participantRepository.findParticipantByMemberId(member.getId());
-
-        if (participant.getRole() == Role.HOST && participant.getChannel() == channel) {
-            channelBoardRepository.deleteById(channelBoard.getId());
-        }
     }
 
     public ChannelBoard validateChannelBoard(Long channelBoardId) {

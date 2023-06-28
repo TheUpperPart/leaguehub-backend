@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.channel;
 
+import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
@@ -10,8 +11,10 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.UserUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +35,9 @@ public class ChannelService {
     @Transactional
     public void createChannel(CreateChannelDto createChannelDto) {
 
-        String personalId = UserUtil.getUserPersonalId();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getDetails();
+        String personalId = userDetails.getUsername();
 
         Member member = memberService.validateMember(personalId);
 
@@ -46,6 +51,18 @@ public class ChannelService {
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         channel.createParticipationLink();
+    }
+
+    @Transactional
+    public ChannelDto findChannel(Long channelId) {
+
+        Channel findChannel = channelRepository.findById(channelId)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
+                .realPlayer(findChannel.getRealPlayer()).category(findChannel.getCategory()).build();
+
+        return channelDto;
     }
 
     public Channel validateChannel(Long channelId) {
