@@ -16,7 +16,7 @@ public class ResponseChannelDto {
 
     private Integer participateNum;
 
-    private List<ChannelBoardDto> channelBoardDtoList;
+    private List<ChannelBoardDto> boards;
 
     private Integer permission;
 
@@ -26,7 +26,7 @@ public class ResponseChannelDto {
         this.leagueTitle = leagueTitle;
         this.game = game;
         this.participateNum = participateNum;
-        this.channelBoardDtoList = channelBoardDtoList;
+        this.boards = channelBoardDtoList;
         this.permission = permission;
     }
 }
