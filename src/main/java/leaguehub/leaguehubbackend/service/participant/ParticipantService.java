@@ -81,6 +81,7 @@ public class ParticipantService {
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
 
         return summonerDetail.get("tier").toString() + " " + summonerDetail.get("rank").toString();
-
     }
+
+
 }

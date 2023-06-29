@@ -8,4 +8,5 @@ public class MatchRankResultDto {
     private String name;
 
     private String placement;
+
 }

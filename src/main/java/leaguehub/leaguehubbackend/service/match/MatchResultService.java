@@ -14,8 +14,8 @@ public class MatchResultService {
     private final MatchRepository matchRepository;
     private final MatchResultRepository matchResultRepository;
 
-    public MatchResult createMatchResult(String name, String passwd, String matchId){
-        Match match = matchRepository.findByMatchNameAndMatchPasswd(name, passwd);
+    public MatchResult saveMatchResult(String name, String passwd, String matchId){
+        Match match = matchRepository.findByMatchPasswd(passwd);
         MatchResult matchResult = MatchResult.createMatchResult(matchId, match);
         matchResultRepository.save(matchResult);
 

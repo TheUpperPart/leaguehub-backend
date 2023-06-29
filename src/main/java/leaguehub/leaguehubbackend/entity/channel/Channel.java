@@ -23,7 +23,6 @@ public class Channel extends BaseTimeEntity {
     private Category category;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private Integer maxPlayer;
 
     private Integer realPlayer;

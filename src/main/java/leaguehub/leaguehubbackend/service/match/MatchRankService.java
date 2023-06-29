@@ -6,6 +6,7 @@ import leaguehub.leaguehubbackend.entity.match.MatchRank;
 import leaguehub.leaguehubbackend.entity.match.MatchResult;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchResultRepository;
@@ -53,6 +54,7 @@ public class MatchRankService {
         JSONObject summonerDetail = webClient.get()
                 .uri(summonerUrl + name + riot_api_key_1)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new ParticipantGameIdNotFoundException()))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new GlobalServerErrorException()))
                 .bodyToMono(JSONObject.class)
                 .block();
@@ -104,27 +106,13 @@ public class MatchRankService {
     }
 
 
-    /**
-     * 최근 매치 id로 경기 세부사항 추출
-     * @param matchResponseDto
-     * @return matchRankResultDto
-     */
     @SneakyThrows
-    public void setMatchRank(MatchResponseDto matchResponseDto) {
-        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
-        String matchId = getMatch(puuid);
+    public List<MatchRankResultDto> setPlacement(JSONArray participantList, MatchResult matchResult){
+        List<MatchRankResultDto> dtoList = new ArrayList<>();
 
-        JSONObject matchDetailJSON = responseMatchDetail(matchId);
 
-        MatchResult matchResult = matchResultService.createMatchResult(
-                matchResponseDto.getMatchName(),
-                matchResponseDto.getMatchPasswd(),
-                matchId);
-
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
-        JSONArray jsonArray = (JSONArray) jsonParser.parse(jsonObject.get("participants").toString());
         for (int i = 0; i < 8; i++) {
-            JSONObject participants = (JSONObject) jsonParser.parse(jsonArray.get(i).toString());
+            JSONObject participants = (JSONObject) jsonParser.parse(participantList.get(i).toString());
             String placement = participants.get("placement").toString();
             String parti1puuid = participants.get("puuid").toString();
 
@@ -136,12 +124,49 @@ public class MatchRankService {
                     .bodyToMono(JSONObject.class)
                     .block().get("name").toString();
 
+            MatchRankResultDto dto = new MatchRankResultDto();
+            dto.setName(summonerName);
+            dto.setPlacement(placement);
+
+            dtoList.add(dto);
 
             MatchRank matchRank = MatchRank.createMatchRank(summonerName, placement, matchResult);
             matchRankRepository.save(matchRank);
 
-        }
 
+        }
+        return dtoList;
+    }
+
+
+
+    /**
+     * 최근 매치 id로 경기 세부사항 추출
+     *
+     * @param matchResponseDto
+     * @return matchRankResultDto
+     */
+    @SneakyThrows
+    public List<MatchRankResultDto> setMatchRank(MatchResponseDto matchResponseDto) {
+        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
+        String matchId = getMatch(puuid);
+
+        JSONObject matchDetailJSON = responseMatchDetail(matchId);
+
+        MatchResult matchResult = matchResultService.saveMatchResult(
+                matchResponseDto.getMatchName(),
+                matchResponseDto.getMatchPasswd(),
+                matchId);
+
+
+
+        JSONObject info = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
+        JSONArray participantList = (JSONArray) jsonParser.parse(info.get("participants").toString());
+
+        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList, matchResult);
+
+
+        return matchRankResultDtoList;
     }
 
     /**
