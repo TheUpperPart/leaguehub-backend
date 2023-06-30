@@ -1,12 +1,16 @@
 package leaguehub.leaguehubbackend.entity.member;
 
 import jakarta.persistence.*;
+import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
+
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 @Entity
 public class Member extends BaseTimeEntity {
 
@@ -21,7 +25,27 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
+    private String refreshToken;
+
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
+
+    @Enumerated(EnumType.STRING)
+    private BaseRole baseRole;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public static Member kakaoUserToMember(KakaoUserDto kakaoUserDto) {
+        return Member.builder()
+                .personalId(String.valueOf(kakaoUserDto.getId()))
+                .nickname(kakaoUserDto.getProperties().getNickname())
+                .profileImageUrl(kakaoUserDto.getProperties().getProfileImage())
+                .baseRole(BaseRole.USER)
+                .loginProvider(LoginProvider.KAKAO)
+                .build();
+
+    }
 }
