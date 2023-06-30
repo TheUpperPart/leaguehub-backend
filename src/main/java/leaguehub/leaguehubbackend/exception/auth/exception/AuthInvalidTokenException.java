@@ -8,9 +8,8 @@ import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.INVALI
 
 public class AuthInvalidTokenException extends AuthenticationException {
     private final ExceptionCode exceptionCode;
-
     public AuthInvalidTokenException() {
-        super(INVALID_TOKEN.getMessage());
+        super(INVALID_TOKEN.getCode());
         this.exceptionCode = AuthExceptionCode.INVALID_TOKEN;
     }
 

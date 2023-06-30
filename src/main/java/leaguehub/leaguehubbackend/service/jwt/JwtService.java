@@ -128,5 +128,24 @@ public class JwtService {
                         () -> new Exception("일치하는 회원이 없습니다.")
                 );
     }
+    /**
+     * Token 기간만료 확인
+     */
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expirationDate = JWT.decode(token).getExpiresAt();
+            Date now = new Date();
+            if(expirationDate.before(now)) {
+                log.info("토큰이 만료되었습니다.");
+                return true;
+            } else {
+                log.info("토큰이 아직 유효합니다.");
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("토큰의 만료일을 판단하는 중 오류가 발생했습니다. {}", e.getMessage());
+            return false;
+        }
+    }
 
 }
