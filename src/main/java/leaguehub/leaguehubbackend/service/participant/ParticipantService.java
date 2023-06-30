@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -17,14 +18,12 @@ import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -33,9 +32,15 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ParticipantService {
 
+    @Value("${riot-api-key-1}")
+    private String riot_api_key;
 
     private final ParticipantRepository participantRepository;
     private final MemberService memberService;
+
+    private final WebClient webClient;
+    private final JSONParser jsonParser;
+
 
     public int findParticipantPermission(Long channelId) {
 
@@ -62,12 +67,6 @@ public class ParticipantService {
         return participantRepository.findParticipantByRoleAndChannelId(HOST, channelId).getNickname();
     }
 
-    @Value("${riot-api-key-1}")
-    private String riot_api_key;
-
-    private final WebClient webClient;
-
-    private final JSONParser jsonParser;
 
     /**
      * 게임 카테고리에 따라 요청 분할
@@ -132,20 +131,31 @@ public class ParticipantService {
 
     /**
      * 고유 id로 티어추출
+     *
      * @param userDetail
      * @return Tier
      */
     @SneakyThrows
-    public String getTier(String userDetail){
+    public String searchTier(String userDetail){
 
         String jsonToString = userDetail.replaceAll("[\\[\\[\\]]", "");
 
         if(jsonToString.isEmpty())
-            return "unranked";
+            return GameTier.UNRANKED.getTier();
 
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
+        String tier = summonerDetail.get("tier").toString();
+        String rank = summonerDetail.get("rank").toString();
+        String leaguePoints = summonerDetail.get("leaguePoints").toString();
 
-        return summonerDetail.get("tier").toString() + " " + summonerDetail.get("rank").toString();
+        if(tier.equalsIgnoreCase("master") ||
+                tier.equalsIgnoreCase("grandmaster")
+                || tier.equalsIgnoreCase("challenger")){
+            return tier.concat(" ").concat(leaguePoints).concat("점");
+        }
+
+        return GameTier.findGameTier(tier, rank);
+
     }
 
 
@@ -186,7 +196,7 @@ public class ParticipantService {
 
         String userDetail = requestUserDetail(nickname);
 
-        String tier = getTier(userDetail);
+        String tier = searchTier(userDetail);
 
         Integer playCount = getPlayCount(userDetail);
 
