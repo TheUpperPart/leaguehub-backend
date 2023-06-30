@@ -1,15 +1,14 @@
 package leaguehub.leaguehubbackend.config;
 
+import org.json.simple.parser.JSONParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class WebClientConfig {
+public class JsonSimpleConfig {
 
     @Bean
-    public WebClient webClient() {
-
-        return WebClient.create();
+    public JSONParser jsonParser(){
+        return new JSONParser();
     }
 }
