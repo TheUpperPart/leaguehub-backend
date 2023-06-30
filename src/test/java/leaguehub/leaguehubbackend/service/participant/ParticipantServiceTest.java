@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,25 +25,29 @@ class ParticipantServiceTest {
     ParticipantService participantService;
 
     @Test
-    @DisplayName("티어 검색 성공 테스트")
-    void getTierSuccessTest() throws Exception {
+    @DisplayName("티어, 플레이 횟수 검색 성공 테스트")
+    void getDetailSuccessTest() throws Exception {
 
-        String tier1 = participantService.getTier("칸영기");
-        String tier2 = participantService.getTier("서초임");
-        String tier3 = participantService.getTier("채수채수밭");
-        String tier4 = participantService.getTier("사라진검 리븐");
+        ResponseUserDetailDto testDto1 = participantService.getTierAndPlayCount("칸영기");
+        ResponseUserDetailDto testDto2 = participantService.getTierAndPlayCount("서초임");
+        ResponseUserDetailDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
+        ResponseUserDetailDto testDto4 = participantService.getTierAndPlayCount("사라진검 리븐");
 
-        assertThat(tier1).isEqualToIgnoringCase("platinum iv");
-        assertThat(tier2).isEqualToIgnoringCase("unranked");
-        assertThat(tier3).isEqualToIgnoringCase("challenger i");
-        assertThat(tier4).isEqualToIgnoringCase("grandmaster i");
+        assertThat(testDto1.getTier()).isEqualToIgnoringCase("platinum iv");
+        assertThat(testDto2.getTier()).isEqualToIgnoringCase("unranked");
+        assertThat(testDto3.getTier()).isEqualToIgnoringCase("challenger i");
+        assertThat(testDto4.getTier()).isEqualToIgnoringCase("challenger i");
+
+
+        assertThat(testDto1.getPlayCount()).isEqualTo(39);
+        assertThat(testDto2.getPlayCount()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("티어 검색 실패 테스트")
-    void getTierFailTest() throws Exception {
+    @DisplayName("티어, 플레이 횟수 검색 실패 테스트")
+    void getDetailFailTest() throws Exception {
 
-        assertThatThrownBy(() -> participantService.getTier("saovkovsk"))
+        assertThatThrownBy(() -> participantService.getTierAndPlayCount("saovkovsk"))
                 .isInstanceOf(ParticipantGameIdNotFoundException.class);
     }
 }

@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.participant;
 
+import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,21 @@ public class ParticipantService {
 
     private final JSONParser jsonParser;
 
-    public String selectGameCategory(String gameId, Integer category){
-        String tier = "";
-        if(category.equals(0))
-            tier = getTier(gameId);
+    /**
+     * 게임 카테고리에 따라 요청 분할
+     * @param gameId
+     * @param category
+     * @return
+     */
+    public ResponseUserDetailDto selectGameCategory(String gameId, Integer category){
+        ResponseUserDetailDto userDetailDto = new ResponseUserDetailDto();
 
-        return tier;
+        if(category.equals(0)){
+            userDetailDto = getTierAndPlayCount(gameId);
+        }
+
+
+        return userDetailDto;
     }
 
     /**
@@ -53,12 +63,11 @@ public class ParticipantService {
 
 
     /**
-     * 고유 id로 티어추출
+     * 외부 api호출로 유저 상세정보 출력
      * @param nickname
-     * @return Tier
+     * @return
      */
-    @SneakyThrows
-    public String getTier(String nickname){
+    public String requestUserDetail(String nickname){
 
         String gameId = getSummonerId(nickname);
 
@@ -73,7 +82,19 @@ public class ParticipantService {
 
         String arraytoString = summonerDetails.toJSONString();
 
-        String jsonToString = arraytoString.replaceAll("[\\[\\[\\]]", "");
+        return arraytoString;
+
+    }
+
+    /**
+     * 고유 id로 티어추출
+     * @param userDetail
+     * @return Tier
+     */
+    @SneakyThrows
+    public String getTier(String userDetail){
+
+        String jsonToString = userDetail.replaceAll("[\\[\\[\\]]", "");
 
         if(jsonToString.isEmpty())
             return "unranked";
@@ -83,5 +104,53 @@ public class ParticipantService {
         return summonerDetail.get("tier").toString() + " " + summonerDetail.get("rank").toString();
     }
 
+
+    /**
+     * 플레이 횟수 검색
+     * @param userDetail
+     * @return
+     */
+    public Integer getPlayCount(String userDetail){
+
+        String jsonToString = userDetail.replaceAll("[\\[\\[\\]]", "");
+
+        if(jsonToString.isEmpty())
+            return 0;
+
+        return stringToInteger(jsonToString);
+
+    }
+
+    /**
+     * 플레이 횟수 문자열을 정수형으로 변환
+     * @param userDetailJSON
+     * @return
+     */
+    @SneakyThrows
+    public Integer stringToInteger(String userDetailJSON){
+        JSONObject summonerDetail = (JSONObject) jsonParser.parse(userDetailJSON);
+
+        return Integer.parseInt(summonerDetail.get("wins").toString()) + Integer.parseInt(summonerDetail.get("losses").toString());
+    }
+
+    /**
+     * 티어와 플레이 횟수를 받아 반환
+     * @param nickname
+     * @return
+     */
+    public ResponseUserDetailDto getTierAndPlayCount(String nickname){
+
+        String userDetail = requestUserDetail(nickname);
+
+        String tier = getTier(userDetail);
+
+        Integer playCount = getPlayCount(userDetail);
+
+        ResponseUserDetailDto userDetailDto = new ResponseUserDetailDto();
+        userDetailDto.setTier(tier);
+        userDetailDto.setPlayCount(playCount);
+
+        return userDetailDto;
+    }
 
 }
