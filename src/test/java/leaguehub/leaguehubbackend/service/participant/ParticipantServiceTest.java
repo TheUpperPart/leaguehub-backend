@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
+import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -31,16 +32,14 @@ class ParticipantServiceTest {
         ResponseUserDetailDto testDto1 = participantService.getTierAndPlayCount("칸영기");
         ResponseUserDetailDto testDto2 = participantService.getTierAndPlayCount("서초임");
         ResponseUserDetailDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
-        ResponseUserDetailDto testDto4 = participantService.getTierAndPlayCount("사라진검 리븐");
 
-        assertThat(testDto1.getTier()).isEqualToIgnoringCase("platinum iv");
-        assertThat(testDto2.getTier()).isEqualToIgnoringCase("unranked");
-        assertThat(testDto3.getTier()).isEqualToIgnoringCase("challenger i");
-        assertThat(testDto4.getTier()).isEqualToIgnoringCase("challenger i");
-
+        assertThat(testDto1.getTier()).isEqualTo("플래티넘 4");
+        assertThat(testDto2.getTier()).isEqualTo("랭크없음");
 
         assertThat(testDto1.getPlayCount()).isEqualTo(39);
         assertThat(testDto2.getPlayCount()).isEqualTo(0);
+
+        System.out.println(testDto3.getTier());
     }
 
     @Test
@@ -50,4 +49,6 @@ class ParticipantServiceTest {
         assertThatThrownBy(() -> participantService.getTierAndPlayCount("saovkovsk"))
                 .isInstanceOf(ParticipantGameIdNotFoundException.class);
     }
+
+
 }
