@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ public class JwtControllerTest {
     }
 
     @Test
+    @DisplayName("유효한 토큰을 받았을 때, 상태코드는 OK가 반환되어야 함")
     public void whenValidToken_thenReturnsOk() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("validToken"));
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
@@ -60,17 +62,18 @@ public class JwtControllerTest {
     }
 
     @Test
-    public void whenTokenInvalid_thenReturnsUnauthorized() throws Exception {
+    @DisplayName("토큰이 유효하지 않을 때, AT-C-001코드가 반환되어야 함")
+    public void whenTokenInvalid_thenReturnsNotValid() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("invalidToken"));
         Mockito.when(jwtService.isTokenValid("invalidToken")).thenReturn(false);
         mockMvc.perform(get("/api/reissue/token")
                         .header("Authorization-refresh", "Bearer invalidToken")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(jsonPath("$.code").value("AT-C-001"));
     }
 
     @Test
+    @DisplayName("멤버가 존재하지 않을 때, 상태코드는 Not Found가 반환되어야 함")
     public void whenMemberNotFound_thenReturnsNotFound() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("validToken"));
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
@@ -82,6 +85,7 @@ public class JwtControllerTest {
     }
 
     @Test
+    @DisplayName("토큰이 존재하지 않을 때, AT-C-004코드가 반환되어야 함")
     public void whenNoToken_thenReturnsBadRequest() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.empty());
         mockMvc.perform(get("/api/reissue/token")
