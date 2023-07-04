@@ -22,7 +22,7 @@ public class MatchFixture {
         MatchResponseDto matchResponseDto = new MatchResponseDto();
         matchResponseDto.setMatchName("가나다");
         matchResponseDto.setMatchPasswd("abc123456789");
-        matchResponseDto.setNickName("칸영기");
+        matchResponseDto.setNickName("서초임");
 
         return matchResponseDto;
     }

@@ -141,7 +141,7 @@ public class ParticipantService {
         String jsonToString = userDetail.replaceAll("[\\[\\[\\]]", "");
 
         if(jsonToString.isEmpty())
-            return GameTier.UNRANKED.getTier();
+            return GameTier.UNRANKED.toString();
 
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
         String tier = summonerDetail.get("tier").toString();

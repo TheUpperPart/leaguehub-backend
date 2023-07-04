@@ -5,19 +5,17 @@ import lombok.Getter;
 @Getter
 public enum GameTier {
 
-    UNRANKED(-1, "랭크없음"),
-    IRON(0, "아이언"), BRONZE(400, "브론즈"), SILVER(800, "실버"),
-    GOLD(1200, "골드"), PLATINUM(1600, "플래티넘"), DIAMOND(2000, "다이아몬드"),
-    MASTER(2400, "마스터"), GRANDMASTER(2400, "그랜드 마스터"), CHALLENGER(2400, "챌린저"),
-    IV(0, "4"), III(100, "3"), II(200, "2"), I(300, "1");
+    UNRANKED(-1),
+    IRON(0), BRONZE(400), SILVER(800),
+    GOLD(1200), PLATINUM(1600), DIAMOND(2000),
+    MASTER(2400), GRANDMASTER(2400), CHALLENGER(2400),
+    IV(0), III(100), II(200), I(300);
 
 
     private int score;
-    private String tier;
 
-    GameTier(int score, String tier){
+    GameTier(int score){
         this.score = score;
-        this.tier = tier;
     }
 
 
@@ -30,9 +28,9 @@ public enum GameTier {
 
         for(GameTier gameTier : GameTier.values()){
             if(gameTier.toString().equalsIgnoreCase(rank))
-                resultTier = gameTier.tier;
+                resultTier = gameTier.toString();
             if(gameTier.toString().equalsIgnoreCase(grade))
-                resultGrade = gameTier.tier;
+                resultGrade = gameTier.toString();
         }
 
         return resultTier.concat(" ").concat(resultGrade);
