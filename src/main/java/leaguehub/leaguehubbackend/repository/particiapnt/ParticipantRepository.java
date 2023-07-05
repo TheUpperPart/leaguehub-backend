@@ -13,4 +13,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findAllByMemberId(Long memberId);
 
     Participant findParticipantByRoleAndChannelId(Role role, Long channelId);
+
+    Participant findParticipantByMemberIdAndChannelId(Long memberId, Long ChannelId);
 }

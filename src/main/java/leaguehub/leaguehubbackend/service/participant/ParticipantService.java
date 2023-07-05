@@ -3,6 +3,8 @@ package leaguehub.leaguehubbackend.service.participant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipatedInvalidLoginException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipatedInvalidRoleException;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +67,29 @@ public class ParticipantService {
 
     public String findChannelHost(Long channelId) {
         return participantRepository.findParticipantByRoleAndChannelId(HOST, channelId).getNickname();
+    }
+
+    /**
+     * 참가하기 버튼을 통하여 참가 자격이 있는지 확인
+     * @param channelId 해당 채널 아이디
+     */
+    public void participateMatch(Long channelId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetails userDetails = (UserDetails) authentication.getDetails();
+
+        if (userDetails == null) {
+            throw new ParticipatedInvalidLoginException();
+        }
+
+        String personalId = userDetails.getUsername();
+
+        Member member = memberService.validateMember(personalId);
+
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannelId(member.getId(), channelId);
+
+        if(participant.getRole().getNum() != 3)
+            throw new ParticipatedInvalidRoleException();
     }
 
 
