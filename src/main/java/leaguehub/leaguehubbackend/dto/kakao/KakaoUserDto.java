@@ -2,12 +2,12 @@ package leaguehub.leaguehubbackend.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
-
-@Getter
+@Data
 @ToString
 public class KakaoUserDto implements Serializable {
 
@@ -21,7 +21,7 @@ public class KakaoUserDto implements Serializable {
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
-    @Getter
+    @Data
     @ToString
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Properties {
@@ -35,7 +35,7 @@ public class KakaoUserDto implements Serializable {
         private String thumbnailImage;
 
     }
-    @Getter
+    @Data
     @ToString
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KakaoAccount {
@@ -48,7 +48,7 @@ public class KakaoUserDto implements Serializable {
 
         private Profile profile;
 
-        @Getter
+        @Data
         @ToString
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Profile {
