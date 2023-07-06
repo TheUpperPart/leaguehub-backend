@@ -7,5 +7,7 @@ public class ResponseUserDetailDto {
 
     String tier;
 
+    String grade;
+
     Integer playCount;
 }

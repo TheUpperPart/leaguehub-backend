@@ -33,12 +33,13 @@ class ParticipantServiceTest {
         ResponseUserDetailDto testDto2 = participantService.getTierAndPlayCount("서초임");
         ResponseUserDetailDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
 
-        assertThat(testDto1.getTier()).isEqualTo("DIAMOND IV");
+        assertThat(testDto1.getTier()).isEqualTo("DIAMOND");
+        assertThat(testDto1.getGrade()).isEqualTo("IV");
         assertThat(testDto2.getTier()).isEqualTo("UNRANKED");
 
         assertThat(testDto2.getPlayCount()).isEqualTo(0);
 
-        System.out.println(testDto3.getTier());
+        System.out.println(testDto3.getTier() + testDto3.getGrade());
     }
 
     @Test

@@ -15,6 +15,12 @@ public class ParticipantController {
 
     private final ParticipantService participantService;
 
+    /**
+     * nickname과 category를 받아 게임 티어 검색
+     * @param nickname
+     * @param category
+     * @return
+     */
     @GetMapping("/stat")
     public ResponseUserDetailDto getUserDetail(@RequestParam(value = "gameid") String nickname,
                                                @RequestParam(value = "gamecategory") Integer category){

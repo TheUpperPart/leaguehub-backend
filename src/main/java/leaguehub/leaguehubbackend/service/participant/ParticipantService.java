@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.participant;
 
+import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -92,7 +93,6 @@ public class ParticipantService {
             throw new ParticipatedInvalidRoleException();
     }
 
-
     /**
      * 게임 카테고리에 따라 요청 분할
      * @param gameId
@@ -129,7 +129,6 @@ public class ParticipantService {
         return summonerDetail.get("id").toString();
     }
 
-
     /**
      * 외부 api호출로 유저 상세정보 출력
      * @param nickname
@@ -161,12 +160,13 @@ public class ParticipantService {
      * @return Tier
      */
     @SneakyThrows
-    public String searchTier(String userDetail){
+    public GameRankDto searchTier(String userDetail){
 
         String jsonToString = userDetail.replaceAll("[\\[\\[\\]]", "");
 
-        if(jsonToString.isEmpty())
-            return GameTier.UNRANKED.toString();
+        if(jsonToString.isEmpty()){
+            return GameTier.getUnranked();
+        }
 
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
         String tier = summonerDetail.get("tier").toString();
@@ -176,13 +176,12 @@ public class ParticipantService {
         if(tier.equalsIgnoreCase("master") ||
                 tier.equalsIgnoreCase("grandmaster")
                 || tier.equalsIgnoreCase("challenger")){
-            return tier.concat(" ").concat(leaguePoints).concat("점");
+            return GameTier.getRanked(tier, leaguePoints);
         }
 
         return GameTier.findGameTier(tier, rank);
 
     }
-
 
     /**
      * 플레이 횟수 검색
@@ -221,16 +220,19 @@ public class ParticipantService {
 
         String userDetail = requestUserDetail(nickname);
 
-        String tier = searchTier(userDetail);
+        GameRankDto tier = searchTier(userDetail);
 
         Integer playCount = getPlayCount(userDetail);
 
         ResponseUserDetailDto userDetailDto = new ResponseUserDetailDto();
-        userDetailDto.setTier(tier);
+        userDetailDto.setTier(tier.getGameRank().toString());
+        userDetailDto.setGrade(tier.getGameGrade());
         userDetailDto.setPlayCount(playCount);
 
         return userDetailDto;
     }
+
+
 
 
 }
