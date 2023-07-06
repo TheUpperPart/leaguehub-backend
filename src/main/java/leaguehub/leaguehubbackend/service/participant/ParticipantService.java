@@ -1,11 +1,13 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipatedInvalidLoginException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipatedInvalidRoleException;
+import leaguehub.leaguehubbackend.exception.participant.exception.*;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,6 @@ import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,6 +40,7 @@ public class ParticipantService {
     private String riot_api_key;
 
     private final ParticipantRepository participantRepository;
+    private final ChannelRuleRepository channelRuleRepository;
     private final MemberService memberService;
 
     private final WebClient webClient;
@@ -74,13 +76,13 @@ public class ParticipantService {
      * 참가하기 버튼을 통하여 참가 자격이 있는지 확인
      * @param channelId 해당 채널 아이디
      */
-    public void participateMatch(Long channelId){
+    public Participant checkParticipateMatch(Long channelId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDetails userDetails = (UserDetails) authentication.getDetails();
 
         if (userDetails == null) {
-            throw new ParticipatedInvalidLoginException();
+            throw new ParticipantInvalidLoginException();
         }
 
         String personalId = userDetails.getUsername();
@@ -90,7 +92,9 @@ public class ParticipantService {
         Participant participant = participantRepository.findParticipantByMemberIdAndChannelId(member.getId(), channelId);
 
         if(participant.getRole().getNum() != 3)
-            throw new ParticipatedInvalidRoleException();
+            throw new ParticipantInvalidRoleException();
+
+        return participant;
     }
 
     /**
@@ -195,7 +199,7 @@ public class ParticipantService {
         if(jsonToString.isEmpty())
             return 0;
 
-        return stringToInteger(jsonToString);
+        return stringToIntegerPlayCount(jsonToString);
 
     }
 
@@ -205,7 +209,7 @@ public class ParticipantService {
      * @return
      */
     @SneakyThrows
-    public Integer stringToInteger(String userDetailJSON){
+    public Integer stringToIntegerPlayCount(String userDetailJSON){
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(userDetailJSON);
 
         return Integer.parseInt(summonerDetail.get("wins").toString()) + Integer.parseInt(summonerDetail.get("losses").toString());
@@ -230,6 +234,46 @@ public class ParticipantService {
         userDetailDto.setPlayCount(playCount);
 
         return userDetailDto;
+    }
+
+    /**
+     * 해당 채널의 룰을 확인
+     * @param channelRule
+     * @param userDetail
+     * @param tier
+     */
+    public void checkRule(ChannelRule channelRule, String userDetail, GameRankDto tier){
+        if(channelRule.getTier()){
+            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
+            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            if(userRankScore > limitedRankScore)
+                throw new ParticipantInvalidRankException();
+        }
+        if(channelRule.getPlayCount()){
+            int limitedPlayCount = channelRule.getLimitedPlayCount();
+            int userPlayCount = getPlayCount(userDetail);
+            if(userPlayCount < limitedPlayCount)
+                throw new ParticipantInvalidPlayCountException();
+        }
+    }
+
+    /**
+     * 관전자인 사용자가 해당 채널의 경기에 참가
+     * @param responseDto
+     */
+    public void participateMatch(ParticipantResponseDto responseDto){
+
+        Participant participant = checkParticipateMatch(responseDto.getChannelId());
+
+        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannelId(responseDto.getChannelId());
+
+        String userDetail = requestUserDetail(responseDto.getNickname());
+
+        GameRankDto tier = searchTier(userDetail);
+
+        checkRule(channelRule, userDetail, tier);
+
+        participant.updateParticipantStatus(responseDto.getNickname(), tier.getGameRank().toString());
     }
 
 

@@ -48,7 +48,7 @@ public enum GameTier {
         GameRankDto gameTierDto = new GameRankDto();
 
         gameTierDto.setGameRank(UNRANKED);
-        gameTierDto.setGameGrade("");
+        gameTierDto.setGameGrade("NONE");
 
         return gameTierDto;
     }
@@ -70,6 +70,22 @@ public enum GameTier {
         }
 
         return gameTierDto;
+    }
+
+    public static Integer rankToScore(String rank, String grade){
+
+        int rankScore = 0;
+        int gradeScore = -1;
+        for(GameTier gameTier : GameTier.values()){
+            if(gameTier.toString().equalsIgnoreCase(rank))
+                rankScore = gameTier.getScore();
+            if(gameTier.toString().equalsIgnoreCase(grade))
+                gradeScore = gameTier.getScore();
+        }
+        if(gradeScore == -1)
+            gradeScore = Integer.parseInt(grade);
+
+        return rankScore + gradeScore;
     }
 
 }
