@@ -8,7 +8,6 @@ import lombok.ToString;
 
 import java.io.Serializable;
 @Data
-@ToString
 public class KakaoUserDto implements Serializable {
 
     private Long id;
@@ -22,7 +21,6 @@ public class KakaoUserDto implements Serializable {
     private KakaoAccount kakaoAccount;
 
     @Data
-    @ToString
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Properties {
 
@@ -36,7 +34,6 @@ public class KakaoUserDto implements Serializable {
 
     }
     @Data
-    @ToString
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KakaoAccount {
 
@@ -49,7 +46,6 @@ public class KakaoUserDto implements Serializable {
         private Profile profile;
 
         @Data
-        @ToString
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Profile {
             private String nickname;
