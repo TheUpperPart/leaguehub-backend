@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -32,13 +33,16 @@ public class JwtController {
         Optional<String> optionalToken = jwtService.extractRefreshToken(request);
 
         String refreshToken = optionalToken.orElseThrow(() -> {
-            log.info("요청에 refreshToken 없음");
-            return new AuthInvalidTokenException();
+            log.info("요청헤더에 refreshToken 없음: ");
+            return new AuthTokenNotFoundException();
         });
 
-        Optional<Member> memberOpt = Optional.empty();
+        Optional<Member> memberOpt;
         if (jwtService.isTokenValid(refreshToken)) {
             memberOpt = memberService.findMemberByRefreshToken(refreshToken);
+        } else {
+            log.info("유효하지 않은 토큰: " + refreshToken);
+            throw new AuthInvalidTokenException();
         }
 
         Member member = memberOpt.orElseThrow(() -> {
