@@ -22,7 +22,7 @@ public class MemberController {
     public ProfileResponseDto getProfile() {
 
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        System.out.println(memberService.getMemberProfile(userDetails.getUsername()));
+
         return memberService.getMemberProfile(userDetails.getUsername());
     }
 }
