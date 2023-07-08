@@ -45,18 +45,18 @@ public class ChannelController {
         return new ResponseEntity<>("League successfully created", HttpStatus.OK);
     }
 
-    @GetMapping("/channel/{channelId}")
-    public ResponseEntity getChannel(@PathVariable("channelId") Long channelId) {
+    @GetMapping("/channel/{channelLink}")
+    public ResponseEntity getChannel(@PathVariable("channelLink") String channelLink) {
 
-        ChannelDto channelInfo = channelService.findChannel(channelId);
-        List<ChannelBoardDto> channelBoards = channelBoardService.findChannelBoards(channelId);
+        ChannelDto channelInfo = channelService.findChannel(channelLink);
+        List<ChannelBoardDto> channelBoards = channelBoardService.findChannelBoards(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
                 .channelBoardDtoList(channelBoards)
                 .game(channelInfo.getCategory().name())
-                .hostName(participantService.findChannelHost(channelId))
+                .hostName(participantService.findChannelHost(channelLink))
                 .leagueTitle(channelInfo.getTitle())
-                .permission(participantService.findParticipantPermission(channelId))
+                .permission(participantService.findParticipantPermission(channelLink))
                 .build();
 
         return new ResponseEntity(responseChannelDto, HttpStatus.OK);

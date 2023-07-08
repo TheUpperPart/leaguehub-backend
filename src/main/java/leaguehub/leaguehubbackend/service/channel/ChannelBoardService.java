@@ -38,7 +38,7 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardDto> findChannelBoards(Long channelId) {
+    public List<ChannelBoardDto> findChannelBoards(String channelId) {
         Channel channel = channelService.validateChannel(channelId);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
