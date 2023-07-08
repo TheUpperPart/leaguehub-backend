@@ -4,4 +4,6 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRuleRepository extends JpaRepository<ChannelRule, Long> {
+
+    ChannelRule findChannelRuleByChannelId(Long channelId);
 }

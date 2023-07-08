@@ -1,41 +1,91 @@
 package leaguehub.leaguehubbackend.entity.participant;
 
+import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
 import lombok.Getter;
 
 @Getter
 public enum GameTier {
 
-    UNRANKED(-1, "랭크없음"),
-    IRON(0, "아이언"), BRONZE(400, "브론즈"), SILVER(800, "실버"),
-    GOLD(1200, "골드"), PLATINUM(1600, "플래티넘"), DIAMOND(2000, "다이아몬드"),
-    MASTER(2400, "마스터"), GRANDMASTER(2400, "그랜드 마스터"), CHALLENGER(2400, "챌린저"),
-    IV(0, "4"), III(100, "3"), II(200, "2"), I(300, "1");
+    UNRANKED(-1), NONE(0),
+    IRON(0), BRONZE(400), SILVER(800),
+    GOLD(1200), PLATINUM(1600), DIAMOND(2000),
+    MASTER(2400), GRANDMASTER(2400), CHALLENGER(2400),
+    IV(0), III(100), II(200), I(300);
 
 
     private int score;
-    private String tier;
 
-    GameTier(int score, String tier){
+    GameTier(int score){
         this.score = score;
-        this.tier = tier;
     }
 
 
+    /**
+     * rank와 grade를 받아 맞는 티어를 반환
+     * @param rank
+     * @param grade
+     * @return
+     */
+    public static GameRankDto findGameTier(String rank, String grade){
 
-    //
-    public static String findGameTier(String rank, String grade){
-
-        String resultTier = "";
-        String resultGrade = "";
+        GameRankDto gameTierDto = new GameRankDto();
 
         for(GameTier gameTier : GameTier.values()){
             if(gameTier.toString().equalsIgnoreCase(rank))
-                resultTier = gameTier.tier;
+                gameTierDto.setGameRank(gameTier);
             if(gameTier.toString().equalsIgnoreCase(grade))
-                resultGrade = gameTier.tier;
+                gameTierDto.setGameGrade(gameTier.toString());
         }
 
-        return resultTier.concat(" ").concat(resultGrade);
+        return gameTierDto;
+    }
+
+    /**
+     * 언랭일 경우 반환
+     * @return gameTierDto
+     */
+    public static GameRankDto getUnranked(){
+        GameRankDto gameTierDto = new GameRankDto();
+
+        gameTierDto.setGameRank(UNRANKED);
+        gameTierDto.setGameGrade("NONE");
+
+        return gameTierDto;
+    }
+
+    /**
+     * 마스터 이상일 경우 grade 대신 leaguePoints를 반환
+     * @param rank
+     * @param leaguePoints
+     * @return
+     */
+    public static GameRankDto getRanked(String rank, String leaguePoints) {
+        GameRankDto gameTierDto = new GameRankDto();
+
+        for (GameTier gameTier : GameTier.values()) {
+            if (gameTier.toString().equalsIgnoreCase(rank))
+                gameTierDto.setGameRank(gameTier);
+
+            gameTierDto.setGameGrade(leaguePoints);
+        }
+
+        return gameTierDto;
+    }
+
+    public static Integer rankToScore(String rank, String grade){
+
+        int rankScore = 0;
+        int gradeScore = -1;
+        for(GameTier gameTier : GameTier.values()){
+            if(gameTier.toString().equalsIgnoreCase(rank))
+                rankScore = gameTier.getScore();
+            if(gameTier.toString().equalsIgnoreCase(grade))
+                gradeScore = gameTier.getScore();
+        }
+        if(gradeScore == -1)
+            gradeScore = Integer.parseInt(grade);
+
+        return rankScore + gradeScore;
     }
 
 }

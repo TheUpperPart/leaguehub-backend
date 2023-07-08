@@ -30,6 +30,8 @@ public class CreateChannelDto {
 
     private String tierMax;
 
+    private String gradeMax;
+
     @NotBlank
     private String channelImageUrl;
 
@@ -42,7 +44,7 @@ public class CreateChannelDto {
 
     @Builder
     public CreateChannelDto(int game, Integer tournament, String title,
-                            Integer participationNum, Boolean tier, String tierMax,
+                            Integer participationNum, Boolean tier, String tierMax, String gradeMax,
                             Boolean playCount, Integer playCountMin) {
         this.game = game;
         this.tournament = tournament;
@@ -50,6 +52,7 @@ public class CreateChannelDto {
         this.participationNum = participationNum;
         this.tier = tier;
         this.tierMax = tierMax;
+        this.gradeMax = gradeMax;
         this.playCount = playCount;
         this.playCountMin = playCountMin;
     }

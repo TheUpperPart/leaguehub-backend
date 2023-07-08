@@ -49,7 +49,7 @@ class MatchRankServiceTest {
         MatchResponseDto matchResponseDto = MatchFixture.createMatchResponseDto();
         List<MatchRankResultDto> save = matchRankService.setMatchRank(matchResponseDto);
 
-        List<MatchRankResultDto> resultList = matchRankService.getMatchDetail("KR_6565720833");
+        List<MatchRankResultDto> resultList = matchRankService.getMatchDetail("KR_6519793792");
 
         assertThat(save).isEqualTo(resultList);
     }

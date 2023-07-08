@@ -49,7 +49,7 @@ class ChannelTest {
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -80,7 +80,7 @@ class ChannelTest {
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -110,7 +110,7 @@ class ChannelTest {
         assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);
@@ -123,7 +123,7 @@ class ChannelTest {
         assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);

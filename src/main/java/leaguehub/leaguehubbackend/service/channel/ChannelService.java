@@ -44,7 +44,7 @@ public class ChannelService {
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
                 createChannelDto.getGame(), createChannelDto.getParticipationNum(),
                 createChannelDto.getTournament(), createChannelDto.getChannelImageUrl(),
-                createChannelDto.getTier(), createChannelDto.getTierMax(),
+                createChannelDto.getTier(), createChannelDto.getTierMax(), createChannelDto.getGradeMax(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
         channelRepository.save(channel);
