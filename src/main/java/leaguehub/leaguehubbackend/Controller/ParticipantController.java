@@ -1,12 +1,15 @@
-package leaguehub.leaguehubbackend.Controller;
+package leaguehub.leaguehubbackend.controller;
 
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.RequestPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -45,7 +48,7 @@ public class ParticipantController {
 
     /**
      * api 주소 확정 필요
-     * 관전자인 사용자가 해당 채널의 경기에 참가
+     * 관전자인 사용자가 해당 채널의 경기에 참가(TFT 만)
      * @param responseDto
      * @return responseEntity
      */
@@ -55,5 +58,18 @@ public class ParticipantController {
         participantService.participateMatch(responseDto);
 
         return new ResponseEntity<>("Update Participant ROLE", HttpStatus.OK);
+    }
+
+    /**
+     * 채널에 PLAYER 역할인 사람들을 반환
+     * @param channelLink
+     * @return ResponseEntity
+     */
+    @GetMapping("/player")
+    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") Long channelLink){
+
+        List<RequestPlayerDto> players = participantService.loadPlayers(channelLink);
+
+        return new ResponseEntity<>(players, HttpStatus.OK);
     }
 }

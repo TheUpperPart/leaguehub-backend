@@ -2,10 +2,12 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.RequestPlayerDto;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -16,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
@@ -70,6 +73,32 @@ public class ParticipantService {
 
     public String findChannelHost(Long channelId) {
         return participantRepository.findParticipantByRoleAndChannelId(HOST, channelId).getNickname();
+    }
+
+    /**
+     * 해당 채널의 PLAYER 역할인 유저들을 반환
+     * @param channelLink
+     * @return RequestPlayerDtoList
+     */
+    public List<RequestPlayerDto> loadPlayers(Long channelLink){
+
+        List<Participant> findParticipants = participantRepository.findAllByChannelIdOrderByNicknameAsc(channelLink);
+
+        List<RequestPlayerDto> dtoList = new ArrayList<>();
+
+
+        for(Participant participant : findParticipants){
+            if(participant.getRole().getNum() == Role.PLAYER.getNum()){
+                RequestPlayerDto playerDto = new RequestPlayerDto();
+                playerDto.setName(participant.getNickname());
+                playerDto.setImgSrc(participant.getProfileImageUrl());
+                playerDto.setGameId(participant.getGameId());
+
+                dtoList.add(playerDto);
+            }
+        }
+
+        return dtoList;
     }
 
     /**
