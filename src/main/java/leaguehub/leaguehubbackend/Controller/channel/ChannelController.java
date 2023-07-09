@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.controller;
+package leaguehub.leaguehubbackend.controller.channel;
 
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
