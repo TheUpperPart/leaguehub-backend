@@ -50,13 +50,12 @@ public class ChannelService {
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
-        channel.createParticipationLink();
     }
 
     @Transactional
-    public ChannelDto findChannel(Long channelId) {
+    public ChannelDto findChannel(String channelLink) {
 
-        Channel findChannel = channelRepository.findById(channelId)
+        Channel findChannel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
 
         ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
@@ -65,8 +64,8 @@ public class ChannelService {
         return channelDto;
     }
 
-    public Channel validateChannel(Long channelId) {
-        Channel channel = channelRepository.findById(channelId)
+    public Channel validateChannel(String channelLink) {
+        Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
         return channel;
     }

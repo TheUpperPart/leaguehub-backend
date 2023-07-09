@@ -46,7 +46,6 @@ class ChannelBoardTest {
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
-        channel.createParticipationLink();
 
         return channel;
     }
