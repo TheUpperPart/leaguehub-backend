@@ -1,9 +1,8 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestCreateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
-import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -35,31 +34,29 @@ public class ChannelBoardService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public void createChannelBoard(String channelLink, RequestCreateChannelBoardDto request) {
+    public void createChannelBoard(String channelLink, RequestChannelBoardDto request) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getDetails();
-        String personalId = userDetails.getUsername();
-
-        Member member = memberService.validateMember(personalId);
+        Member member = getMember();
 
         List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
-        boolean flag = false;
-        for (Participant participant : findByMemberId) {
-            if((participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                    && participant.getChannel().getChannelLink() == channelLink) {
-                ChannelBoard channelBoard = ChannelBoard.createChannelBoard(participant.getChannel()
-                        , request.getTitle(), request.getContent());
-                channelBoardRepository.save(channelBoard);
-                flag = true;
-            }
-        }
+        checkAuth(channelLink, findByMemberId);
 
-        if(!flag) throw new InvalidParticipantAuthException();
+        findByMemberId.stream()
+                .filter(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
+                        && participant.getChannel().getChannelLink().equals(channelLink))
+                .forEach(participant -> {
+                    ChannelBoard channelBoard = ChannelBoard.createChannelBoard(participant.getChannel(),
+                            request.getTitle(), request.getContent());
+                    channelBoardRepository.save(channelBoard);
+                });
+
+
     }
+
 
     /**
      * 채널 로딩 시점에서 불러오는 채널 게시판(내용은 반환하지 않음.)
+     *
      * @param channelId
      * @return List
      */
@@ -81,7 +78,7 @@ public class ChannelBoardService {
         Channel channel = channelService.validateChannel(channelLink);
         ChannelBoard channelBoard = validateChannelBoard(boardId);
 
-        if(channelBoard.getChannel() != channel) {
+        if (channelBoard.getChannel() != channel) {
             throw new ChannelBoardNotFoundException();
         }
 
@@ -89,14 +86,57 @@ public class ChannelBoardService {
     }
 
     @Transactional
-    public void updateChannelBoard(UpdateChannelBoardDto update) {
+    public void updateChannelBoard(String channelLink, Long boardId, RequestChannelBoardDto update) {
+        Member member = getMember();
+
+        ChannelBoard channelBoard = validateChannelBoard(boardId);
+
+        List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
+        checkAuth(channelLink, findByMemberId);
+
+        findByMemberId.stream()
+                .filter(participant -> participant.getChannel() == channelBoard.getChannel()
+                        && (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER))
+                .forEach(participant ->
+                        channelBoardRepository.findById(boardId).get().updateChannelBoard(update.getTitle(), update.getContent()));
 
     }
 
     @Transactional
     public void deleteChannelBoard(String channelLink, Long boardId) {
+        Member member = getMember();
+
+        ChannelBoard channelBoard = validateChannelBoard(boardId);
+
+        List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
+        checkAuth(channelLink, findByMemberId);
+
+        findByMemberId.stream()
+                .filter(participant -> participant.getChannel() == channelBoard.getChannel()
+                        && (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER))
+                .forEach(participant -> channelBoardRepository.deleteById(boardId));
 
     }
+
+    private Member getMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getDetails();
+        String personalId = userDetails.getUsername();
+
+        Member member = memberService.validateMember(personalId);
+        return member;
+    }
+
+    private void checkAuth(String channelLink, List<Participant> findByMemberId) {
+        boolean hasValidParticipant = findByMemberId.stream()
+                .anyMatch(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
+                        && participant.getChannel().getChannelLink().equals(channelLink));
+
+        if (!hasValidParticipant) {
+            throw new InvalidParticipantAuthException();
+        }
+    }
+
 
     public ChannelBoard validateChannelBoard(Long channelBoardId) {
         return channelBoardRepository.findById(channelBoardId)
