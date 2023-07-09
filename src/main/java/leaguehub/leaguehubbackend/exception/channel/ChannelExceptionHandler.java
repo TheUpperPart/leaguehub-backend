@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.exception.channel;
 
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
@@ -15,6 +16,19 @@ public class ChannelExceptionHandler {
     @ExceptionHandler(ChannelCreateException.class)
     public ResponseEntity<ExceptionResponse> memberNotFoundException(
             ChannelCreateException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(ChannelBoardNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> channelBoardNotfoundException(
+            ChannelBoardNotFoundException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());

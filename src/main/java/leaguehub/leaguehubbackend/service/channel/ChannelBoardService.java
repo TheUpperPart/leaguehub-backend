@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.RequestCreateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 public class ChannelBoardService {
 
     private final ChannelService channelService;
-    private final MemberService memberService;
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
 
@@ -51,6 +51,19 @@ public class ChannelBoardService {
     }
 
     @Transactional
+    public ResponseBoardDetail loadBoardDetail(String channelLink, Long boardId) {
+        Channel channel = channelService.validateChannel(channelLink);
+        ChannelBoard channelBoard = validateChannelBoard(boardId);
+
+        if(channelBoard.getChannel() != channel) {
+            throw new ChannelBoardNotFoundException();
+        }
+
+        return new ResponseBoardDetail(channelBoard.getContent());
+    }
+
+    @Transactional
+
     public void updateChannelBoard(UpdateChannelBoardDto update) {
 
     }
