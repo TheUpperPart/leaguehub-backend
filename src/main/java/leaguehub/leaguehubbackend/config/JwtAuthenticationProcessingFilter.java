@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthMemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
@@ -30,8 +31,8 @@ import java.util.Optional;
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    
     private final MemberRepository memberRepository;
-
     private static final List<String> NO_CHECK_URLS = Arrays.asList("/api/app/login/kakao", "/api/reissue/token");
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -44,7 +45,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         }
         try {
             checkAccessTokenAndAuthentication(request, response, filterChain);
-        } catch (AuthInvalidTokenException | AuthExpiredTokenException e) {
+        } catch (AuthInvalidTokenException | AuthExpiredTokenException | AuthMemberNotFoundException e) {
             request.setAttribute("exception", e.getMessage());
             throw e;
         }
@@ -81,7 +82,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         String personalId = optionalPersonalId.get();
 
         memberRepository.findMemberByPersonalId(personalId)
-                .ifPresentOrElse(this::saveAuthentication, () -> log.info("해당 personalId를 가진 member없음: " + personalId));
+                .ifPresentOrElse(this::saveAuthentication, () -> {
+                    log.info("해당 personalId를 가진 member없음: " + personalId);
+                    throw new AuthMemberNotFoundException();
+                });
 
         filterChain.doFilter(request, response);
 
