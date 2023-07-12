@@ -19,6 +19,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -33,13 +34,15 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     
     private final MemberRepository memberRepository;
-    private static final List<String> NO_CHECK_URLS = Arrays.asList("/api/app/login/kakao", "/api/reissue/token");
+    private static final List<String> NO_CHECK_URLS = Arrays.asList("/h2-console/**", "/api/app/login/kakao", "/api/reissue/token");
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
         // 체크 할필요 없는 url들을 다음 필터로 이동
-        if (NO_CHECK_URLS.contains(request.getRequestURI())) {
+        if (NO_CHECK_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path))) {
             filterChain.doFilter(request, response);
             return;
         }
