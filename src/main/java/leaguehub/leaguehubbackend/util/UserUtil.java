@@ -1,13 +1,77 @@
 package leaguehub.leaguehubbackend.util;
 
+import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
+import leaguehub.leaguehubbackend.entity.member.LoginProvider;
+import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.service.jwt.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
 public class UserUtil {
 
-    public static String getUserPersonalId() {
+    private final MemberRepository memberRepository;
+    private final JwtService jwtService;
+
+    public String getUserPersonalId() {
         return SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName();
+    }
+
+    public void addDefaultUsers() {
+        Member member1 = Member.builder()
+                .personalId("1234")
+                .nickname("member1")
+                .profileImageUrl("https://robohash.org/1234?set=set2&size=180x180")
+                .baseRole(BaseRole.USER)
+                .loginProvider(LoginProvider.KAKAO)
+                .build();
+
+        Member member2 = Member.builder()
+                .personalId("4321")
+                .nickname("member2")
+                .profileImageUrl("https://robohash.org/4321?set=set2&size=180x180")
+                .baseRole(BaseRole.USER)
+                .loginProvider(LoginProvider.KAKAO)
+                .build();
+
+        Member manager = Member.builder()
+                .personalId("1")
+                .nickname("관리자")
+                .profileImageUrl("https://robohash.org/1?set=set2&size=180x180")
+                .baseRole(BaseRole.ADMIN)
+                .loginProvider(LoginProvider.LEAGUEHUB)
+                .build();
+
+        List<Member> members = Arrays.asList(
+                member1,
+                member2,
+                manager
+        );
+
+        memberRepository.saveAll(members);
+
+        createTokens(members);
+    }
+    public void createTokens(List<Member> members) {
+        for (Member member : members) {
+            String accessToken = jwtService.createAccessToken(member.getPersonalId());
+            System.out.println("--------------------------");
+            System.out.printf("해당 멤버 : '%s':%n", member.getNickname());
+            System.out.printf("Access Token : %s%n", accessToken);
+            System.out.println("--------------------------");
+            System.out.println();
+
+        }
     }
 }
