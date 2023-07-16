@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.controller;
 
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -69,6 +67,7 @@ public class JwtControllerTest {
         mockMvc.perform(get("/api/reissue/token")
                         .header("Authorization-refresh", "Bearer invalidToken")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AT-C-001"));
     }
 
@@ -81,7 +80,8 @@ public class JwtControllerTest {
         mockMvc.perform(get("/api/reissue/token")
                         .header("Authorization-refresh", "Bearer validToken")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code").value("AT-C-005"));
     }
 
     @Test
@@ -90,6 +90,7 @@ public class JwtControllerTest {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.empty());
         mockMvc.perform(get("/api/reissue/token")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.code").value("AT-C-004"));
     }
 
