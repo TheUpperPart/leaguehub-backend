@@ -2,18 +2,15 @@ package leaguehub.leaguehubbackend;
 
 import jakarta.annotation.PostConstruct;
 import leaguehub.leaguehubbackend.util.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@AllArgsConstructor
 @SpringBootApplication
 public class LeaguehubBackendApplication {
-    private final UserUtil userUtil;
 
-    @Autowired
-    public LeaguehubBackendApplication(UserUtil userUtil) {
-        this.userUtil = userUtil;
-    }
+    private final UserUtil userUtil;
 
     public static void main(String[] args) {
         SpringApplication.run(LeaguehubBackendApplication.class, args);
