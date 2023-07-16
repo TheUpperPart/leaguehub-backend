@@ -1,6 +1,5 @@
 package leaguehub.leaguehubbackend.exception.auth.exception;
 
-import leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import org.springframework.security.core.AuthenticationException;
 
@@ -10,7 +9,7 @@ public class AuthInvalidTokenException extends AuthenticationException {
     private final ExceptionCode exceptionCode;
     public AuthInvalidTokenException() {
         super(INVALID_TOKEN.getCode());
-        this.exceptionCode = AuthExceptionCode.INVALID_TOKEN;
+        this.exceptionCode = INVALID_TOKEN;
     }
 
     public ExceptionCode getExceptionCode() {
