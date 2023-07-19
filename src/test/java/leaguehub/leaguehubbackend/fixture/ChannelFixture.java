@@ -1,7 +1,8 @@
 package leaguehub.leaguehubbackend.fixture;
 
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestCreateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
 
 public class ChannelFixture {
@@ -76,8 +77,8 @@ public class ChannelFixture {
         return createChannelDto;
     }
 
-    public static RequestCreateChannelBoardDto createChannelBoardDto() {
-        RequestCreateChannelBoardDto channelBoardDto = new RequestCreateChannelBoardDto();
+    public static RequestChannelBoardDto createChannelBoardDto() {
+        RequestChannelBoardDto channelBoardDto = new RequestChannelBoardDto();
         channelBoardDto.setTitle("test");
         channelBoardDto.setContent("test");
 
