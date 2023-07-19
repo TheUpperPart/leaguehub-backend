@@ -1,10 +1,15 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.LoginProvider;
 import leaguehub.leaguehubbackend.entity.member.Member;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserFixture {
 
@@ -24,6 +29,19 @@ public class UserFixture {
                 .refreshToken("refreshToken")
                 .build();
         return loginMemberResponse;
+    }
 
+    public static void setUpAuth() {
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+                .username("id")
+                .password("id")
+                .roles("USER")
+                .build();
+
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetailsUser, null
+                , authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

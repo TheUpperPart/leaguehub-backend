@@ -37,7 +37,7 @@ public class ChannelController {
                 log.error(error.getObjectName());
             }
 
-            throw new RuntimeException();
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
         channelService.createChannel(createChannelDto);
