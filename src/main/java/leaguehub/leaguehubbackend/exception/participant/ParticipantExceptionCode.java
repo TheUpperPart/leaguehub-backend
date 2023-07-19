@@ -18,7 +18,7 @@ public enum ParticipantExceptionCode implements ExceptionCode {
     INVALID_PARTICIPATED_LOGIN_REQUEST(BAD_REQUEST, "PA-C-005", "로그인이 필요합니다."),
     INVALID_PARTICIPATED_ROLE_REQUEST(BAD_REQUEST, "PA-C-006", "이미 참가하였거나 경기 관리자입니다."),
     INVALID_PARTICIPATED_TIER_REQUEST(BAD_REQUEST, "PA-C-007", "유저 티어가 설정된 티어보다 높습니다."),
-    INVALID_PARTICIPATED_PLAY_COUNT_REQUEST(BAD_REQUEST, "PA-C-008", "경기 횟수가 설정된 횟수보다 낮습니다.");
+    INVALID_PARTICIPATED_PLAY_COUNT_REQUEST(BAD_REQUEST, "PA-C-008", "경기 횟수가 설정된 횟수보다 낮습니다."),
     INVALID_PARTICIPANT_AUTH(UNAUTHORIZED, "PA-C-009", "해당 채널의 권한이 유효하지 않습니다");
 
     private final HttpStatus httpStatus;
