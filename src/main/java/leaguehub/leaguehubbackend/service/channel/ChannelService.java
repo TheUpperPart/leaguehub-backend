@@ -32,7 +32,7 @@ public class ChannelService {
      * @return
      */
     @Transactional
-    public void createChannel(CreateChannelDto createChannelDto) {
+    public Long createChannel(CreateChannelDto createChannelDto) {
 
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         String personalId = userDetails.getUsername();
@@ -48,6 +48,8 @@ public class ChannelService {
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
+
+        return channel.getId();
     }
 
     @Transactional
