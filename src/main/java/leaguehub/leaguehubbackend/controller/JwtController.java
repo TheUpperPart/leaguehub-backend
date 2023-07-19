@@ -3,9 +3,9 @@ package leaguehub.leaguehubbackend.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidRefreshToken;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
-import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class JwtController {
 
         Member member = memberOpt.orElseThrow(() -> {
             log.info("해당 refreshToken을 가지고 있는 멤버 없음: " + refreshToken);
-            return new MemberNotFoundException();
+            return new AuthInvalidRefreshToken();
         });
 
         LoginMemberResponse loginMemberResponse = jwtService.createTokens(member.getPersonalId());

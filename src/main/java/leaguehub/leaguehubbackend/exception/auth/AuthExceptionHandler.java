@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.exception.auth;
 
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidRefreshToken;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
@@ -31,6 +32,19 @@ public class AuthExceptionHandler {
     @ExceptionHandler(AuthExpiredTokenException.class)
     public ResponseEntity<ExceptionResponse> authExpiredTokenException(
             AuthExpiredTokenException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(AuthInvalidRefreshToken.class)
+    public ResponseEntity<ExceptionResponse> authInvalidRefreshToken(
+            AuthInvalidRefreshToken e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());
