@@ -50,7 +50,7 @@ public class UserUtil {
                 .nickname("관리자")
                 .profileImageUrl("https://robohash.org/1?set=set2&size=180x180")
                 .baseRole(BaseRole.ADMIN)
-                .loginProvider(LoginProvider.LEAGUEHUB)
+                .loginProvider(LoginProvider.KAKAO)
                 .build();
 
         List<Member> members = Arrays.asList(
