@@ -14,23 +14,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateChannelDto {
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("category")
     private int game;
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("matchformat")
     private Integer tournament;
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("title")
     private String title;
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("participationNum")
     private Integer participationNum;
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("tier")
     private Boolean tier;
 
@@ -39,11 +39,10 @@ public class CreateChannelDto {
 
     private String gradeMax;
 
-    @NotBlank
     @JsonProperty("channelImageUrl")
     private String channelImageUrl;
 
-    @NotEmpty
+    @NotNull
     @JsonProperty("playcount")
     private Boolean playCount;
 
