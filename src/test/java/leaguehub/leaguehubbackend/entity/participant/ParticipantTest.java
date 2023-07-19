@@ -52,7 +52,6 @@ class ParticipantTest {
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
-        channel.createParticipationLink();
 
 
         assertThat(participantRepository.findAll().size()).isEqualTo(1);

@@ -50,7 +50,7 @@ public class ParticipantService {
     private final JSONParser jsonParser;
 
 
-    public int findParticipantPermission(Long channelId) {
+    public int findParticipantPermission(String channelLink) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getDetails();
@@ -65,14 +65,14 @@ public class ParticipantService {
         List<Participant> findParticipant = participantRepository.findAllByMemberId(member.getId());
 
         return findParticipant.stream()
-                .filter(participant -> participant.getChannel().getId() == channelId)
+                .filter(participant -> participant.getChannel().getChannelLink() == channelLink)
                 .map(participant -> participant.getRole().getNum())
                 .findFirst()
                 .orElse(OBSERVER.getNum());
     }
 
-    public String findChannelHost(Long channelId) {
-        return participantRepository.findParticipantByRoleAndChannelId(HOST, channelId).getNickname();
+    public String findChannelHost(String channelLink) {
+        return participantRepository.findParticipantByRoleAndChannel_ChannelLink(HOST, channelLink).getNickname();
     }
 
     /**

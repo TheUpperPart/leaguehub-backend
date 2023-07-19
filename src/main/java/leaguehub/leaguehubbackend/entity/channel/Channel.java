@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import lombok.AccessLevel;
@@ -32,7 +31,8 @@ public class Channel extends BaseTimeEntity {
 
     private Integer realPlayer;
 
-    private String participationLink;
+    @Column(unique = true)
+    private String channelLink;
 
     private String accessCode;
 
@@ -58,13 +58,15 @@ public class Channel extends BaseTimeEntity {
                                         boolean tier, String tierMax, String gradeMax,
                                         boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
+        String uuid = UUID.randomUUID().toString();
         channel.title = title;
         channel.category = Category.getByNumber(category);
         channel.maxPlayer = maxPlayer;
         channel.realPlayer = 0;
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(matchFormat);
-        channel.accessCode = channel.createAccessCode();
+        channel.channelLink = channel.createParticipationLink(uuid);
+        channel.accessCode = channel.createAccessCode(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
         channel.channelRule = ChannelRule.createChannelRule(tierMax
                 , gradeMax
@@ -85,14 +87,16 @@ public class Channel extends BaseTimeEntity {
         }
     }
 
-    private String createAccessCode() {
-        String accessCode = UUID.randomUUID().toString().substring(0, 7);
+    private String createAccessCode(String uuid) {
+        String accessCode = uuid.substring(0, 8);
 
         return accessCode;
     }
 
-    public void createParticipationLink() {
-        this.participationLink = "http://localhost:8080/" + this.getId();
+    public String createParticipationLink(String uuid) {
+        String channelLink = uuid.substring(24,uuid.length());
+
+        return channelLink;
     }
 
     //채널 이미지 Url에 대한 정보가 없으면 기본 채널 이미지를 반환한다.

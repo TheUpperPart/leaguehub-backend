@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.member;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
+import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
 
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -40,6 +41,17 @@ public class MemberService {
         Member member = memberRepository.findMemberByPersonalId(personalId)
                 .orElseThrow(MemberNotFoundException::new);
         return member;
+    }
+
+    public ProfileResponseDto getMemberProfile(String personalId) {
+        Member member = memberRepository.findMemberByPersonalId(personalId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        return ProfileResponseDto.builder()
+                .profileId(member.getPersonalId())
+                .profileImageUrl(member.getProfileImageUrl())
+                .nickName(member.getNickname())
+                .build();
     }
 }
 

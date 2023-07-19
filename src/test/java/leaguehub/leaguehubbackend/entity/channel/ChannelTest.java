@@ -55,7 +55,6 @@ class ChannelTest {
         channelRepository.save(channel);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
-        channel.createParticipationLink();
 
         //when
         Optional<Channel> findChannel = channelRepository.findById(channel.getId());
@@ -86,7 +85,6 @@ class ChannelTest {
         channelRepository.save(channel);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
-        channel.createParticipationLink();
 
         //when
         Optional<Channel> findChannel = channelRepository.findById(channel.getId());
@@ -98,9 +96,10 @@ class ChannelTest {
         assertThat(findChannel.get().getRealPlayer()).isEqualTo(0);
         assertThat(findChannel.get().getCategory()).isEqualTo(Category.getByNumber(channelDto.getGame()));
         assertThat(findChannel.get().getChannelRule().getLimitedPlayCount()).isEqualTo(channelDto.getPlayCountMin());
-        assertThat(findChannel.get().getParticipationLink()).isEqualTo("http://localhost:8080/" + channel.getId());
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
+        assertThat(findChannel.get().getChannelLink()).isEqualTo(channel.getChannelLink());
+        assertThat(findChannel.get().getAccessCode()).isEqualTo(channel.getAccessCode());
     }
 
     @Test
