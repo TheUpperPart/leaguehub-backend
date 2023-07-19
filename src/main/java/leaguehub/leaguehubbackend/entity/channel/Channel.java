@@ -55,7 +55,8 @@ public class Channel extends BaseTimeEntity {
 
     public static Channel createChannel(String title, Integer category, int maxPlayer,
                                         Integer matchFormat, String channelImageUrl,
-                                        boolean tier, String tierMax, boolean playCount, Integer playCountMin) {
+                                        boolean tier, String tierMax, String gradeMax,
+                                        boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
         String uuid = UUID.randomUUID().toString();
         channel.title = title;
@@ -68,6 +69,7 @@ public class Channel extends BaseTimeEntity {
         channel.accessCode = channel.createAccessCode(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
         channel.channelRule = ChannelRule.createChannelRule(tierMax
+                , gradeMax
                 , tier
                 , playCount
                 , playCountMin);

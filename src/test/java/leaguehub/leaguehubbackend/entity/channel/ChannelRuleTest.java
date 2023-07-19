@@ -24,7 +24,7 @@ class ChannelRuleTest {
     @DisplayName("채널 룰 생성 테스트")
     public void createChannelRule() throws Exception {
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        ChannelRule channelRule = ChannelRule.createChannelRule(channelDto.getTierMax(), channelDto.getTier(),
+        ChannelRule channelRule = ChannelRule.createChannelRule(channelDto.getTierMax(), channelDto.getGradeMax(), channelDto.getTier(),
                 channelDto.getPlayCount(), channelDto.getPlayCountMin());
 
         ChannelRule save = channelRuleRepository.save(channelRule);

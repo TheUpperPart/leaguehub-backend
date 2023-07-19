@@ -21,6 +21,8 @@ public class ChannelRule extends BaseTimeEntity {
 
     private String limitedTier;
 
+    private String limitedGrade;
+
     private Boolean tier;
 
     private Boolean playCount;
@@ -30,7 +32,7 @@ public class ChannelRule extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    public static ChannelRule createChannelRule(String tierMax, Boolean tier,
+    public static ChannelRule createChannelRule(String tierMax, String gradeMax, Boolean tier,
                                                 Boolean playCount, Integer playCountMin) {
         ChannelRule channelRule = new ChannelRule();
 
@@ -39,8 +41,10 @@ public class ChannelRule extends BaseTimeEntity {
 
         if (tier == true) {
             channelRule.limitedTier = tierMax;
+            channelRule.limitedGrade = gradeMax;
         } else {
             channelRule.limitedTier = GlobalConstant.NO_DATA.getData();
+            channelRule.limitedGrade = GlobalConstant.NO_DATA.getData();
         }
 
         if (playCount == true) {

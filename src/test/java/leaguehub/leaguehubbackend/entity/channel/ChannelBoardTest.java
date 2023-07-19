@@ -40,7 +40,7 @@ class ChannelBoardTest {
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(),channelDto.getGradeMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
