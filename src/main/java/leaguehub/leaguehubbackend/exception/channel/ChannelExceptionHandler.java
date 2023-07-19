@@ -8,13 +8,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
+@RestControllerAdvice
 @RequiredArgsConstructor
 public class ChannelExceptionHandler {
 
     @ExceptionHandler(ChannelCreateException.class)
-    public ResponseEntity<ExceptionResponse> memberNotFoundException(
+    public ResponseEntity<ExceptionResponse> channelCreateException(
             ChannelCreateException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
