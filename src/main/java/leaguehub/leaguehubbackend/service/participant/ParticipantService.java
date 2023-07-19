@@ -12,6 +12,7 @@ import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,8 +53,7 @@ public class ParticipantService {
 
     public int findParticipantPermission(String channelLink) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getDetails();
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         if (userDetails == null) {
             return OBSERVER.getNum();
         }
