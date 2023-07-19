@@ -54,4 +54,13 @@ public class Participant extends BaseTimeEntity {
 
         return participant;
     }
+
+
+    public Participant updateParticipantStatus(String gameId, String gameTier){
+        this.gameId = gameId;
+        this.gameTier = gameTier;
+        this.role = Role.PLAYER;
+
+        return this;
+    }
 }
