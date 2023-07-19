@@ -106,8 +106,16 @@ class ChannelControllerTest {
                 .andExpect(jsonPath("$.leagueTitle").value("test"))
                 .andExpect(jsonPath("$.game").value("TFT"))
                 .andExpect(jsonPath("$.hostName").value("test"));
+    }
 
+    @Test
+    @DisplayName("채널 정보 가져오기 실패 테스트 - 유효하지 않은 채널 링크")
+    void getChannelFailTest() throws Exception {
+        Long id = channelService.createChannel(ChannelFixture.createChannelDto());
+        Optional<Channel> channel = channelRepository.findById(id);
 
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + "NoValid"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
 
