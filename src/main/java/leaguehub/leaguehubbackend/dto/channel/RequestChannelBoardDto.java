@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.dto.channel;
 import lombok.Data;
 
 @Data
-public class RequestCreateChannelBoardDto {
+public class RequestChannelBoardDto {
 
     private String title;
 

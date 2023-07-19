@@ -7,8 +7,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Data
+@NoArgsConstructor
 public class CreateChannelDto {
 
     @NotEmpty
@@ -20,19 +23,24 @@ public class CreateChannelDto {
     private Integer tournament;
 
     @NotEmpty
+    @JsonProperty("title")
     private String title;
 
     @NotEmpty
+    @JsonProperty("participationNum")
     private Integer participationNum;
 
     @NotEmpty
+    @JsonProperty("tier")
     private Boolean tier;
 
+    @JsonProperty("tierMax")
     private String tierMax;
 
     private String gradeMax;
 
     @NotBlank
+    @JsonProperty("channelImageUrl")
     private String channelImageUrl;
 
     @NotEmpty
