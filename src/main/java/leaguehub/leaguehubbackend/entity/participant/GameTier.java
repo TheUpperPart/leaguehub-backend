@@ -82,8 +82,11 @@ public enum GameTier {
             if(gameTier.toString().equalsIgnoreCase(grade))
                 gradeScore = gameTier.getScore();
         }
-        if(gradeScore == -1)
+        if(gradeScore == -1){
             gradeScore = Integer.parseInt(grade);
+
+        }
+
 
         return rankScore + gradeScore;
     }

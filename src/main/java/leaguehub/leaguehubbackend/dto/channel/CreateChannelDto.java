@@ -37,6 +37,7 @@ public class CreateChannelDto {
     @JsonProperty("tierMax")
     private String tierMax;
 
+    @JsonProperty("gradeMax")
     private String gradeMax;
 
     @JsonProperty("channelImageUrl")
