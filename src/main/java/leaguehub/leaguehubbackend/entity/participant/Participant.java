@@ -55,6 +55,19 @@ public class Participant extends BaseTimeEntity {
         return participant;
     }
 
+    public static Participant participateChannel(Member member, Channel channel) {
+        Participant participant = new Participant();
+        participant.nickname = member.getNickname();
+        participant.profileImageUrl = member.getProfileImageUrl();
+        participant.role = Role.OBSERVER;
+        participant.member = member;
+        participant.channel = channel;
+
+        participant.gameId = GlobalConstant.NO_DATA.getData();
+        participant.gameTier = GlobalConstant.NO_DATA.getData();
+
+        return participant;
+    }
 
     public Participant updateParticipantStatus(String gameId, String gameTier){
         this.gameId = gameId;

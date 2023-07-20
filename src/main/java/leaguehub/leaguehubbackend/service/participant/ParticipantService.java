@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -44,11 +45,11 @@ public class ParticipantService {
     private String riot_api_key;
 
     private final ParticipantRepository participantRepository;
-    private final ChannelRuleRepository channelRuleRepository;
     private final MemberService memberService;
 
     private final WebClient webClient;
     private final JSONParser jsonParser;
+    private final ChannelRepository channelRepository;
 
 
     public int findParticipantPermission(String channelLink) {
@@ -80,9 +81,9 @@ public class ParticipantService {
      * @param channelLink
      * @return RequestPlayerDtoList
      */
-    public List<RequestPlayerDto> loadPlayers(Long channelLink){
+    public List<RequestPlayerDto> loadPlayers(String channelLink){
 
-        List<Participant> findParticipants = participantRepository.findAllByChannelIdOrderByNicknameAsc(channelLink);
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
 
         List<RequestPlayerDto> dtoList = new ArrayList<>();
 
@@ -103,12 +104,11 @@ public class ParticipantService {
 
     /**
      * 참가하기 버튼을 통하여 참가 자격이 있는지 확인
-     * @param channelId 해당 채널 아이디
+     * @param channelLink 해당 채널 아이디
      */
-    public Participant checkParticipateMatch(Long channelId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public Participant checkParticipateMatch(String channelLink){
 
-        UserDetails userDetails = (UserDetails) authentication.getDetails();
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
         if (userDetails == null) {
             throw new ParticipantInvalidLoginException();
@@ -118,7 +118,7 @@ public class ParticipantService {
 
         Member member = memberService.validateMember(personalId);
 
-        Participant participant = participantRepository.findParticipantByMemberIdAndChannelId(member.getId(), channelId);
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
 
         if(participant.getRole().getNum() != 3)
             throw new ParticipantInvalidRoleException();
@@ -292,9 +292,9 @@ public class ParticipantService {
      */
     public void participateMatch(ParticipantResponseDto responseDto){
 
-        Participant participant = checkParticipateMatch(responseDto.getChannelId());
+        Participant participant = checkParticipateMatch(responseDto.getChannelLink());
 
-        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannelId(responseDto.getChannelId());
+        ChannelRule channelRule = channelRepository.findByChannelLink(responseDto.getChannelLink()).get().getChannelRule();
 
         String userDetail = requestUserDetail(responseDto.getNickname());
 

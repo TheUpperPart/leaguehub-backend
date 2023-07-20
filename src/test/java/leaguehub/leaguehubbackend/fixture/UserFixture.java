@@ -16,12 +16,27 @@ public class UserFixture {
     public static Member createMember() {
         Member member = Member.builder()
                 .personalId("id").profileImageUrl("url")
-                .nickname("test").refreshToken("refreshToken")
+                .nickname("id").refreshToken("refreshToken")
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
 
         return member;
     }
+
+
+
+
+    public static Member createCustomeMember(String name){
+        Member member = Member.builder()
+                .personalId(name).profileImageUrl("url")
+                .nickname(name).refreshToken("refreshToken")
+                .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
+                .build();
+
+        return member;
+    }
+
+
 
     public static LoginMemberResponse createLoginResponse() {
         LoginMemberResponse loginMemberResponse = LoginMemberResponse.builder()
@@ -34,6 +49,19 @@ public class UserFixture {
     public static void setUpAuth() {
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
                 .username("id")
+                .password("id")
+                .roles("USER")
+                .build();
+
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetailsUser, null
+                , authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    public static void setUpCustomAuth(String name) {
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+                .username(name)
                 .password("id")
                 .roles("USER")
                 .build();

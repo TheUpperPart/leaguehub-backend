@@ -21,16 +21,19 @@ public class ChannelFixture {
         return createChannelDto;
     }
 
-    public static CreateChannelDto createAllPropertiesChannelDto() {
+
+    public static CreateChannelDto createAllPropertiesCustomChannelDto(Boolean tier, Boolean playCount,
+                                                                       String tierMax, String gradeMax, int playCountMin) {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
                 .game(0)
                 .title("test")
                 .tournament(0)
                 .participationNum(16)
-                .tier(true)
-                .tierMax("Sliver")
-                .playCount(true)
-                .playCountMin(100)
+                .tier(tier)
+                .tierMax(tierMax)
+                .gradeMax(gradeMax)
+                .playCount(playCount)
+                .playCountMin(playCountMin)
                 .build();
 
 
