@@ -29,6 +29,10 @@ public class SecurityConfiguration {
     private static final String[] WHITE_LIST_URLS = {
             "/api/app/login/kakao",
             "/api/reissue/token",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/v3/api-docs/**",
+
     };
 
     @Bean
