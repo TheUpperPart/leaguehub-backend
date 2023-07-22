@@ -15,11 +15,13 @@ import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -41,8 +43,7 @@ public class ChannelBoardService {
         checkAuth(channelLink, findByMemberId);
 
         findByMemberId.stream()
-                .filter(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                        && participant.getChannel().getChannelLink().equals(channelLink))
+                .filter(getParticipantPredicate(channelLink))
                 .forEach(participant -> {
                     ChannelBoard channelBoard = ChannelBoard.createChannelBoard(participant.getChannel(),
                             request.getTitle(), request.getContent());
@@ -60,8 +61,8 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardDto> findChannelBoards(String channelId) {
-        Channel channel = channelService.validateChannel(channelId);
+    public List<ChannelBoardDto> findChannelBoards(String channelLink) {
+        Channel channel = channelService.validateChannel(channelLink);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
@@ -127,12 +128,17 @@ public class ChannelBoardService {
 
     private void checkAuth(String channelLink, List<Participant> findByMemberId) {
         boolean hasValidParticipant = findByMemberId.stream()
-                .anyMatch(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                        && participant.getChannel().getChannelLink().equals(channelLink));
+                .anyMatch(getParticipantPredicate(channelLink));
 
         if (!hasValidParticipant) {
             throw new InvalidParticipantAuthException();
         }
+    }
+
+    @NotNull
+    private static Predicate<Participant> getParticipantPredicate(String channelLink) {
+        return participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
+                && participant.getChannel().getChannelLink().equals(channelLink);
     }
 
 
