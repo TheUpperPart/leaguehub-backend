@@ -32,9 +32,16 @@ import java.util.Optional;
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    
+
     private final MemberRepository memberRepository;
-    private static final List<String> NO_CHECK_URLS = Arrays.asList("/h2-console/**", "/api/app/login/kakao", "/api/reissue/token");
+    private static final List<String> NO_CHECK_URLS = Arrays.asList(
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/v3/api-docs/**",
+            "/h2-console/**",
+            "/api/app/login/kakao",
+            "/api/reissue/token"
+    );
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
