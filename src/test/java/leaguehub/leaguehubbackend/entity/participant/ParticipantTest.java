@@ -43,7 +43,7 @@ class ParticipantTest {
     public void createHostTest() throws Exception {
 
         Member member = memberRepository.save(UserFixture.createMember());
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesChannelDto();
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, "Silver", "i",100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),

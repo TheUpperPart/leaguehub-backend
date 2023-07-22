@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRuleRepository extends JpaRepository<ChannelRule, Long> {
 
-    ChannelRule findChannelRuleByChannelId(Long channelId);
+    ChannelRule findChannelRuleByChannel_ChannelLink(String channelLink);
 }

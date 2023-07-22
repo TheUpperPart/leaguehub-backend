@@ -26,22 +26,24 @@ public class ParticipantController {
      * @return
      */
     @GetMapping("/stat")
-    public ResponseUserDetailDto getUserDetail(@RequestParam(value = "gameid") String nickname,
+    public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname,
                                                @RequestParam(value = "gamecategory") Integer category){
 
-        return participantService.selectGameCategory(nickname, category);
+        ResponseUserDetailDto userDetailDto = participantService.selectGameCategory(nickname, category);
+
+        return new ResponseEntity<>(userDetailDto, HttpStatus.OK);
     }
 
     /**
      * api 주소 확정 필요
      * 역할이 관전자일 경우 참가 버튼을 누르면 model창 출력
-     * @param channelId
+     * @param channelLink
      * @return responseEntity
      */
-    @GetMapping("/participant/{channelId}")
-    public ResponseEntity participateMatch(@PathVariable("channelId") Long channelId){
+    @GetMapping("/participant/{channelLink}")
+    public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink){
 
-        participantService.checkParticipateMatch(channelId);
+        participantService.checkParticipateMatch(channelLink);
 
         return new ResponseEntity<>("Valid OBSERVER ROLE", HttpStatus.OK);
     }
@@ -66,7 +68,7 @@ public class ParticipantController {
      * @return ResponseEntity
      */
     @GetMapping("/player")
-    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") Long channelLink){
+    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink){
 
         List<RequestPlayerDto> players = participantService.loadPlayers(channelLink);
 

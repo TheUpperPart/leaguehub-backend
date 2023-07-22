@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
     Optional<Channel> findByChannelLink(String channelLink);
+
 }

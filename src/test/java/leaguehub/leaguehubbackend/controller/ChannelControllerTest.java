@@ -105,7 +105,7 @@ class ChannelControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.leagueTitle").value("test"))
                 .andExpect(jsonPath("$.game").value("TFT"))
-                .andExpect(jsonPath("$.hostName").value("test"));
+                .andExpect(jsonPath("$.hostName").value("id"));
     }
 
     @Test
