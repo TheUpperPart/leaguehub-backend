@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.Controller.participant.ParticipantController;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
