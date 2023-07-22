@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.controller;
+package leaguehub.leaguehubbackend.Controller.participant;
 
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.dto.participant.RequestPlayerDto;

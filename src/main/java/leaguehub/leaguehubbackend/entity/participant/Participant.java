@@ -33,6 +33,9 @@ public class Participant extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ParticipantStatus participantStatus;
 
+    @Enumerated(EnumType.STRING)
+    private Request request;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -49,6 +52,8 @@ public class Participant extends BaseTimeEntity {
         participant.member = member;
         participant.channel = channel;
 
+        participant.request = Request.NOREQUEST;
+
         participant.gameId = GlobalConstant.NO_DATA.getData();
         participant.gameTier = GlobalConstant.NO_DATA.getData();
 
@@ -63,16 +68,34 @@ public class Participant extends BaseTimeEntity {
         participant.member = member;
         participant.channel = channel;
 
+        participant.request = Request.NOREQUEST;
+
         participant.gameId = GlobalConstant.NO_DATA.getData();
         participant.gameTier = GlobalConstant.NO_DATA.getData();
 
         return participant;
     }
 
+
+    public Participant requestParticipantMatch(){
+        this.request = Request.REQUEST;
+
+        return this;
+    }
+
+
+    public Participant rejectParticipantRequest(){
+        this.request = Request.REJECT;
+
+        return this;
+    }
+
+
     public Participant updateParticipantStatus(String gameId, String gameTier){
         this.gameId = gameId;
         this.gameTier = gameTier;
         this.role = Role.PLAYER;
+        this.request = Request.DONE;
 
         return this;
     }
