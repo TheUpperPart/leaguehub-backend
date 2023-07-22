@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.controller;
+package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.controller.channel.ChannelController;
@@ -63,7 +63,6 @@ class ChannelControllerTest {
     public void testCreateChannel() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         String json = objectMapper.writeValueAsString(createChannelDto);
-        System.out.println(json);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -75,7 +74,6 @@ class ChannelControllerTest {
     public void testFailCreateChannel() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.invalidatedTournamentData();
         String json = objectMapper.writeValueAsString(createChannelDto);
-        System.out.println(json);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -88,7 +86,6 @@ class ChannelControllerTest {
     void createChannelControllerError() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.bindingResultCheck();
         String json = objectMapper.writeValueAsString(createChannelDto);
-        System.out.println(json);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
