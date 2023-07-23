@@ -10,7 +10,7 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.Request;
+import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantInvalidPlayCountException;
@@ -285,8 +285,8 @@ class ParticipantServiceTest {
         assertThat(part3.getGameId()).isEqualTo(requestPlayerDto.get(1).getGameId());
 
 
-        assertThat(part2.getRequest()).isEqualTo(Request.DONE);
-        assertThat(part3.getRequest()).isEqualTo(Request.DONE);
+        assertThat(part2.getRequestStatus()).isEqualTo(RequestStatus.DONE);
+        assertThat(part3.getRequestStatus()).isEqualTo(RequestStatus.DONE);
     }
 
 

@@ -55,7 +55,7 @@ class ParticipantTest {
         assertThat(participant.getMember()).isEqualTo(member);
         assertThat(participant.getRole()).isEqualTo(Role.HOST);
 
-        assertThat(participant.getRequest()).isEqualTo(Request.NOREQUEST);
+        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
         assertThat(participant.getGameId()).isEqualTo(GlobalConstant.NO_DATA.getData());
     }
 
