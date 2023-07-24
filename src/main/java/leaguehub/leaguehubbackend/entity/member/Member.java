@@ -27,9 +27,10 @@ public class Member extends BaseTimeEntity {
 
     private String refreshToken;
 
+    private String email;
+
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
-
 
     @Enumerated(EnumType.STRING)
     private BaseRole baseRole;
@@ -37,13 +38,15 @@ public class Member extends BaseTimeEntity {
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+    public void updateEmail(String email) { this.email = email; }
+    public void updateRole(BaseRole role) { this.baseRole = role; }
 
     public static Member kakaoUserToMember(KakaoUserDto kakaoUserDto) {
         return Member.builder()
                 .personalId(String.valueOf(kakaoUserDto.getId()))
                 .nickname(kakaoUserDto.getProperties().getNickname())
                 .profileImageUrl(kakaoUserDto.getProperties().getProfileImage())
-                .baseRole(BaseRole.USER)
+                .baseRole(BaseRole.GUEST)
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
 
