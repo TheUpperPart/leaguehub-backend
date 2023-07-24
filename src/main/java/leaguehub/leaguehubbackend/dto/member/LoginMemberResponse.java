@@ -9,5 +9,6 @@ public class LoginMemberResponse {
 
     private String accessToken;
     private String refreshToken;
+    private boolean verifiedUser;
 }
 
