@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.dto.participant;
 import lombok.Data;
 
 @Data
-public class RequestPlayerDto {
+public class PlayerDto {
 
     String name;
 
