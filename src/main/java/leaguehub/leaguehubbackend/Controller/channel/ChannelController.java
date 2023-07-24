@@ -49,7 +49,7 @@ public class ChannelController {
     public ResponseEntity getChannel(@PathVariable("channelLink") String channelLink) {
 
         ChannelDto channelInfo = channelService.findChannel(channelLink);
-        List<ChannelBoardLoadDto> channelBoards = channelBoardService.findChannelBoards(channelLink);
+        List<ChannelBoardLoadDto> channelBoards = channelBoardService.loadChannelBoards(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
                 .channelBoardLoadDtoList(channelBoards)

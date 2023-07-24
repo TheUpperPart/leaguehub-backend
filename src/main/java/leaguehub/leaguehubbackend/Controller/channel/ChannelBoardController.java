@@ -48,9 +48,9 @@ public class ChannelBoardController {
     }
 
     @GetMapping("/channel/{channelLink}/{boardId}")
-    public ResponseEntity loadChannelBoard(@PathVariable("channelLink") String channelLink,
-                                           @PathVariable("boardId") Long boardId) {
-        ChannelBoardDto channelBoardDto = channelBoardService.loadBoardDetail(channelLink, boardId);
+    public ResponseEntity getChannelBoard(@PathVariable("channelLink") String channelLink,
+                                          @PathVariable("boardId") Long boardId) {
+        ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channelLink, boardId);
 
         return new ResponseEntity(channelBoardDto, OK);
     }
