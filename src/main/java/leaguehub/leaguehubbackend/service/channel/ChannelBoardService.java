@@ -60,7 +60,7 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardLoadDto> findChannelBoards(String channelLink) {
+    public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
         Channel channel = channelService.validateChannel(channelLink);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
@@ -73,7 +73,7 @@ public class ChannelBoardService {
     }
 
     @Transactional
-    public ChannelBoardDto loadBoardDetail(String channelLink, Long boardId) {
+    public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
         Channel channel = channelService.validateChannel(channelLink);
         ChannelBoard channelBoard = validateChannelBoard(boardId);
 

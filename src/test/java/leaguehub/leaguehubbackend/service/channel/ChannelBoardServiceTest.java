@@ -119,9 +119,9 @@ class ChannelBoardServiceTest {
         Optional<Channel> channel = channelRepository.findById(channelId);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
-        List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.findChannelBoards(channel.get().getChannelLink());
+        List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
 
-        ChannelBoardDto channelBoardDto = channelBoardService.loadBoardDetail(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getId());
+        ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getId());
 
         assertThat(findChannelBoards.size()).isEqualTo(4);
         assertThat(channelBoardDto.getContent()).isEqualTo("test");
@@ -139,12 +139,12 @@ class ChannelBoardServiceTest {
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(findChannel);
 
-        assertThatThrownBy(() -> channelBoardService.findChannelBoards("NO_VALID"))
+        assertThatThrownBy(() -> channelBoardService.loadChannelBoards("NO_VALID"))
                 .isInstanceOf(ChannelNotFoundException.class);
 
-        assertThatThrownBy(() -> channelBoardService.loadBoardDetail(channel.get().getChannelLink(), channelBoards.get(0).getId()))
+        assertThatThrownBy(() -> channelBoardService.getChannelBoard(channel.get().getChannelLink(), channelBoards.get(0).getId()))
                 .isInstanceOf(ChannelBoardNotFoundException.class);
-        assertThatThrownBy(() -> channelBoardService.loadBoardDetail(channel.get().getChannelLink(), 1414141L))
+        assertThatThrownBy(() -> channelBoardService.getChannelBoard(channel.get().getChannelLink(), 1414141L))
                 .isInstanceOf(ChannelBoardNotFoundException.class);
     }
 
