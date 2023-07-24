@@ -5,8 +5,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 
+import leaguehub.leaguehubbackend.exception.member.exception.DuplicateEmailException;
+import leaguehub.leaguehubbackend.exception.member.exception.InvalidEmailAddressException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
@@ -17,8 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
-
 import java.util.Optional;
+import java.util.regex.Pattern;
+
+import static leaguehub.leaguehubbackend.exception.member.MemberExceptionCode.INVALID_EMAIL_ADDRESS;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +78,31 @@ public class MemberService {
         } else {
             throw new MemberNotFoundException();
         }
+    }
+
+    @Transactional
+    public void updateEmail(String email, String personalId) {
+
+        if (!isValidEmailFormat(email)) {
+            throw new InvalidEmailAddressException();
+        }
+
+        if (memberRepository.findMemberByEmail(email).isPresent()) {
+            throw new DuplicateEmailException();
+        }
+
+        Member member = memberRepository.findMemberByPersonalId(personalId)
+                .orElseThrow(MemberNotFoundException::new);
+        member.updateEmail(email);
+        member.updateRole(BaseRole.USER);
+
+        memberRepository.save(member);
+    }
+
+    public static boolean isValidEmailFormat(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pat = Pattern.compile(emailRegex);
+        return pat.matcher(email).matches();
     }
 }
 

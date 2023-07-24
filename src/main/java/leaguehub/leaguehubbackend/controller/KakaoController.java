@@ -12,16 +12,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
+import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.kakao.KakaoService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,10 +67,12 @@ public class KakaoController {
 
         KakaoUserDto userDto = kakaoService.getKakaoUser(KakaoToken);
 
-        memberService.findMemberByPersonalId(String.valueOf(userDto.getId()))
+        Member member = memberService.findMemberByPersonalId(String.valueOf(userDto.getId()))
                 .orElseGet(() -> memberService.saveMember(userDto).orElseThrow(GlobalServerErrorException::new));
 
         LoginMemberResponse loginMemberResponse = jwtService.createTokens(String.valueOf(userDto.getId()));
+
+        loginMemberResponse.setVerifiedUser(member.getBaseRole() != BaseRole.GUEST);
 
         return ResponseEntity.ok(loginMemberResponse);
     }
