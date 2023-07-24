@@ -88,8 +88,8 @@ public class ChannelFixture {
         return channelBoardDto;
     }
 
-    public static UpdateChannelBoardDto updateChannelDto() {
-        UpdateChannelBoardDto channelBoardDto = new UpdateChannelBoardDto();
+    public static RequestChannelBoardDto updateChannelDto() {
+        RequestChannelBoardDto channelBoardDto = new RequestChannelBoardDto();
         channelBoardDto.setTitle("test1");
         channelBoardDto.setContent("test1");
 
