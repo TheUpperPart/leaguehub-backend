@@ -1,9 +1,8 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -120,12 +119,12 @@ class ChannelBoardServiceTest {
         Optional<Channel> channel = channelRepository.findById(channelId);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
-        List<ChannelBoardDto> findChannelBoards = channelBoardService.findChannelBoards(channel.get().getChannelLink());
-        ResponseBoardDetail responseBoardDetail =
-                channelBoardService.loadBoardDetail(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getId());
+        List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.findChannelBoards(channel.get().getChannelLink());
+
+        ChannelBoardDto channelBoardDto = channelBoardService.loadBoardDetail(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getId());
 
         assertThat(findChannelBoards.size()).isEqualTo(4);
-        assertThat(responseBoardDetail.getDetail()).isEqualTo("test");
+        assertThat(channelBoardDto.getContent()).isEqualTo("test");
     }
 
     @Test
@@ -155,7 +154,7 @@ class ChannelBoardServiceTest {
         Optional<Channel> channel = channelRepository.findById(channelId);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         Long boardId = channelBoards.get(0).getId();
-        RequestChannelBoardDto update = ChannelFixture.updateChannelDto();
+        ChannelBoardDto update = ChannelFixture.updateChannelDto();
         channelBoardService.updateChannelBoard(channel.get().getChannelLink(), boardId, update);
 
         assertThat(channelBoards.get(0).getTitle()).isEqualTo(update.getTitle());
@@ -172,7 +171,7 @@ class ChannelBoardServiceTest {
         participantRepository.save(Participant.participateChannel(test, channel.get()));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         Long boardId = channelBoards.get(0).getId();
-        RequestChannelBoardDto update = ChannelFixture.updateChannelDto();
+        ChannelBoardDto update = ChannelFixture.updateChannelDto();
 
         assertThatThrownBy(() -> channelBoardService.updateChannelBoard(channel.get().getChannelLink(), boardId, update))
                 .isInstanceOf(InvalidParticipantAuthException.class);

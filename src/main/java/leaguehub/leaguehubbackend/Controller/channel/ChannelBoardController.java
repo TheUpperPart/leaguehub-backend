@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -22,17 +21,9 @@ public class ChannelBoardController {
     private final ChannelBoardService channelBoardService;
     private final ParticipantService participantService;
 
-    @GetMapping("/channel/{channelLink}/{boardId}")
-    public ResponseEntity loadBoardDetail(@PathVariable("channelLink") String channelLink,
-                                          @PathVariable("boardId") Long boardId) {
-        ResponseBoardDetail responseBoardDetail = channelBoardService.loadBoardDetail(channelLink, boardId);
-
-        return new ResponseEntity(responseBoardDetail, OK);
-    }
-
     @PostMapping("/channel/{channelLink}/new")
     public ResponseEntity createChannelBoard(@PathVariable("channelLink") String channelLink,
-                                             @RequestBody RequestChannelBoardDto request) {
+                                             @RequestBody ChannelBoardDto request) {
         channelBoardService.createChannelBoard(channelLink, request);
 
         return new ResponseEntity("Board successfully created", OK);
@@ -41,7 +32,7 @@ public class ChannelBoardController {
     @PostMapping("/channel/{channelLink}/{boardId}")
     public ResponseEntity updateChannelBoard(@PathVariable("channelLink") String channelLink,
                                           @PathVariable("boardId") Long boardId,
-                                             @RequestBody RequestChannelBoardDto channelBoardDto) {
+                                             @RequestBody ChannelBoardDto channelBoardDto) {
         channelBoardService.updateChannelBoard(channelLink, boardId, channelBoardDto);
 
         return new ResponseEntity("Board successfully updated", OK);
@@ -54,5 +45,13 @@ public class ChannelBoardController {
         channelBoardService.deleteChannelBoard(channelLink, boardId);
 
         return new ResponseEntity("Board successfully deleted", OK);
+    }
+
+    @GetMapping("/channel/{channelLink}/{boardId}")
+    public ResponseEntity loadChannelBoard(@PathVariable("channelLink") String channelLink,
+                                           @PathVariable("boardId") Long boardId) {
+        ChannelBoardDto channelBoardDto = channelBoardService.loadBoardDetail(channelLink, boardId);
+
+        return new ResponseEntity(channelBoardDto, OK);
     }
 }

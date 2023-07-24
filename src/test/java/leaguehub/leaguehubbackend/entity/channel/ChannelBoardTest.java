@@ -1,8 +1,7 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.UpdateChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -76,7 +75,7 @@ class ChannelBoardTest {
         Channel channel = createChannel();
         ChannelBoard saved = channelBoardRepository.save(ChannelBoard.createChannelBoard(channel
                 , createChannelBoardDto().getTitle(), createChannelBoardDto().getContent()));
-        RequestChannelBoardDto updateChannelBoardDto = updateChannelDto();
+        ChannelBoardDto updateChannelBoardDto = updateChannelDto();
 
 
         channelBoardRepository.save(saved.updateChannelBoard(updateChannelBoardDto.getTitle(), updateChannelBoardDto.getContent()));

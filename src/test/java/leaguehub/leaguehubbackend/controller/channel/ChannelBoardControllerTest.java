@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -93,7 +93,7 @@ class ChannelBoardControllerTest {
         Long channelId = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findById(channelId);
 
-        RequestChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
+        ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/new")
@@ -114,7 +114,7 @@ class ChannelBoardControllerTest {
 
         participantRepository.save(Participant.participateChannel(test, findChannel));
 
-        RequestChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
+        ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + findChannel.getChannelLink() + "/new")
@@ -135,7 +135,7 @@ class ChannelBoardControllerTest {
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.detail").value("공지사항을 작성해주세요."));
+                .andExpect(jsonPath("$.content").value("공지사항을 작성해주세요."));
 
     }
 
@@ -159,8 +159,8 @@ class ChannelBoardControllerTest {
         Long channelId = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findById(channelId);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
-        RequestChannelBoardDto requestChannelBoardDto = ChannelFixture.updateChannelDto();
-        String json = objectMapper.writeValueAsString(requestChannelBoardDto);
+        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
+        String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
                                 + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +172,7 @@ class ChannelBoardControllerTest {
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("$.detail").value("test1"));
+                .andExpect(jsonPath("$.content").value("test1"));
     }
 
     @Test
@@ -186,7 +186,7 @@ class ChannelBoardControllerTest {
         UserFixture.setUpCustomAuth("test231");
         participantRepository.save(Participant.participateChannel(test, findChannel));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(findChannel);
-        RequestChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
+        ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + findChannel.getChannelLink() +
@@ -203,8 +203,8 @@ class ChannelBoardControllerTest {
         Long channelId = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findById(channelId);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
-        RequestChannelBoardDto requestChannelBoardDto = ChannelFixture.updateChannelDto();
-        String json = objectMapper.writeValueAsString(requestChannelBoardDto);
+        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
+        String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
                                 + channel.get().getChannelLink() + "/123141515")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -222,7 +222,7 @@ class ChannelBoardControllerTest {
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
-                                + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
+                        + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
