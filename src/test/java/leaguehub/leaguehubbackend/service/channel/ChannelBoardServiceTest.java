@@ -100,10 +100,13 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 만들기 테스트 - 실패 (권한 없음)")
     void invalidMemberChannelBoard() throws Exception {
-        memberRepository.save(UserFixture.createCustomeMember("test2"));
-        UserFixture.setUpCustomAuth("test2");
         Channel customChannel = createCustomChannel(false, false, "Silver", "iv", 100);
         Channel findChannel = channelRepository.save(customChannel);
+
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
+        participantRepository.save(Participant.participateChannel(test, findChannel));
 
 
         Assertions.assertThatThrownBy(() -> channelBoardService.createChannelBoard(findChannel.getChannelLink(),
@@ -162,9 +165,11 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 업데이트 테스트 - 실패(권한없음)")
     void updateFailTest() {
-        memberRepository.save(UserFixture.createCustomeMember("test2"));
-        UserFixture.setUpCustomAuth("test2");
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
         Optional<Channel> channel = channelRepository.findById(channelId);
+        participantRepository.save(Participant.participateChannel(test, channel.get()));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         Long boardId = channelBoards.get(0).getId();
         RequestChannelBoardDto update = ChannelFixture.updateChannelDto();
@@ -190,9 +195,11 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 삭제 테스트 - 실패(권한없음)")
     void deleteFailTest() {
-        memberRepository.save(UserFixture.createCustomeMember("test2"));
-        UserFixture.setUpCustomAuth("test2");
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
         Optional<Channel> channel = channelRepository.findById(channelId);
+        participantRepository.save(Participant.participateChannel(test, channel.get()));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         ChannelBoard channelBoard = channelBoards.get(0);
         assertThatThrownBy(() -> channelBoardService.deleteChannelBoard(channel.get().getChannelLink(), channelBoard.getId()))

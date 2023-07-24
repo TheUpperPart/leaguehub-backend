@@ -108,8 +108,11 @@ class ChannelBoardControllerTest {
         Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
-        memberRepository.save(UserFixture.createCustomeMember("test231"));
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
+
+        participantRepository.save(Participant.participateChannel(test, findChannel));
 
         RequestChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
@@ -178,8 +181,10 @@ class ChannelBoardControllerTest {
         Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
-        memberRepository.save(UserFixture.createCustomeMember("test231"));
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
+        participantRepository.save(Participant.participateChannel(test, findChannel));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(findChannel);
         RequestChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
@@ -229,8 +234,10 @@ class ChannelBoardControllerTest {
         Long channelId = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findById(channelId);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
-        memberRepository.save(UserFixture.createCustomeMember("test1"));
-        UserFixture.setUpCustomAuth("test1");
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
+        participantRepository.save(Participant.participateChannel(test, channel.get()));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
