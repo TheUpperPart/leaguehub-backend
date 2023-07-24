@@ -17,6 +17,7 @@ public class UserFixture {
         Member member = Member.builder()
                 .personalId("id").profileImageUrl("url")
                 .nickname("id").refreshToken("refreshToken")
+                .email("id@example.com")
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
 
