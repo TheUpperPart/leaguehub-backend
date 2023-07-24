@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.entity.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -18,10 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -58,6 +54,8 @@ class ParticipantTest {
         assertThat(participant.getChannel()).isEqualTo(channel);
         assertThat(participant.getMember()).isEqualTo(member);
         assertThat(participant.getRole()).isEqualTo(Role.HOST);
+
+        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
         assertThat(participant.getGameId()).isEqualTo(GlobalConstant.NO_DATA.getData());
     }
 
