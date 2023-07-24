@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import jakarta.validation.Valid;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseChannelDto;
@@ -49,10 +49,10 @@ public class ChannelController {
     public ResponseEntity getChannel(@PathVariable("channelLink") String channelLink) {
 
         ChannelDto channelInfo = channelService.findChannel(channelLink);
-        List<ChannelBoardDto> channelBoards = channelBoardService.findChannelBoards(channelLink);
+        List<ChannelBoardLoadDto> channelBoards = channelBoardService.loadChannelBoards(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
-                .channelBoardDtoList(channelBoards)
+                .channelBoardLoadDtoList(channelBoards)
                 .game(channelInfo.getCategory().name())
                 .hostName(participantService.findChannelHost(channelLink))
                 .leagueTitle(channelInfo.getTitle())

@@ -1,8 +1,7 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -35,7 +34,7 @@ public class ChannelBoardService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public void createChannelBoard(String channelLink, RequestChannelBoardDto request) {
+    public void createChannelBoard(String channelLink, ChannelBoardDto request) {
 
         Member member = getMember();
 
@@ -61,20 +60,20 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardDto> findChannelBoards(String channelLink) {
+    public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
         Channel channel = channelService.validateChannel(channelLink);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
-        List<ChannelBoardDto> channelBoardDtoList = channelBoards.stream()
-                .map(channelBoard -> new ChannelBoardDto(channelBoard.getId(), channelBoard.getTitle()))
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
+                .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle()))
                 .collect(Collectors.toList());
 
-        return channelBoardDtoList;
+        return channelBoardLoadDtoList;
     }
 
     @Transactional
-    public ResponseBoardDetail loadBoardDetail(String channelLink, Long boardId) {
+    public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
         Channel channel = channelService.validateChannel(channelLink);
         ChannelBoard channelBoard = validateChannelBoard(boardId);
 
@@ -82,11 +81,11 @@ public class ChannelBoardService {
             throw new ChannelBoardNotFoundException();
         }
 
-        return new ResponseBoardDetail(channelBoard.getContent());
+        return new ChannelBoardDto(channelBoard.getTitle(), channelBoard.getContent());
     }
 
     @Transactional
-    public void updateChannelBoard(String channelLink, Long boardId, RequestChannelBoardDto update) {
+    public void updateChannelBoard(String channelLink, Long boardId, ChannelBoardDto update) {
         Member member = getMember();
 
         ChannelBoard channelBoard = validateChannelBoard(boardId);
