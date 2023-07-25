@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
@@ -298,7 +299,7 @@ public class ParticipantService {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
 
         for(Participant user : participantList){
-            if(user.getGameId() == gameId)
+            if(Objects.equals(user.getGameId(), gameId))
                 throw new ParticipantDuplicatedGameIdException();
         }
 
