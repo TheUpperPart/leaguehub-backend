@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
@@ -48,9 +49,9 @@ class ChannelServiceTest {
     @DisplayName("채널 생성 테스트 - 서비스")
     void createChannel() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        Long channelId = channelService.createChannel(createChannelDto);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 
-        Optional<Channel> findChannel = channelRepository.findById(channelId);
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getMaxPlayer()).isEqualTo(createChannelDto.getParticipationNum());
         assertThat(findChannel.get().getTitle()).isEqualTo(createChannelDto.getTitle());
@@ -68,9 +69,9 @@ class ChannelServiceTest {
     @DisplayName("findChannel 성공 - 서비스")
     void validateTest() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        Long channelId = channelService.createChannel(createChannelDto);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 
-        Optional<Channel> findChannel = channelRepository.findById(channelId);
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
 
         String validateChannelLink = findChannel.get().getChannelLink();
         ChannelDto channel = channelService.findChannel(validateChannelLink);

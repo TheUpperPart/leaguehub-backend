@@ -2,6 +2,8 @@ package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -16,6 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -32,12 +38,9 @@ public class ChannelService {
      * @return
      */
     @Transactional
-    public Long createChannel(CreateChannelDto createChannelDto) {
+    public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
 
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        String personalId = userDetails.getUsername();
-
-        Member member = memberService.validateMember(personalId);
+        Member member = getMember();
 
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
                 createChannelDto.getGame(), createChannelDto.getParticipationNum(),
@@ -49,7 +52,29 @@ public class ChannelService {
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
 
-        return channel.getId();
+        return new ResponseCreateChannelDto(channel.getChannelLink());
+    }
+
+    @Transactional
+    public List<ParticipantChannelDto> findParticipantChannelList() {
+        Member member = getMember();
+
+        List<Participant> allByParticipantList = participantRepository.findAllByMemberId(member.getId());
+
+        List<ParticipantChannelDto> participantChannelDtoList = allByParticipantList.stream()
+                .map(participant -> {
+                    Channel channel = participant.getChannel();
+                    return new ParticipantChannelDto(
+                            channel.getChannelLink(),
+                            channel.getTitle(),
+                            channel.getCategory().getNum(),
+                            channel.getChannelImageUrl()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return participantChannelDtoList;
+
     }
 
     @Transactional
@@ -68,6 +93,13 @@ public class ChannelService {
         Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
         return channel;
+    }
+
+    private Member getMember() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        String personalId = userDetails.getUsername();
+
+        return memberService.validateMember(personalId);
     }
 
 

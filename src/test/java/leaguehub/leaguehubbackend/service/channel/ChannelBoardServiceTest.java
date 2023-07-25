@@ -3,6 +3,7 @@ package leaguehub.leaguehubbackend.service.channel;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -51,7 +52,7 @@ class ChannelBoardServiceTest {
     @Autowired
     ParticipantRepository participantRepository;
 
-    private Long channelId;
+    private String channelLink;
 
     Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, String gradeMax, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
@@ -82,13 +83,14 @@ class ChannelBoardServiceTest {
         memberRepository.save(UserFixture.createMember());
         UserFixture.setUpAuth();
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        channelId = channelService.createChannel(createChannelDto);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        channelLink = responseCreateChannelDto.getChannelLink();
     }
 
     @Test
     @DisplayName("게시판 만들기 테스트 - 성공")
     void createChannelBoard() {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
@@ -116,7 +118,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 조회 테스트 - 성공")
     void loadBoard() {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
         List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
@@ -130,7 +132,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 조회 테스트 - 실패(해당 채널이 아닌 다른 채널의 게시판 ID 값으로 조회, 없는 게시판 ID로 조회)")
     void failLoadBoard() throws Exception {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
         memberRepository.save(UserFixture.createCustomeMember("test2"));
         UserFixture.setUpCustomAuth("test2");
@@ -151,7 +153,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 업데이트 테스트 - 성공")
     void updateTest() {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         Long boardId = channelBoards.get(0).getId();
         ChannelBoardDto update = ChannelFixture.updateChannelDto();
@@ -167,7 +169,7 @@ class ChannelBoardServiceTest {
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         participantRepository.save(Participant.participateChannel(test, channel.get()));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         Long boardId = channelBoards.get(0).getId();
@@ -180,7 +182,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 삭제 테스트 - 성공")
     void deleteTest() {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         ChannelBoard channelBoard = channelBoards.get(0);
         channelBoardService.deleteChannelBoard(channel.get().getChannelLink(), channelBoard.getId());
@@ -197,7 +199,7 @@ class ChannelBoardServiceTest {
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         participantRepository.save(Participant.participateChannel(test, channel.get()));
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
         ChannelBoard channelBoard = channelBoards.get(0);
