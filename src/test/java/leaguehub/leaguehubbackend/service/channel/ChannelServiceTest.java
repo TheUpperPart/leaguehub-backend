@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,6 +80,21 @@ class ChannelServiceTest {
 
         assertThat(channel.getTitle()).isEqualTo(findChannel.get().getTitle());
         assertThat(channel.getRealPlayer()).isEqualTo(findChannel.get().getRealPlayer());
+    }
+
+    @Test
+    @DisplayName("참가한 채널 찾기")
+    void findParticipantList() {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+
+        CreateChannelDto createChannelDto1 = ChannelFixture.createChannelDto();
+        createChannelDto1.setTitle("test3");
+        ResponseCreateChannelDto responseCreateChannelDto1 = channelService.createChannel(createChannelDto1);
+
+        List<ParticipantChannelDto> participantChannelList = channelService.findParticipantChannelList();
+
+        assertThat(participantChannelList.size()).isEqualTo(2);
     }
 
 }
