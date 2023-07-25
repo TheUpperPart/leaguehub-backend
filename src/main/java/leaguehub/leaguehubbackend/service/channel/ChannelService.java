@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -58,15 +59,22 @@ public class ChannelService {
     public List<ParticipantChannelDto> findParticipantChannelList() {
         Member member = getMember();
 
-        List<Participant> allByMemberId = participantRepository.findAllByMemberId(member.getId());
-        List<ParticipantChannelDto> participantChannelDtoList = new ArrayList<>();
-        for (Participant participant : allByMemberId) {
-            Channel channel = participant.getChannel();
-            participantChannelDtoList.add(new ParticipantChannelDto(channel.getChannelLink(), channel.getTitle(),
-                    channel.getCategory().getNum(), channel.getChannelImageUrl()));
-        }
+        List<Participant> allByParticipantList = participantRepository.findAllByMemberId(member.getId());
+
+        List<ParticipantChannelDto> participantChannelDtoList = allByParticipantList.stream()
+                .map(participant -> {
+                    Channel channel = participant.getChannel();
+                    return new ParticipantChannelDto(
+                            channel.getChannelLink(),
+                            channel.getTitle(),
+                            channel.getCategory().getNum(),
+                            channel.getChannelImageUrl()
+                    );
+                })
+                .collect(Collectors.toList());
 
         return participantChannelDtoList;
+
     }
 
     @Transactional
