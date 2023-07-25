@@ -3,6 +3,7 @@ package leaguehub.leaguehubbackend.controller.channel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.controller.channel.ChannelController;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -95,8 +96,8 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 정보 가져오기 테스트")
     void getChannelTest() throws Exception {
-        Long id = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findById(id);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + channel.get().getChannelLink()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -108,8 +109,8 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 정보 가져오기 실패 테스트 - 유효하지 않은 채널 링크")
     void getChannelFailTest() throws Exception {
-        Long id = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findById(id);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + "NoValid"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
