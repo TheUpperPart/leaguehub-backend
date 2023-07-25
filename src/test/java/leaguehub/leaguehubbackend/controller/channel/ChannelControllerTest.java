@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -116,5 +117,15 @@ class ChannelControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
+    @Test
+    @DisplayName("채널 리스트 가져오기")
+    void loadChannelsList() throws Exception {
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/channels"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+    }
 
 }
