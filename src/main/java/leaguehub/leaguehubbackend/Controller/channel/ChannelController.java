@@ -1,10 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import jakarta.validation.Valid;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -17,6 +14,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @RestController
@@ -37,28 +36,36 @@ public class ChannelController {
                 log.error(error.getObjectName());
             }
 
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errors, BAD_REQUEST);
         }
 
-        channelService.createChannel(createChannelDto);
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 
-        return new ResponseEntity<>("League successfully created", HttpStatus.OK);
+        return new ResponseEntity<>(responseCreateChannelDto, OK);
     }
 
     @GetMapping("/channel/{channelLink}")
     public ResponseEntity getChannel(@PathVariable("channelLink") String channelLink) {
 
         ChannelDto channelInfo = channelService.findChannel(channelLink);
-        List<ChannelBoardDto> channelBoards = channelBoardService.findChannelBoards(channelLink);
+        List<ChannelBoardLoadDto> channelBoards = channelBoardService.loadChannelBoards(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
-                .channelBoardDtoList(channelBoards)
+                .channelBoardLoadDtoList(channelBoards)
                 .game(channelInfo.getCategory().name())
                 .hostName(participantService.findChannelHost(channelLink))
                 .leagueTitle(channelInfo.getTitle())
                 .permission(participantService.findParticipantPermission(channelLink))
                 .build();
 
-        return new ResponseEntity(responseChannelDto, HttpStatus.OK);
+        return new ResponseEntity(responseChannelDto, OK);
+    }
+
+    @GetMapping("/channels")
+    public ResponseEntity loadChannels() {
+
+        List<ParticipantChannelDto> participantChannelList = channelService.findParticipantChannelList();
+
+        return new ResponseEntity(participantChannelList, OK);
     }
 }

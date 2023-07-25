@@ -3,6 +3,8 @@ package leaguehub.leaguehubbackend.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
+import leaguehub.leaguehubbackend.exception.member.exception.DuplicateEmailException;
+import leaguehub.leaguehubbackend.exception.member.exception.InvalidEmailAddressException;
 import leaguehub.leaguehubbackend.fixture.ProfileResponseFixture;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -99,5 +102,59 @@ class MemberControllerTest {
                 any(HttpServletRequest.class),
                 any(HttpServletResponse.class)
         );
+    }
+
+    @Test
+    @DisplayName("이메일 업데이트 성공")
+    public void whenUpdateEmail_thenReturnSuccessMessage() throws Exception {
+
+        String newEmail = "newEmail@example.com";
+
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        doNothing().when(memberService).updateEmail(newEmail, userDetails.getUsername());
+
+        mockMvc.perform(post("/api/member/email")
+                        .param("email", newEmail))
+                .andExpect(status().isOk())
+                .andExpect(content().string(newEmail));
+
+        verify(memberService).updateEmail(newEmail, userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("이메일 형식이 잘못되었을 때 에러 반환")
+    public void whenUpdateEmailInvalidFormat_thenReturnErrorMessage() throws Exception {
+
+        String newEmail = "newEmailexample.com";
+
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        doThrow(new InvalidEmailAddressException()).when(memberService).updateEmail(newEmail, userDetails.getUsername());
+
+        mockMvc.perform(post("/api/member/email")
+                        .param("email", newEmail))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof InvalidEmailAddressException));
+
+        verify(memberService).updateEmail(newEmail, userDetails.getUsername());
+    }
+
+    @Test
+    @DisplayName("이메일이 중복될 경우 에러 반환")
+    public void whenUpdateEmailDuplicate_thenReturnErrorMessage() throws Exception {
+
+        String newEmail = "duplicate@example.com";
+
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        doThrow(new DuplicateEmailException()).when(memberService).updateEmail(newEmail, userDetails.getUsername());
+
+        mockMvc.perform(post("/api/member/email")
+                        .param("email", newEmail))
+                .andExpect(status().isConflict())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof DuplicateEmailException));
+
+        verify(memberService).updateEmail(newEmail, userDetails.getUsername());
     }
 }

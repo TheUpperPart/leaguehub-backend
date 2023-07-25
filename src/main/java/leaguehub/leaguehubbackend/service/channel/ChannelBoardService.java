@@ -1,8 +1,7 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseBoardDetail;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -15,11 +14,13 @@ import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -33,7 +34,7 @@ public class ChannelBoardService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public void createChannelBoard(String channelLink, RequestChannelBoardDto request) {
+    public void createChannelBoard(String channelLink, ChannelBoardDto request) {
 
         Member member = getMember();
 
@@ -41,8 +42,7 @@ public class ChannelBoardService {
         checkAuth(channelLink, findByMemberId);
 
         findByMemberId.stream()
-                .filter(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                        && participant.getChannel().getChannelLink().equals(channelLink))
+                .filter(getParticipantPredicate(channelLink))
                 .forEach(participant -> {
                     ChannelBoard channelBoard = ChannelBoard.createChannelBoard(participant.getChannel(),
                             request.getTitle(), request.getContent());
@@ -60,20 +60,20 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardDto> findChannelBoards(String channelId) {
-        Channel channel = channelService.validateChannel(channelId);
+    public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
+        Channel channel = channelService.validateChannel(channelLink);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
 
-        List<ChannelBoardDto> channelBoardDtoList = channelBoards.stream()
-                .map(channelBoard -> new ChannelBoardDto(channelBoard.getId(), channelBoard.getTitle()))
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
+                .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle()))
                 .collect(Collectors.toList());
 
-        return channelBoardDtoList;
+        return channelBoardLoadDtoList;
     }
 
     @Transactional
-    public ResponseBoardDetail loadBoardDetail(String channelLink, Long boardId) {
+    public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
         Channel channel = channelService.validateChannel(channelLink);
         ChannelBoard channelBoard = validateChannelBoard(boardId);
 
@@ -81,11 +81,11 @@ public class ChannelBoardService {
             throw new ChannelBoardNotFoundException();
         }
 
-        return new ResponseBoardDetail(channelBoard.getContent());
+        return new ChannelBoardDto(channelBoard.getTitle(), channelBoard.getContent());
     }
 
     @Transactional
-    public void updateChannelBoard(String channelLink, Long boardId, RequestChannelBoardDto update) {
+    public void updateChannelBoard(String channelLink, Long boardId, ChannelBoardDto update) {
         Member member = getMember();
 
         ChannelBoard channelBoard = validateChannelBoard(boardId);
@@ -127,12 +127,17 @@ public class ChannelBoardService {
 
     private void checkAuth(String channelLink, List<Participant> findByMemberId) {
         boolean hasValidParticipant = findByMemberId.stream()
-                .anyMatch(participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                        && participant.getChannel().getChannelLink().equals(channelLink));
+                .anyMatch(getParticipantPredicate(channelLink));
 
         if (!hasValidParticipant) {
             throw new InvalidParticipantAuthException();
         }
+    }
+
+    @NotNull
+    private static Predicate<Participant> getParticipantPredicate(String channelLink) {
+        return participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
+                && participant.getChannel().getChannelLink().equals(channelLink);
     }
 
 

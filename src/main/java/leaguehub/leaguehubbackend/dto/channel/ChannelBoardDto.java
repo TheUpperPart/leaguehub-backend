@@ -1,16 +1,18 @@
 package leaguehub.leaguehubbackend.dto.channel;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ChannelBoardDto {
 
-    private Long id;
+    private String title;
 
-    private String name;
+    private String content;
 
-    public ChannelBoardDto(Long channelBoardId, String name) {
-        this.id = channelBoardId;
-        this.name = name;
+    public ChannelBoardDto(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }

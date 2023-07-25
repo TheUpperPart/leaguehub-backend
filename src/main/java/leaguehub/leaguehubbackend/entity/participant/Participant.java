@@ -77,6 +77,7 @@ public class Participant extends BaseTimeEntity {
     }
 
 
+
     public Participant approveParticipantMatch(){
         this.role = Role.PLAYER;
         this.requestStatus = RequestStatus.DONE;
@@ -95,6 +96,7 @@ public class Participant extends BaseTimeEntity {
     public Participant updateParticipantStatus(String gameId, String gameTier){
         this.gameId = gameId;
         this.gameTier = gameTier;
+
         this.requestStatus = RequestStatus.REQUEST;
 
         return this;

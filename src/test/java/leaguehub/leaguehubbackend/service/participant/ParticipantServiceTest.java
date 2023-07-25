@@ -370,6 +370,7 @@ class ParticipantServiceTest {
 
         assertThat(part2.getRequestStatus()).isEqualTo(RequestStatus.DONE);
         assertThat(part3.getRequestStatus()).isEqualTo(RequestStatus.DONE);
+
     }
 
     @Test

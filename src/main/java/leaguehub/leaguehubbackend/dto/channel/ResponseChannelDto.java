@@ -16,17 +16,17 @@ public class ResponseChannelDto {
 
     private Integer participateNum;
 
-    private List<ChannelBoardDto> boards;
+    private List<ChannelBoardLoadDto> boards;
 
     private Integer permission;
 
     @Builder
-    public ResponseChannelDto(String hostName, String leagueTitle, String game, Integer participateNum, List<ChannelBoardDto> channelBoardDtoList, Integer permission) {
+    public ResponseChannelDto(String hostName, String leagueTitle, String game, Integer participateNum, List<ChannelBoardLoadDto> channelBoardLoadDtoList, Integer permission) {
         this.hostName = hostName;
         this.leagueTitle = leagueTitle;
         this.game = game;
         this.participateNum = participateNum;
-        this.boards = channelBoardDtoList;
+        this.boards = channelBoardLoadDtoList;
         this.permission = permission;
     }
 }
