@@ -15,10 +15,13 @@ public class ChannelDto {
 
     private Integer realPlayer;
 
+    private Integer maxPlayer;
+
     @Builder
-    public ChannelDto(String title, Category category, Integer realPlayer) {
+    public ChannelDto(String title, Category category, Integer realPlayer, Integer maxPlayer) {
         this.title = title;
         this.category = category;
         this.realPlayer = realPlayer;
+        this.maxPlayer = maxPlayer;
     }
 }
