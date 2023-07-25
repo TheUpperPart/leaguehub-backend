@@ -54,6 +54,8 @@ public class ChannelController {
                 .channelBoardLoadDtoList(channelBoards)
                 .game(channelInfo.getCategory().name())
                 .hostName(participantService.findChannelHost(channelLink))
+                .participateNum(channelInfo.getRealPlayer())
+                .maxPlayer(channelInfo.getMaxPlayer())
                 .leagueTitle(channelInfo.getTitle())
                 .permission(participantService.findParticipantPermission(channelLink))
                 .build();
