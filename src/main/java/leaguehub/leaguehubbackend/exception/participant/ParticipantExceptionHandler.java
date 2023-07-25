@@ -92,4 +92,55 @@ public class ParticipantExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ParticipantRejectedRequestedException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantRejectedRequestedException(
+            ParticipantRejectedRequestedException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+    @ExceptionHandler(ParticipantAlreadyRequestedException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantAlreadyRequestedException(
+            ParticipantAlreadyRequestedException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(ParticipantDuplicatedGameIdException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantDuplicatedGameIdException(
+            ParticipantDuplicatedGameIdException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(ParticipantNotGameHostException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantNotGameHostException(
+            ParticipantNotGameHostException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
 }

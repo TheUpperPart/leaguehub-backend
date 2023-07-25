@@ -1,31 +1,28 @@
 package leaguehub.leaguehubbackend.service.participant;
 
-import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
-import leaguehub.leaguehubbackend.dto.participant.RequestPlayerDto;
+import leaguehub.leaguehubbackend.dto.participant.*;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
+
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
@@ -81,16 +78,16 @@ public class ParticipantService {
      * @param channelLink
      * @return RequestPlayerDtoList
      */
-    public List<RequestPlayerDto> loadPlayers(String channelLink){
+    public List<PlayerDto> loadPlayers(String channelLink){
 
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
 
-        List<RequestPlayerDto> dtoList = new ArrayList<>();
+        List<PlayerDto> dtoList = new ArrayList<>();
 
 
         for(Participant participant : findParticipants){
             if(participant.getRole().getNum() == Role.PLAYER.getNum()){
-                RequestPlayerDto playerDto = new RequestPlayerDto();
+                PlayerDto playerDto = new PlayerDto();
                 playerDto.setName(participant.getNickname());
                 playerDto.setImgSrc(participant.getProfileImageUrl());
                 playerDto.setGameId(participant.getGameId());
@@ -102,12 +99,7 @@ public class ParticipantService {
         return dtoList;
     }
 
-    /**
-     * 참가하기 버튼을 통하여 참가 자격이 있는지 확인
-     * @param channelLink 해당 채널 아이디
-     */
-    public Participant checkParticipateMatch(String channelLink){
-
+    public Participant getParticipant(String channelLink){
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
         if (userDetails == null) {
@@ -120,8 +112,25 @@ public class ParticipantService {
 
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
 
-        if(participant.getRole().getNum() != 3)
+        return participant;
+    }
+
+    /**
+     * 참가하기 버튼을 통하여 참가 자격이 있는지 확인
+     * @param channelLink 해당 채널 아이디
+     */
+    public Participant checkParticipateMatch(String channelLink){
+
+        Participant participant = getParticipant(channelLink);
+
+        if(participant.getRole().getNum() != OBSERVER.getNum() || participant.getRequestStatus().getNum() == RequestStatus.DONE.getNum())
             throw new ParticipantInvalidRoleException();
+
+        if(participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum())
+            throw new ParticipantAlreadyRequestedException();
+
+        if(participant.getRequestStatus().getNum() == RequestStatus.REJECT.getNum())
+            throw new ParticipantRejectedRequestedException();
 
         return participant;
     }
@@ -286,6 +295,16 @@ public class ParticipantService {
         }
     }
 
+    public void checkDuplicateNickname(String gameId, String channelLink){
+        List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
+
+        for(Participant user : participantList){
+            if(Objects.equals(user.getGameId(), gameId))
+                throw new ParticipantDuplicatedGameIdException();
+        }
+
+    }
+
     /**
      * 관전자인 사용자가 해당 채널의 경기에 참가
      * @param responseDto
@@ -296,14 +315,92 @@ public class ParticipantService {
 
         ChannelRule channelRule = channelRepository.findByChannelLink(responseDto.getChannelLink()).get().getChannelRule();
 
-        String userDetail = requestUserDetail(responseDto.getNickname());
+        checkDuplicateNickname(responseDto.getGameId(), responseDto.getChannelLink());
+
+        String userDetail = requestUserDetail(responseDto.getGameId());
 
         GameRankDto tier = searchTier(userDetail);
 
         checkRule(channelRule, userDetail, tier);
 
-        participant.updateParticipantStatus(responseDto.getNickname(), tier.getGameRank().toString());
+        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString());
     }
+
+    /**
+     * 요청을 보낸 사람들을 조회
+     * @param channelLink
+     * @return
+     */
+    public List<ResponseStatusPlayerDto> loadRequestStatusPlayerList(String channelLink){
+
+        checkRoleHost(channelLink);
+
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
+
+        List<ResponseStatusPlayerDto> dtoList = new ArrayList<>();
+
+
+        for(Participant participant : findParticipants){
+            if(participant.getRole().getNum() == OBSERVER.getNum() &&
+            participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum()){
+                ResponseStatusPlayerDto requestPlayerDto = new ResponseStatusPlayerDto();
+                requestPlayerDto.setPk(participant.getId());
+                requestPlayerDto.setNickname(participant.getNickname());
+                requestPlayerDto.setGameId(participant.getGameId());
+                requestPlayerDto.setTier(participant.getGameTier());
+
+                dtoList.add(requestPlayerDto);
+            }
+        }
+
+        return dtoList;
+    }
+
+    /**
+     * 해당채널의 관리자가 맞는지 확인
+     * @param channelLink
+     */
+    public void checkRoleHost(String channelLink){
+        Participant participant = getParticipant(channelLink);
+
+        if(participant.getRole().getNum() != HOST.getNum())
+            throw new ParticipantNotGameHostException();
+        
+    }
+
+    /**
+     * 해당 채널의 요청한 참가자를 승인해줌
+     *
+     * @param channelLink
+     * @param participantId
+     */
+    public void approveParticipantRequest(String channelLink, Long participantId){
+        
+        checkRoleHost(channelLink);
+
+        Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+
+        findParticipant.approveParticipantMatch();
+
+    }
+
+    /**
+     * 해당 채널의 요청한 참가자를 거절함
+     * @param channelLink
+     * @param participantId
+     */
+    public void rejectedParticipantRequest(String channelLink, Long participantId){
+
+        checkRoleHost(channelLink);
+
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+
+        participant.rejectParticipantRequest();
+
+    }
+
+
+
 
 
 
