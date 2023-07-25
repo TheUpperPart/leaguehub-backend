@@ -84,8 +84,7 @@ public class ChannelService {
                 .orElseThrow(ChannelNotFoundException::new);
 
         ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
-                .realPlayer(findChannel.getRealPlayer()).category(findChannel.getCategory())
-                .maxPlayer(findChannel.getMaxPlayer()).build();
+                .realPlayer(findChannel.getRealPlayer()).category(findChannel.getCategory()).build();
 
         return channelDto;
     }

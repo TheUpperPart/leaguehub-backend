@@ -19,7 +19,7 @@ public class CreateChannelDto {
     private int game;
 
     @NotNull
-    @JsonProperty("matchFormat")
+    @JsonProperty("matchformat")
     private Integer tournament;
 
     @NotNull
@@ -27,7 +27,7 @@ public class CreateChannelDto {
     private String title;
 
     @NotNull
-    @JsonProperty("maxPlayer")
+    @JsonProperty("participationNum")
     private Integer participationNum;
 
     @NotNull
@@ -44,10 +44,10 @@ public class CreateChannelDto {
     private String channelImageUrl;
 
     @NotNull
-    @JsonProperty("playCount")
+    @JsonProperty("playcount")
     private Boolean playCount;
 
-    @JsonProperty("playCountMin")
+    @JsonProperty("playcountMin")
     private Integer playCountMin;
 
     @Builder
