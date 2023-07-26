@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -104,12 +105,14 @@ class ChannelBoardControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.boardIndex").value(4))
+                .andDo(print());
     }
 
     @Test
     @DisplayName("게시판 만들기 - 실패(권한없음)")
-    void FailCreateChannelBoard() throws Exception {
+    void 트FailCreateChannelBoard() throws Exception {
         Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
