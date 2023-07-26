@@ -2,22 +2,24 @@ package leaguehub.leaguehubbackend.dto.channel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ChannelBoardLoadDto {
 
     @JsonProperty("boardId")
-    private Long id;
+    private Long boardId;
 
     @JsonProperty("boardTitle")
-    private String title;
+    private String boardTitle;
 
     @JsonProperty("boardIndex")
-    private int index;
+    private int boardIndex;
 
     public ChannelBoardLoadDto(Long channelBoardId, String title, int index) {
-        this.id = channelBoardId;
-        this.title = title;
-        this.index = index;
+        this.boardId = channelBoardId;
+        this.boardTitle = title;
+        this.boardIndex = index;
     }
 }

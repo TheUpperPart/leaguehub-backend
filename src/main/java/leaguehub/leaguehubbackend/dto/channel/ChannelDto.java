@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import leaguehub.leaguehubbackend.entity.channel.Category;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ChannelDto {
 
     private String title;
