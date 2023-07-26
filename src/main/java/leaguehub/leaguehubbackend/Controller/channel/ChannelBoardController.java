@@ -27,9 +27,9 @@ public class ChannelBoardController {
     @PostMapping("/channel/{channelLink}/new")
     public ResponseEntity createChannelBoard(@PathVariable("channelLink") String channelLink,
                                              @RequestBody ChannelBoardDto request) {
-        channelBoardService.createChannelBoard(channelLink, request);
+        ChannelBoardLoadDto channelBoardLoadDto = channelBoardService.createChannelBoard(channelLink, request);
 
-        return new ResponseEntity("Board successfully created", OK);
+        return new ResponseEntity(channelBoardLoadDto, OK);
     }
 
     @PostMapping("/channel/{channelLink}/{boardId}")
