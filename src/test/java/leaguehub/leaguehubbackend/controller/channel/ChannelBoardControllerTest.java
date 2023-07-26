@@ -130,7 +130,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/"
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
@@ -159,7 +159,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
@@ -186,7 +186,7 @@ class ChannelBoardControllerTest {
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
         participantRepository.save(Participant.participateChannel(test, findChannel));
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(findChannel);
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(findChannel.getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
 
@@ -203,7 +203,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
@@ -220,7 +220,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
@@ -234,7 +234,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
