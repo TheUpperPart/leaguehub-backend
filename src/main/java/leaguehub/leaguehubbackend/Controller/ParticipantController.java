@@ -1,6 +1,5 @@
 package leaguehub.leaguehubbackend.controller;
 
-import leaguehub.leaguehubbackend.dto.channel.RequestChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.dto.participant.PlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
@@ -23,13 +22,14 @@ public class ParticipantController {
 
     /**
      * nickname과 category를 받아 게임 티어 검색
+     *
      * @param nickname
      * @param category
      * @return
      */
     @GetMapping("/stat")
     public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname,
-                                               @RequestParam(value = "gamecategory") Integer category){
+                                        @RequestParam(value = "gamecategory") Integer category) {
 
         ResponseUserDetailDto userDetailDto = participantService.selectGameCategory(nickname, category);
 
@@ -39,11 +39,12 @@ public class ParticipantController {
     /**
      * api 주소 확정 필요
      * 역할이 관전자일 경우 참가 버튼을 누르면 model창 출력
+     *
      * @param channelLink
      * @return responseEntity
      */
     @GetMapping("/participant/{channelLink}")
-    public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink) {
 
         participantService.checkParticipateMatch(channelLink);
 
@@ -53,11 +54,12 @@ public class ParticipantController {
     /**
      * api 주소 확정 필요
      * 관전자인 사용자가 gameId를 가지고 해당 채널의 경기에 참가(TFT 만)
+     *
      * @param responseDto
      * @return responseEntity
      */
     @PostMapping("/participant/match")
-    public ResponseEntity participateMatch(@RequestBody ParticipantResponseDto responseDto){
+    public ResponseEntity participateMatch(@RequestBody ParticipantResponseDto responseDto) {
 
         participantService.participateMatch(responseDto);
 
@@ -66,11 +68,12 @@ public class ParticipantController {
 
     /**
      * 채널에 PLAYER 역할인 사람들을 조회
+     *
      * @param channelLink
      * @return ResponseEntity
      */
     @GetMapping("/player")
-    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink){
+    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink) {
 
         List<PlayerDto> players = participantService.loadPlayers(channelLink);
 
@@ -79,11 +82,12 @@ public class ParticipantController {
 
     /**
      * 관리자가 request상태인 유저들을 조회
+     *
      * @param channelLink
      * @return
      */
     @GetMapping("/player/already")
-    public ResponseEntity loadRequestPlayer(@RequestParam(value = "channelLink") String channelLink){
+    public ResponseEntity loadRequestPlayer(@RequestParam(value = "channelLink") String channelLink) {
 
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadRequestStatusPlayerList(channelLink);
 
@@ -96,7 +100,7 @@ public class ParticipantController {
 
     @PostMapping("/player/approve/{channelLink}/{participantId}")
     public ResponseEntity approveParticipant(@PathVariable("channelLink") String channelLink,
-                                             @PathVariable("participantId") Long participantId){
+                                             @PathVariable("participantId") Long participantId) {
 
         participantService.approveParticipantRequest(channelLink, participantId);
 
@@ -105,7 +109,7 @@ public class ParticipantController {
 
     @PostMapping("/player/reject/{channelLink}/{participantId}")
     public ResponseEntity rejectedParticipant(@PathVariable("channelLink") String channelLink,
-                                              @PathVariable("participantId") Long participantId){
+                                              @PathVariable("participantId") Long participantId) {
 
         participantService.rejectedParticipantRequest(channelLink, participantId);
 

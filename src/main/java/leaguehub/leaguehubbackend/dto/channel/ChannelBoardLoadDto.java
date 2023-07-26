@@ -12,8 +12,12 @@ public class ChannelBoardLoadDto {
     @JsonProperty("boardTitle")
     private String title;
 
-    public ChannelBoardLoadDto(Long channelBoardId, String title) {
+    @JsonProperty("boardIndex")
+    private int index;
+
+    public ChannelBoardLoadDto(Long channelBoardId, String title, int index) {
         this.id = channelBoardId;
         this.title = title;
+        this.index = index;
     }
 }
