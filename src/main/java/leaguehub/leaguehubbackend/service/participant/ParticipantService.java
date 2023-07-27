@@ -115,16 +115,20 @@ public class ParticipantService {
      * @param channelLink 해당 채널 아이디
      */
     public Participant checkParticipateMatch(String channelLink) {
+        int requestStatusRequest = 1;
+        int requestStatusDone = 2;
+        int requestStatusReject = 3;
+        int roleObserver = 3;
 
         Participant participant = getParticipant(channelLink);
 
-        if (participant.getRole().getNum() != OBSERVER.getNum() || participant.getRequestStatus().getNum() == RequestStatus.DONE.getNum())
+        if (participant.getRole().getNum() != roleObserver || participant.getRequestStatus().getNum() == requestStatusDone)
             throw new ParticipantInvalidRoleException();
 
-        if (participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum())
+        if (participant.getRequestStatus().getNum() == requestStatusRequest)
             throw new ParticipantAlreadyRequestedException();
 
-        if (participant.getRequestStatus().getNum() == RequestStatus.REJECT.getNum())
+        if (participant.getRequestStatus().getNum() == requestStatusReject)
             throw new ParticipantRejectedRequestedException();
 
         return participant;
@@ -213,9 +217,9 @@ public class ParticipantService {
         String rank = summonerDetail.get("rank").toString();
         String leaguePoints = summonerDetail.get("leaguePoints").toString();
 
-        if (tier.equalsIgnoreCase("master") ||
-                tier.equalsIgnoreCase("grandmaster")
-                || tier.equalsIgnoreCase("challenger")) {
+        if (tier.equalsIgnoreCase(GameTier.MASTER.toString()) ||
+                tier.equalsIgnoreCase(GameTier.GRANDMASTER.toString())
+                || tier.equalsIgnoreCase(GameTier.CHALLENGER.toString())) {
             return GameTier.getRanked(tier, leaguePoints);
         }
 
