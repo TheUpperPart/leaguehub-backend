@@ -287,17 +287,25 @@ public class ParticipantService {
      * @param tier
      */
     public void checkRule(ChannelRule channelRule, String userDetail, GameRankDto tier) {
-        if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
-                throw new ParticipantInvalidRankException();
-        }
+        rankRuleCheck(channelRule, tier);
+        playCountRuleCheck(channelRule, userDetail);
+    }
+
+    private void playCountRuleCheck(ChannelRule channelRule, String userDetail) {
         if (channelRule.getPlayCount()) {
             int limitedPlayCount = channelRule.getLimitedPlayCount();
             int userPlayCount = getPlayCount(userDetail);
             if (userPlayCount < limitedPlayCount)
                 throw new ParticipantInvalidPlayCountException();
+        }
+    }
+
+    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+        if (channelRule.getTier()) {
+            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
+            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            if (userRankScore > limitedRankScore)
+                throw new ParticipantInvalidRankException();
         }
     }
 
