@@ -78,10 +78,9 @@ public class ParticipantService {
      */
     public List<ResponseStatusPlayerDto> loadPlayers(String channelLink) {
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, Role.PLAYER, RequestStatus.DONE);
 
         return findParticipants.stream()
-                .filter(participant -> participant.getRole().getNum() == Role.PLAYER.getNum())
                 .map(participant -> {
                     ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
                     responsePlayerDto.setPk(participant.getId());
@@ -340,11 +339,9 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, RequestStatus.REQUEST);
 
         return findParticipants.stream()
-                .filter(participant -> participant.getRole().getNum() == Role.OBSERVER.getNum() &&
-                        participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum())
                 .map(participant -> {
                     ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
                     responsePlayerDto.setPk(participant.getId());
@@ -413,11 +410,9 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, RequestStatus.NOREQUEST);
 
         return findParticipants.stream()
-                .filter(participant -> participant.getRole().getNum() == OBSERVER.getNum() &&
-                        participant.getRequestStatus().getNum() == RequestStatus.NOREQUEST.getNum())
                 .map(participant -> {
                     ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
                     responsePlayerDto.setPk(participant.getId());
