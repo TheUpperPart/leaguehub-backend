@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.service.channel;
 
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
@@ -96,6 +96,7 @@ class ChannelBoardServiceTest {
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
 
         assertThat(channelBoards.size()).isEqualTo(4);
+        assertThat(channelBoards.get(channelBoards.size() - 1).getIndex()).isEqualTo(4);
     }
 
     @Test
@@ -123,7 +124,7 @@ class ChannelBoardServiceTest {
 
         List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
 
-        ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getId());
+        ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getBoardId());
 
         assertThat(findChannelBoards.size()).isEqualTo(4);
         assertThat(channelBoardDto.getContent()).isEqualTo("test");
@@ -190,6 +191,9 @@ class ChannelBoardServiceTest {
 
         assertThat(flushBoard.size()).isEqualTo(2);
         assertThat(flushBoard).doesNotContain(channelBoard);
+        for (ChannelBoard board : flushBoard) {
+            assertThat(board.getIndex()).isNotEqualTo(3);
+        }
     }
 
 
@@ -204,6 +208,44 @@ class ChannelBoardServiceTest {
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         ChannelBoard channelBoard = channelBoards.get(0);
         assertThatThrownBy(() -> channelBoardService.deleteChannelBoard(channel.get().getChannelLink(), channelBoard.getId()))
+                .isInstanceOf(InvalidParticipantAuthException.class);
+    }
+
+    @Test
+    @DisplayName("게시판 드래그앤드랍 인덱스 테스트 - 성공")
+    void updateIndex() {
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+        channelBoardLoadDtoList.get(0).setBoardIndex(3);
+        channelBoardLoadDtoList.get(2).setBoardIndex(1);
+
+        channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
+
+        Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
+        List<ChannelBoard> allByChannelId = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+
+        for (ChannelBoard channelBoard : allByChannelId) {
+            if (channelBoard.getIndex() == 3) {
+                assertThat(channelBoard.getTitle()).isEqualTo("리그 공지사항");
+            }
+
+            if (channelBoard.getIndex() == 1) {
+                assertThat(channelBoard.getTitle()).isEqualTo("참여하기");
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("게시판 드래그앤드랍 인덱스 테스트 - 실패(권한없음)")
+    void updateIndex_NoAuth() {
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+        channelBoardLoadDtoList.get(0).setBoardIndex(3);
+        channelBoardLoadDtoList.get(2).setBoardIndex(1);
+
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
+
+        assertThatThrownBy(() -> channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList))
                 .isInstanceOf(InvalidParticipantAuthException.class);
     }
 

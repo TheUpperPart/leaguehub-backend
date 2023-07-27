@@ -3,10 +3,12 @@ package leaguehub.leaguehubbackend.dto.channel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class ResponseChannelDto {
 
     private String hostName;
