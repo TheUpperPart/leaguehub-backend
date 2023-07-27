@@ -3,7 +3,6 @@ package leaguehub.leaguehubbackend.service.participant;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
-import leaguehub.leaguehubbackend.dto.participant.PlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
@@ -358,13 +357,13 @@ class ParticipantServiceTest {
 
 
         //when
-        List<PlayerDto> requestPlayerDto = participantService.loadPlayers(channel.getChannelLink());
+        List<ResponseStatusPlayerDto> requestPlayerDto = participantService.loadPlayers(channel.getChannelLink());
 
         //then
-        assertThat(part2.getNickname()).isEqualTo(requestPlayerDto.get(0).getName());
+        assertThat(part2.getNickname()).isEqualTo(requestPlayerDto.get(0).getNickname());
         assertThat(part2.getGameId()).isEqualTo(requestPlayerDto.get(0).getGameId());
 
-        assertThat(part3.getNickname()).isEqualTo(requestPlayerDto.get(1).getName());
+        assertThat(part3.getNickname()).isEqualTo(requestPlayerDto.get(1).getNickname());
         assertThat(part3.getGameId()).isEqualTo(requestPlayerDto.get(1).getGameId());
 
 

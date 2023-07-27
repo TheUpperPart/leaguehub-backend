@@ -330,11 +330,11 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100",20);
         UserFixture.setUpCustomAuth("id");
 
-        mockMvc.perform(get("/api/player?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/profile/player?channelLink=" + channel.getChannelLink()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].name").value("참가된사람1"))
+                .andExpect(jsonPath("[0].nickname").value("참가된사람1"))
                 .andExpect(jsonPath("[0].gameId").value("참가된사람1"))
-                .andExpect(jsonPath("[1].name").value("참가된사람2"))
+                .andExpect(jsonPath("[1].nickname").value("참가된사람2"))
                 .andExpect(jsonPath("[1].gameId").value("참가된사람2"))
                 .andDo(print());
 
@@ -348,7 +348,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100",20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        mockMvc.perform(get("/api/player/already?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
                 .andExpect(status().isBadRequest());
 
     }
@@ -360,7 +360,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100",20);
         UserFixture.setUpCustomAuth("id");
 
-        mockMvc.perform(get("/api/player/already?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].nickname").value("요청한사람"))
                 .andExpect(jsonPath("[0].gameId").value("bronze"))

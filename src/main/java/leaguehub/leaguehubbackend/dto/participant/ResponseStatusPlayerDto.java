@@ -9,6 +9,8 @@ public class ResponseStatusPlayerDto {
 
     String nickname;
 
+    String imgSrc;
+
     String gameId;
 
     String tier;
