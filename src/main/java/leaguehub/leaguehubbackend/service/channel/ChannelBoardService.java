@@ -14,13 +14,11 @@ import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -34,39 +32,38 @@ public class ChannelBoardService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public void createChannelBoard(String channelLink, ChannelBoardDto request) {
+    public ChannelBoardLoadDto createChannelBoard(String channelLink, ChannelBoardDto request) {
 
         Member member = getMember();
+        Channel channel = channelService.validateChannel(channelLink);
+        Participant participant = getParticipant(channel.getId(), member.getId());
+        checkAuth(participant.getRole());
 
-        List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
-        checkAuth(channelLink, findByMemberId);
-
-        findByMemberId.stream()
-                .filter(getParticipantPredicate(channelLink))
-                .forEach(participant -> {
-                    ChannelBoard channelBoard = ChannelBoard.createChannelBoard(participant.getChannel(),
-                            request.getTitle(), request.getContent());
-                    channelBoardRepository.save(channelBoard);
-                });
+        Integer maxIndexByChannel = channelBoardRepository.findMaxIndexByChannel(channel);
 
 
+        ChannelBoard channelBoard = ChannelBoard.createChannelBoard(channel,
+                request.getTitle(), request.getContent(), maxIndexByChannel + 1);
+        channelBoardRepository.save(channelBoard);
+
+        return new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex());
     }
 
 
     /**
      * 채널 로딩 시점에서 불러오는 채널 게시판(내용은 반환하지 않음.)
      *
-     * @param channelId
+     * @param channelLink
      * @return List
      */
     @Transactional
     public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
         Channel channel = channelService.validateChannel(channelLink);
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel);
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
 
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
-                .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle()))
+                .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex()))
                 .collect(Collectors.toList());
 
         return channelBoardLoadDtoList;
@@ -75,46 +72,63 @@ public class ChannelBoardService {
     @Transactional
     public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
         Channel channel = channelService.validateChannel(channelLink);
-        ChannelBoard channelBoard = validateChannelBoard(boardId);
+        ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
-        if (channelBoard.getChannel() != channel) {
-            throw new ChannelBoardNotFoundException();
-        }
 
         return new ChannelBoardDto(channelBoard.getTitle(), channelBoard.getContent());
     }
 
     @Transactional
     public void updateChannelBoard(String channelLink, Long boardId, ChannelBoardDto update) {
+
         Member member = getMember();
 
-        ChannelBoard channelBoard = validateChannelBoard(boardId);
+        Channel channel = channelService.validateChannel(channelLink);
+        Participant participant = getParticipant(channel.getId(), member.getId());
+        checkAuth(participant.getRole());
 
-        List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
-        checkAuth(channelLink, findByMemberId);
+        ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
-        findByMemberId.stream()
-                .filter(participant -> participant.getChannel() == channelBoard.getChannel()
-                        && (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER))
-                .forEach(participant ->
-                        channelBoardRepository.findById(boardId).get().updateChannelBoard(update.getTitle(), update.getContent()));
 
+        channelBoard.updateChannelBoard(update.getTitle(), update.getContent());
     }
 
     @Transactional
     public void deleteChannelBoard(String channelLink, Long boardId) {
         Member member = getMember();
 
-        ChannelBoard channelBoard = validateChannelBoard(boardId);
+        Channel channel = channelService.validateChannel(channelLink);
+        Participant participant = getParticipant(channel.getId(), member.getId());
 
-        List<Participant> findByMemberId = participantRepository.findAllByMemberId(member.getId());
-        checkAuth(channelLink, findByMemberId);
+        checkAuth(participant.getRole());
 
-        findByMemberId.stream()
-                .filter(participant -> participant.getChannel() == channelBoard.getChannel()
-                        && (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER))
-                .forEach(participant -> channelBoardRepository.deleteById(boardId));
+        ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
+
+        channelBoardRepository.delete(channelBoard);
+        List<ChannelBoard> boardsAfterDeleted = channelBoardRepository.findAllByChannelAndIndexGreaterThan(channel, channelBoard.getIndex());
+        for (ChannelBoard board : boardsAfterDeleted) {
+            board.updateIndex(board.getIndex() - 1);
+        }
+    }
+
+    @Transactional
+    public void updateChannelBoardIndex(String channelLink, List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
+        Member member = getMember();
+
+        Channel channel = channelService.validateChannel(channelLink);
+        Participant participant = getParticipant(channel.getId(), member.getId());
+
+        checkAuth(participant.getRole());
+
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+
+        channelBoardLoadDtoList.forEach(channelBoardLoadDto -> {
+            channelBoards.stream()
+                    .filter(channelBoard -> channelBoard.getId() == channelBoardLoadDto.getBoardId())
+                    .findFirst()
+                    .ifPresent(channelBoard -> channelBoard.updateIndex(channelBoardLoadDto.getBoardIndex()));
+        });
     }
 
     private Member getMember() {
@@ -125,26 +139,20 @@ public class ChannelBoardService {
         return member;
     }
 
-    private void checkAuth(String channelLink, List<Participant> findByMemberId) {
-        boolean hasValidParticipant = findByMemberId.stream()
-                .anyMatch(getParticipantPredicate(channelLink));
+    private Participant getParticipant(Long channelId, Long memberId) {
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
+                .orElseThrow(() -> new InvalidParticipantAuthException());
+        return participant;
+    }
 
-        if (!hasValidParticipant) {
+    public ChannelBoard validateChannelBoard(Long channelBoardId, Long channelId) {
+        return channelBoardRepository.findChannelBoardsByIdAndChannel_Id(channelBoardId, channelId)
+                .orElseThrow(() -> new ChannelBoardNotFoundException());
+    }
+
+    private void checkAuth(Role role) {
+        if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }
     }
-
-    @NotNull
-    private static Predicate<Participant> getParticipantPredicate(String channelLink) {
-        return participant -> (participant.getRole() == Role.HOST || participant.getRole() == Role.MANAGER)
-                && participant.getChannel().getChannelLink().equals(channelLink);
-    }
-
-
-    public ChannelBoard validateChannelBoard(Long channelBoardId) {
-        return channelBoardRepository.findById(channelBoardId)
-                .orElseThrow(ChannelBoardNotFoundException::new);
-    }
-
-
 }

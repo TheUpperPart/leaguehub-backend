@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -24,9 +27,9 @@ public class ChannelBoardController {
     @PostMapping("/channel/{channelLink}/new")
     public ResponseEntity createChannelBoard(@PathVariable("channelLink") String channelLink,
                                              @RequestBody ChannelBoardDto request) {
-        channelBoardService.createChannelBoard(channelLink, request);
+        ChannelBoardLoadDto channelBoardLoadDto = channelBoardService.createChannelBoard(channelLink, request);
 
-        return new ResponseEntity("Board successfully created", OK);
+        return new ResponseEntity(channelBoardLoadDto, OK);
     }
 
     @PostMapping("/channel/{channelLink}/{boardId}")
@@ -53,5 +56,13 @@ public class ChannelBoardController {
         ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channelLink, boardId);
 
         return new ResponseEntity(channelBoardDto, OK);
+    }
+
+    @PostMapping("/channel/{channelLink}/index")
+    public ResponseEntity updateChannelBoardIndex(@PathVariable("channelLink") String channelLink,
+                                                  @RequestBody List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
+        channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
+
+        return new ResponseEntity("BoardIndex successfully updated", OK);
     }
 }

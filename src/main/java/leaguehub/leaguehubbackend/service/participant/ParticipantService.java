@@ -7,14 +7,23 @@ import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,16 +31,6 @@ import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
-
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import lombok.SneakyThrows;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 
 @Service
@@ -76,6 +75,7 @@ public class ParticipantService {
      * @param channelLink
      * @return RequestPlayerDtoList
      */
+
     public List<ResponseStatusPlayerDto> loadPlayers(String channelLink) {
 
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, Role.PLAYER, RequestStatus.DONE);
@@ -104,7 +104,8 @@ public class ParticipantService {
 
         Member member = memberService.validateMember(personalId);
 
-        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
+                .orElseThrow(() -> new InvalidParticipantAuthException());
 
         return participant;
     }
@@ -115,6 +116,7 @@ public class ParticipantService {
      * @param channelLink 해당 채널 아이디
      */
     public Participant checkParticipateMatch(String channelLink) {
+
         int requestStatusRequest = 1;
         int requestStatusDone = 2;
         int requestStatusReject = 3;
@@ -129,6 +131,7 @@ public class ParticipantService {
             throw new ParticipantAlreadyRequestedException();
 
         if (participant.getRequestStatus().getNum() == requestStatusReject)
+
             throw new ParticipantRejectedRequestedException();
 
         return participant;
@@ -217,9 +220,11 @@ public class ParticipantService {
         String rank = summonerDetail.get("rank").toString();
         String leaguePoints = summonerDetail.get("leaguePoints").toString();
 
+
         if (tier.equalsIgnoreCase(GameTier.MASTER.toString()) ||
                 tier.equalsIgnoreCase(GameTier.GRANDMASTER.toString())
                 || tier.equalsIgnoreCase(GameTier.CHALLENGER.toString())) {
+
             return GameTier.getRanked(tier, leaguePoints);
         }
 
@@ -287,11 +292,13 @@ public class ParticipantService {
      * @param tier
      */
     public void checkRule(ChannelRule channelRule, String userDetail, GameRankDto tier) {
+
         rankRuleCheck(channelRule, tier);
         playCountRuleCheck(channelRule, userDetail);
     }
 
     private void playCountRuleCheck(ChannelRule channelRule, String userDetail) {
+
         if (channelRule.getPlayCount()) {
             int limitedPlayCount = channelRule.getLimitedPlayCount();
             int userPlayCount = getPlayCount(userDetail);
@@ -299,6 +306,7 @@ public class ParticipantService {
                 throw new ParticipantInvalidPlayCountException();
         }
     }
+
 
     private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
         if (channelRule.getTier()) {
@@ -308,6 +316,7 @@ public class ParticipantService {
                 throw new ParticipantInvalidRankException();
         }
     }
+
 
     public void checkDuplicateNickname(String gameId, String channelLink) {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
@@ -351,6 +360,7 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
+
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, RequestStatus.REQUEST);
 
         return findParticipants.stream()
@@ -363,6 +373,7 @@ public class ParticipantService {
                     return responsePlayerDto;
                 })
                 .collect(Collectors.toList());
+
     }
 
     /**
@@ -415,6 +426,7 @@ public class ParticipantService {
 
         Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
 
+
         participant.updateHostRole();
     }
 
@@ -436,6 +448,7 @@ public class ParticipantService {
                 })
                 .collect(Collectors.toList());
     }
+
 
 
 }

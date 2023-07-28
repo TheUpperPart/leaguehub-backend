@@ -73,6 +73,7 @@ public class MemberService {
             if (auth != null){
                 new SecurityContextLogoutHandler().logout(request, response, auth);
                 member.updateRefreshToken(null);
+                SecurityContextHolder.clearContext();
                 memberRepository.save(member);
             }
         } else {

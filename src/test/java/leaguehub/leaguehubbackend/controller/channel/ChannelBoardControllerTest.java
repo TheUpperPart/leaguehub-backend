@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
@@ -14,6 +15,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
@@ -51,6 +54,8 @@ class ChannelBoardControllerTest {
     ChannelRepository channelRepository;
     @Autowired
     ChannelBoardRepository channelBoardRepository;
+    @Autowired
+    ChannelBoardService channelBoardService;
     @Autowired
     ParticipantRepository participantRepository;
     @Autowired
@@ -100,12 +105,14 @@ class ChannelBoardControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.boardIndex").value(4))
+                .andDo(print());
     }
 
     @Test
     @DisplayName("게시판 만들기 - 실패(권한없음)")
-    void FailCreateChannelBoard() throws Exception {
+    void 트FailCreateChannelBoard() throws Exception {
         Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
@@ -130,7 +137,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/"
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
@@ -159,7 +166,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
@@ -186,7 +193,7 @@ class ChannelBoardControllerTest {
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
         participantRepository.save(Participant.participateChannel(test, findChannel));
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(findChannel);
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(findChannel.getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
 
@@ -203,7 +210,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
@@ -220,7 +227,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
                         + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
@@ -234,7 +241,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel(channel.get());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
         UserFixture.setUpCustomAuth("test231");
@@ -259,5 +266,50 @@ class ChannelBoardControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("게시판 인덱스 업데이트 - 성공")
+    void updateIndex() throws Exception {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
+        channelBoardLoadDtoList.get(0).setBoardIndex(3);
+        channelBoardLoadDtoList.get(2).setBoardIndex(1);
+
+        String json = objectMapper.writeValueAsString(channelBoardLoadDtoList);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
+                                + channel.get().getChannelLink() + "/index")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("게시판 인덱스 업데이트 - 실패(권한 없음)")
+    void failUpdateIndex() throws Exception {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
+        channelBoardLoadDtoList.get(0).setBoardIndex(3);
+        channelBoardLoadDtoList.get(2).setBoardIndex(1);
+
+        String json = objectMapper.writeValueAsString(channelBoardLoadDtoList);
+
+        Member test = UserFixture.createCustomeMember("test231");
+        memberRepository.save(test);
+        UserFixture.setUpCustomAuth("test231");
+        participantRepository.save(Participant.participateChannel(test, channel.get()));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
+                                + channel.get().getChannelLink() + "/index")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+
+    }
 
 }

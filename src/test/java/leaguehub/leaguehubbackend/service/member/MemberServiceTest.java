@@ -11,6 +11,7 @@ import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundExcep
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,6 +42,7 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Test
+    @DisplayName("개인 아이디로 멤버 찾기")
     void findMemberByPersonalId() {
         Member expectedMember = UserFixture.createMember();
         when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.of(expectedMember));
@@ -52,6 +54,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("리프레시 토큰으로 멤버 찾기")
     void findMemberByRefreshToken() {
         Member expectedMember = UserFixture.createMember();
         when(memberRepository.findByRefreshToken("refreshToken")).thenReturn(Optional.of(expectedMember));
@@ -63,6 +66,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("새로운 멤버 저장")
     void saveMember() {
         KakaoUserDto kakaoUserDto = KakaoUserDtoFixture.createKakaoUserDto();
         Member expectedMember = Member.kakaoUserToMember(KakaoUserDtoFixture.createKakaoUserDto()); 
@@ -79,6 +83,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("개인 아이디로 멤버 유효성 검사")
     void validateMember() {
         Member expectedMember = UserFixture.createMember();
         when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.of(expectedMember));
@@ -92,6 +97,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("개인 아이디로 멤버 프로필 가져오기")
     void getMemberProfile() {
         Member testMember = UserFixture.createMember();
         when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.of(testMember));
@@ -108,6 +114,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 로그아웃")
     void logoutMember() {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -126,9 +133,11 @@ class MemberServiceTest {
 
         verify(memberRepository).save(testMember);
 
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
+    @DisplayName("사용자 이름이 일치하지 않을 때 멤버 로그아웃")
     void logoutMember_WhenUsernamesDoNotMatch() {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -144,9 +153,11 @@ class MemberServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         assertThrows(MemberNotFoundException.class, () -> memberService.logoutMember("id", userDetails, request, response));
+
     }
 
     @Test
+    @DisplayName("유효한 이메일로 멤버 이메일 업데이트")
     void updateEmailWithValidEmail() {
         String testEmail = "test@example.com";
         String testId = "12345678";
@@ -160,6 +171,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("유효하지 않은 이메일로 멤버 이메일 업데이트 시도")
     void updateEmailWithInvalidEmail() {
         String testEmail = "invalidemail";
         String testId = "12345678";
@@ -168,6 +180,7 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("중복된 이메일로 멤버 이메일 업데이트 시도")
     void updateEmailWithDuplicateEmail() {
         String testEmail = "id@example.com";
         String testId = "12345678";
