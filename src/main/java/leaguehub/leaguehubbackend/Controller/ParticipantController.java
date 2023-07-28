@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.controller;
 
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
-import leaguehub.leaguehubbackend.dto.participant.PlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -72,10 +71,12 @@ public class ParticipantController {
      * @param channelLink
      * @return ResponseEntity
      */
-    @GetMapping("/player")
-    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink) {
 
-        List<PlayerDto> players = participantService.loadPlayers(channelLink);
+    @GetMapping("/profile/player")
+    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink){
+
+
+        List<ResponseStatusPlayerDto> players = participantService.loadPlayers(channelLink);
 
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
@@ -86,8 +87,9 @@ public class ParticipantController {
      * @param channelLink
      * @return
      */
-    @GetMapping("/player/already")
-    public ResponseEntity loadRequestPlayer(@RequestParam(value = "channelLink") String channelLink) {
+
+    @GetMapping("/profile/request")
+    public ResponseEntity loadRequestPlayer(@RequestParam(value = "channelLink") String channelLink){
 
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadRequestStatusPlayerList(channelLink);
 
@@ -115,5 +117,23 @@ public class ParticipantController {
 
         return new ResponseEntity<>("reject participant", HttpStatus.OK);
     }
+
+    @PostMapping("/player/host/{channelLink}/{participantId}")
+    public ResponseEntity updateHostParticipant(@PathVariable("channelLink") String channelLink,
+                                              @PathVariable("participantId") Long participantId){
+
+        participantService.updateHostRole(channelLink, participantId);
+
+        return new ResponseEntity<>("update HOST", HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/observer")
+    public ResponseEntity loadObserverPlayer(@RequestParam(value = "channelLink") String channelLink){
+
+        List<ResponseStatusPlayerDto> responsePlayers = participantService.loadObserverPlayerList(channelLink);
+
+        return new ResponseEntity<>(responsePlayers, HttpStatus.OK);
+    }
+
 
 }

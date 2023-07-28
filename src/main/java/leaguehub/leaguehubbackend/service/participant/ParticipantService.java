@@ -25,9 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
@@ -37,16 +37,13 @@ import static leaguehub.leaguehubbackend.entity.participant.Role.OBSERVER;
 @RequiredArgsConstructor
 public class ParticipantService {
 
-    @Value("${riot-api-key-1}")
-    private String riot_api_key;
-
     private final ParticipantRepository participantRepository;
     private final MemberService memberService;
-
     private final WebClient webClient;
     private final JSONParser jsonParser;
     private final ChannelRepository channelRepository;
-
+    @Value("${riot-api-key-1}")
+    private String riot_api_key;
 
     public int findParticipantPermission(String channelLink) {
 
@@ -78,25 +75,22 @@ public class ParticipantService {
      * @param channelLink
      * @return RequestPlayerDtoList
      */
-    public List<PlayerDto> loadPlayers(String channelLink) {
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
+    public List<ResponseStatusPlayerDto> loadPlayers(String channelLink) {
 
-        List<PlayerDto> dtoList = new ArrayList<>();
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, Role.PLAYER, RequestStatus.DONE);
 
-
-        for (Participant participant : findParticipants) {
-            if (participant.getRole().getNum() == Role.PLAYER.getNum()) {
-                PlayerDto playerDto = new PlayerDto();
-                playerDto.setName(participant.getNickname());
-                playerDto.setImgSrc(participant.getProfileImageUrl());
-                playerDto.setGameId(participant.getGameId());
-
-                dtoList.add(playerDto);
-            }
-        }
-
-        return dtoList;
+        return findParticipants.stream()
+                .map(participant -> {
+                    ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
+                    responsePlayerDto.setPk(participant.getId());
+                    responsePlayerDto.setNickname(participant.getNickname());
+                    responsePlayerDto.setImgSrc(participant.getProfileImageUrl());
+                    responsePlayerDto.setGameId(participant.getGameId());
+                    responsePlayerDto.setTier(participant.getGameTier());
+                    return responsePlayerDto;
+                })
+                .collect(Collectors.toList());
     }
 
     public Participant getParticipant(String channelLink) {
@@ -123,15 +117,21 @@ public class ParticipantService {
      */
     public Participant checkParticipateMatch(String channelLink) {
 
+        int requestStatusRequest = 1;
+        int requestStatusDone = 2;
+        int requestStatusReject = 3;
+        int roleObserver = 3;
+
         Participant participant = getParticipant(channelLink);
 
-        if (participant.getRole().getNum() != OBSERVER.getNum() || participant.getRequestStatus().getNum() == RequestStatus.DONE.getNum())
+        if (participant.getRole().getNum() != roleObserver || participant.getRequestStatus().getNum() == requestStatusDone)
             throw new ParticipantInvalidRoleException();
 
-        if (participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum())
+        if (participant.getRequestStatus().getNum() == requestStatusRequest)
             throw new ParticipantAlreadyRequestedException();
 
-        if (participant.getRequestStatus().getNum() == RequestStatus.REJECT.getNum())
+        if (participant.getRequestStatus().getNum() == requestStatusReject)
+
             throw new ParticipantRejectedRequestedException();
 
         return participant;
@@ -220,9 +220,11 @@ public class ParticipantService {
         String rank = summonerDetail.get("rank").toString();
         String leaguePoints = summonerDetail.get("leaguePoints").toString();
 
-        if (tier.equalsIgnoreCase("master") ||
-                tier.equalsIgnoreCase("grandmaster")
-                || tier.equalsIgnoreCase("challenger")) {
+
+        if (tier.equalsIgnoreCase(GameTier.MASTER.toString()) ||
+                tier.equalsIgnoreCase(GameTier.GRANDMASTER.toString())
+                || tier.equalsIgnoreCase(GameTier.CHALLENGER.toString())) {
+
             return GameTier.getRanked(tier, leaguePoints);
         }
 
@@ -290,12 +292,13 @@ public class ParticipantService {
      * @param tier
      */
     public void checkRule(ChannelRule channelRule, String userDetail, GameRankDto tier) {
-        if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
-                throw new ParticipantInvalidRankException();
-        }
+
+        rankRuleCheck(channelRule, tier);
+        playCountRuleCheck(channelRule, userDetail);
+    }
+
+    private void playCountRuleCheck(ChannelRule channelRule, String userDetail) {
+
         if (channelRule.getPlayCount()) {
             int limitedPlayCount = channelRule.getLimitedPlayCount();
             int userPlayCount = getPlayCount(userDetail);
@@ -303,6 +306,17 @@ public class ParticipantService {
                 throw new ParticipantInvalidPlayCountException();
         }
     }
+
+
+    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+        if (channelRule.getTier()) {
+            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
+            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            if (userRankScore > limitedRankScore)
+                throw new ParticipantInvalidRankException();
+        }
+    }
+
 
     public void checkDuplicateNickname(String gameId, String channelLink) {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
@@ -346,25 +360,20 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkOrderByNicknameAsc(channelLink);
 
-        List<ResponseStatusPlayerDto> dtoList = new ArrayList<>();
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, RequestStatus.REQUEST);
 
+        return findParticipants.stream()
+                .map(participant -> {
+                    ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
+                    responsePlayerDto.setPk(participant.getId());
+                    responsePlayerDto.setNickname(participant.getNickname());
+                    responsePlayerDto.setGameId(participant.getGameId());
+                    responsePlayerDto.setTier(participant.getGameTier());
+                    return responsePlayerDto;
+                })
+                .collect(Collectors.toList());
 
-        for (Participant participant : findParticipants) {
-            if (participant.getRole().getNum() == OBSERVER.getNum() &&
-                    participant.getRequestStatus().getNum() == RequestStatus.REQUEST.getNum()) {
-                ResponseStatusPlayerDto requestPlayerDto = new ResponseStatusPlayerDto();
-                requestPlayerDto.setPk(participant.getId());
-                requestPlayerDto.setNickname(participant.getNickname());
-                requestPlayerDto.setGameId(participant.getGameId());
-                requestPlayerDto.setTier(participant.getGameTier());
-
-                dtoList.add(requestPlayerDto);
-            }
-        }
-
-        return dtoList;
     }
 
     /**
@@ -411,6 +420,35 @@ public class ParticipantService {
         participant.rejectParticipantRequest();
 
     }
+
+    public void updateHostRole(String channelLink, Long participantId) {
+        checkRoleHost(channelLink);
+
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+
+
+        participant.updateHostRole();
+    }
+
+    public List<ResponseStatusPlayerDto> loadObserverPlayerList(String channelLink) {
+
+        checkRoleHost(channelLink);
+
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, RequestStatus.NOREQUEST);
+
+        return findParticipants.stream()
+                .map(participant -> {
+                    ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
+                    responsePlayerDto.setPk(participant.getId());
+                    responsePlayerDto.setNickname(participant.getNickname());
+                    responsePlayerDto.setImgSrc(participant.getProfileImageUrl());
+                    responsePlayerDto.setGameId(participant.getGameId());
+                    responsePlayerDto.setTier(participant.getGameTier());
+                    return responsePlayerDto;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
 }

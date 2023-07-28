@@ -3,6 +3,7 @@ package leaguehub.leaguehubbackend.repository.particiapnt;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -23,7 +24,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findAllByChannelIdOrderByNicknameAsc(Long channelId);
 
-    List<Participant> findAllByChannel_ChannelLinkOrderByNicknameAsc(String channelLink);
+    List<Participant> findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(String channelLink, Role role, RequestStatus requestStatus);
+
 
     List<Participant> findAllByChannel_ChannelLink(String channelLink);
 
