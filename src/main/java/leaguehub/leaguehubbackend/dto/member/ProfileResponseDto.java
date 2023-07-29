@@ -13,4 +13,8 @@ public class ProfileResponseDto {
 
     private String nickName;
 
+    private String email;
+
+    private Boolean userEmailVerified;
+
 }
