@@ -60,9 +60,16 @@ public class MemberService {
                 .profileId(member.getPersonalId())
                 .profileImageUrl(member.getProfileImageUrl())
                 .nickName(member.getNickname())
-                .email(member.getEmail() != null && member.isEmailUserVerified() ? member.getEmail() : "N/A")
+                .email(getVerifiedEmail(member))
                 .userEmailVerified(member.isEmailUserVerified())
                 .build();
+    }
+
+    public String getVerifiedEmail(Member member) {
+        if (member.getEmail() != null && member.isEmailUserVerified()) {
+            return member.getEmail();
+        }
+        return "N/A";
     }
 
     public void logoutMember(String personalId, UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
