@@ -391,6 +391,14 @@ public class ParticipantService {
 
     }
 
+    public void checkRealPlayerCount(String channelLink) {
+        Channel channel = channelRepository.findByChannelLink(channelLink)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        if (channel.getRealPlayer() >= channel.getMaxPlayer())
+            throw new ParticipantRealPlayerIsMaxException();
+    }
+
     /**
      * 해당 채널의 요청한 참가자를 승인해줌
      *
@@ -400,6 +408,8 @@ public class ParticipantService {
     public void approveParticipantRequest(String channelLink, Long participantId) {
 
         checkRoleHost(channelLink);
+
+        checkRealPlayerCount(channelLink);
 
         Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
 
