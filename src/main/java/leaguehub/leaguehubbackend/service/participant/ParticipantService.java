@@ -1,12 +1,14 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.participant.*;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -403,6 +405,14 @@ public class ParticipantService {
 
         findParticipant.approveParticipantMatch();
 
+        List<Participant> playerLists = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink,
+                Role.PLAYER, RequestStatus.DONE);
+
+        Channel channel = channelRepository.findByChannelLink(channelLink)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        channel.updateRealPlayer(playerLists.toArray().length);
+
     }
 
     /**
@@ -448,7 +458,6 @@ public class ParticipantService {
                 })
                 .collect(Collectors.toList());
     }
-
 
 
 }

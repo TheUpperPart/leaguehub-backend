@@ -108,4 +108,11 @@ public class Channel extends BaseTimeEntity {
         return channelImageUrl;
     }
 
+    //실제 참가자 수를 업데이트 한다.
+    public Channel updateRealPlayer(Integer realPlayer){
+        this.realPlayer = realPlayer;
+
+        return this;
+    }
+
 }
