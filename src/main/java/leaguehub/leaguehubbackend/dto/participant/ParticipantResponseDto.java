@@ -9,4 +9,6 @@ public class ParticipantResponseDto {
     String channelLink;
 
     String gameId;
+
+    String nickname;
 }

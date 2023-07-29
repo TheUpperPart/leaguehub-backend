@@ -347,7 +347,7 @@ public class ParticipantService {
 
         checkRule(channelRule, userDetail, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString());
+        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString(), responseDto.getNickname());
     }
 
     /**
