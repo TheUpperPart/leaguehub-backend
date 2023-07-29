@@ -31,7 +31,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
     }
@@ -61,6 +60,8 @@ public class MemberService {
                 .profileId(member.getPersonalId())
                 .profileImageUrl(member.getProfileImageUrl())
                 .nickName(member.getNickname())
+                .email(member.getEmail() != null && member.isEmailUserVerified() ? member.getEmail() : "N/A")
+                .userEmailVerified(member.isEmailUserVerified())
                 .build();
     }
 
