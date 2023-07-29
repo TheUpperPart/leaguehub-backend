@@ -421,7 +421,7 @@ public class ParticipantService {
         Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
 
-        channel.updateRealPlayer(playerLists.toArray().length);
+        channel.updateRealPlayer(playerLists.size());
 
     }
 
