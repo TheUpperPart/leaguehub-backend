@@ -499,11 +499,146 @@ class ParticipantServiceTest {
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
-        //
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
 
+
+    }
+
+    @Test
+    @DisplayName("참가한사람 거절 테스트 (관리자 o) - 성공")
+    public void rejectedPlayerSuccessTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("id");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.approveParticipantMatch();
+
+        //when
+        participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
+
+        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+
+        //then
+        assertThat(updateDummy.getId()).isEqualTo(dummy1.getId());
+        assertThat(updateDummy.getRole().getNum()).isEqualTo(Role.OBSERVER.getNum());
+        assertThat(updateDummy.getRequestStatus().getNum()).isEqualTo(RequestStatus.REJECT.getNum());
+
+    }
+
+    @Test
+    @DisplayName("참가한사람 거절 테스트 (관리자 x) - 실패")
+    public void rejectedPlayerFailTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus("더미1", "platinum");
+
+        assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+                .isInstanceOf(ParticipantNotGameHostException.class);
+
+    }
+
+    @Test
+    @DisplayName("관전자 조회 테스트 (관리자 o) - 성공")
+    public void loadObserverListTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("id");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
+
+
+        //when
+        List<ResponseStatusPlayerDto> DtoList = participantService.loadObserverPlayerList(channel.getChannelLink());
+
+        //then
+        assertThat(dummy1.getId()).isEqualTo(DtoList.get(0).getPk());
+        assertThat(dummy1.getNickname()).isEqualTo(DtoList.get(0).getNickname());
+        assertThat(dummy1.getGameId()).isEqualTo(DtoList.get(0).getGameId());
+        assertThat(dummy1.getGameTier()).isEqualTo(DtoList.get(0).getTier());
+        assertThat(dummy1.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+
+        assertThat(dummy2.getId()).isEqualTo(DtoList.get(1).getPk());
+        assertThat(dummy2.getNickname()).isEqualTo(DtoList.get(1).getNickname());
+        assertThat(dummy2.getGameId()).isEqualTo(DtoList.get(1).getGameId());
+        assertThat(dummy2.getGameTier()).isEqualTo(DtoList.get(1).getTier());
+        assertThat(dummy2.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+
+    }
+
+    @Test
+    @DisplayName("관전자 조회 테스트 (관리자 x) - 실패")
+    public void loadObserverListFailTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
+
+        //when
+        assertThatThrownBy(() -> participantService.loadObserverPlayerList(channel.getChannelLink()))
+                .isInstanceOf(ParticipantNotGameHostException.class);
+
+    }
+
+    @Test
+    @DisplayName("관리자 권한 부여 테스트 (관리자 o) - 성공")
+    public void updateHostParticipantSuccessTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("id");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
+        dummy1.updateParticipantStatus("더미1", "platinum");
+
+        //when
+        participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
+        participantService.updateHostRole(channel.getChannelLink(), dummy2.getId());
+
+        Participant updateDummy1 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+        Participant updateDummy2 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy2.getId(), channel.getChannelLink());
+
+        //then
+        assertThat(updateDummy1.getId()).isEqualTo(dummy1.getId());
+        assertThat(updateDummy1.getRole().getNum()).isEqualTo(Role.HOST.getNum());
+        assertThat(updateDummy1.getRequestStatus().getNum()).isEqualTo(RequestStatus.NOREQUEST.getNum());
+
+        assertThat(updateDummy2.getId()).isEqualTo(dummy2.getId());
+        assertThat(updateDummy2.getRole().getNum()).isEqualTo(Role.HOST.getNum());
+        assertThat(updateDummy2.getRequestStatus().getNum()).isEqualTo(RequestStatus.NOREQUEST.getNum());
+
+    }
+
+    @Test
+    @DisplayName("관리자권한 부여 테스트 (관리자 x) - 실패")
+    public void updateHostParticipantFailTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
+
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus("더미1", "platinum");
+
+        assertThatThrownBy(() -> participantService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
+                .isInstanceOf(ParticipantNotGameHostException.class);
 
     }
 
