@@ -29,6 +29,8 @@ public class Member extends BaseTimeEntity {
 
     private String email;
 
+    private boolean emailUserVerified;
+
     @Enumerated(EnumType.STRING)
     private LoginProvider loginProvider;
 
@@ -46,6 +48,7 @@ public class Member extends BaseTimeEntity {
                 .personalId(String.valueOf(kakaoUserDto.getId()))
                 .nickname(kakaoUserDto.getProperties().getNickname())
                 .profileImageUrl(kakaoUserDto.getProperties().getProfileImage())
+                .emailUserVerified(false)
                 .baseRole(BaseRole.GUEST)
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
