@@ -143,4 +143,17 @@ public class ParticipantExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ParticipantRealPlayerIsMaxException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantRealPlayerIsMaxException(
+            ParticipantRealPlayerIsMaxException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
 }
