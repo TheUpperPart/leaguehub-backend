@@ -1,12 +1,14 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.participant.*;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -347,7 +349,7 @@ public class ParticipantService {
 
         checkRule(channelRule, userDetail, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString());
+        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString(), responseDto.getNickname());
     }
 
     /**
@@ -389,6 +391,14 @@ public class ParticipantService {
 
     }
 
+    public void checkRealPlayerCount(String channelLink) {
+        Channel channel = channelRepository.findByChannelLink(channelLink)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        if (channel.getRealPlayer() >= channel.getMaxPlayer())
+            throw new ParticipantRealPlayerIsMaxException();
+    }
+
     /**
      * 해당 채널의 요청한 참가자를 승인해줌
      *
@@ -399,9 +409,19 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
+        checkRealPlayerCount(channelLink);
+
         Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
 
         findParticipant.approveParticipantMatch();
+
+        List<Participant> playerLists = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink,
+                Role.PLAYER, RequestStatus.DONE);
+
+        Channel channel = channelRepository.findByChannelLink(channelLink)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        channel.updateRealPlayer(playerLists.size());
 
     }
 
@@ -448,7 +468,6 @@ public class ParticipantService {
                 })
                 .collect(Collectors.toList());
     }
-
 
 
 }

@@ -26,6 +26,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -97,10 +102,10 @@ class ParticipantControllerTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("bronze", "bronze");
+        alreadyParticipant.updateParticipantStatus("bronze", "bronze", "요청한사람");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum");
-        doneParticipant2.updateParticipantStatus("참가된사람2", "iron");
+        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum", "참가된사람1");
+        doneParticipant2.updateParticipantStatus("참가된사람2", "iron", "참가된사람2");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -378,8 +383,8 @@ class ParticipantControllerTest {
 
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
-        //when
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isOk());
@@ -387,7 +392,7 @@ class ParticipantControllerTest {
     }
 
     @Test
-    @DisplayName("요청한사람 승인 테스트 (관리자 o) - 실패")
+    @DisplayName("요청한사람 승인 테스트 (관리자 x) - 실패")
     public void approveParticipantFailTest() throws Exception{
         //given
         Channel channel = createCustomChannel(false, false, "master", "100",20);
@@ -395,7 +400,7 @@ class ParticipantControllerTest {
 
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());
@@ -411,7 +416,7 @@ class ParticipantControllerTest {
 
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isOk());
@@ -427,7 +432,7 @@ class ParticipantControllerTest {
 
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());

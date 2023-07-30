@@ -94,9 +94,10 @@ public class Participant extends BaseTimeEntity {
     }
 
 
-    public Participant updateParticipantStatus(String gameId, String gameTier){
+    public Participant updateParticipantStatus(String gameId, String gameTier, String nickname){
         this.gameId = gameId;
         this.gameTier = gameTier;
+        this.nickname = nickname;
 
         this.requestStatus = RequestStatus.REQUEST;
 

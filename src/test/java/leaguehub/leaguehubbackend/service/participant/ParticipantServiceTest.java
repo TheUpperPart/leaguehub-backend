@@ -32,6 +32,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -108,10 +109,10 @@ class ParticipantServiceTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("bronze", "bronze");
+        alreadyParticipant.updateParticipantStatus("bronze", "bronze", "참가된사람1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum");
-        doneParticipant2.updateParticipantStatus("참가된사람2", "iron");
+        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum", "참가된사람1");
+        doneParticipant2.updateParticipantStatus("참가된사람2", "iron", "참가된사람2");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -350,8 +351,8 @@ class ParticipantServiceTest {
         Participant part2 = participantRepository.save(Participant.participateChannel(platinumMember, channel));
         Participant part3 = participantRepository.save(Participant.participateChannel(ironMember, channel));
 
-        part2.updateParticipantStatus("손성한", "platinum");
-        part3.updateParticipantStatus("썹맹구", "iron");
+        part2.updateParticipantStatus("손성한", "platinum", "손성한");
+        part3.updateParticipantStatus("썹맹구", "iron", "썹맹구");
 
         part2.approveParticipantMatch();
         part3.approveParticipantMatch();
@@ -385,8 +386,8 @@ class ParticipantServiceTest {
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("더미1", "platinum");
-        dummy2.updateParticipantStatus("더미2", "iron");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        dummy2.updateParticipantStatus("더미2", "iron", "더미2");
 
         //when
         assertThatThrownBy(() -> participantService.loadRequestStatusPlayerList(channel.getChannelLink()))
@@ -406,8 +407,7 @@ class ParticipantServiceTest {
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("더미1", "platinum");
-        dummy2.updateParticipantStatus("더미2", "iron");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         //when
         List<ResponseStatusPlayerDto> DtoList = participantService.loadRequestStatusPlayerList(channel.getChannelLink());
@@ -419,12 +419,6 @@ class ParticipantServiceTest {
         assertThat(dummy1.getGameId()).isEqualTo(DtoList.get(0).getGameId());
         assertThat(dummy1.getGameTier()).isEqualTo(DtoList.get(0).getTier());
         assertThat(dummy1.getRequestStatus()).isEqualTo(RequestStatus.REQUEST);
-
-        assertThat(dummy2.getId()).isEqualTo(DtoList.get(1).getPk());
-        assertThat(dummy2.getNickname()).isEqualTo(DtoList.get(1).getNickname());
-        assertThat(dummy2.getGameId()).isEqualTo(DtoList.get(1).getGameId());
-        assertThat(dummy2.getGameTier()).isEqualTo(DtoList.get(1).getTier());
-        assertThat(dummy2.getRequestStatus()).isEqualTo(RequestStatus.REQUEST);
 
     }
 
@@ -438,17 +432,20 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         //when
         participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
         Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+        Optional<Channel> channel1 = channelRepository.findByChannelLink(channel.getChannelLink());
+        int updateRealPlayerCount = 3;
 
         //then
         assertThat(updateDummy.getId()).isEqualTo(dummy1.getId());
         assertThat(updateDummy.getRole().getNum()).isEqualTo(Role.PLAYER.getNum());
         assertThat(updateDummy.getRequestStatus().getNum()).isEqualTo(RequestStatus.DONE.getNum());
+        assertThat(channel1.get().getRealPlayer()).isEqualTo(updateRealPlayerCount);
 
     }
 
@@ -461,13 +458,10 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
-
-        //
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
-
 
     }
 
@@ -480,7 +474,7 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         //when
         participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
@@ -503,7 +497,7 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))

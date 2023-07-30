@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.Controller;
+package leaguehub.leaguehubbackend.controller;
 
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
