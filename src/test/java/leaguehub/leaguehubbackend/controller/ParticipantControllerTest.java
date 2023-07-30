@@ -16,6 +16,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,14 +103,22 @@ class ParticipantControllerTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("bronze", "bronze", "요청한사람");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze", "participantNickname1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum", "참가된사람1");
-        doneParticipant2.updateParticipantStatus("참가된사람2", "iron", "참가된사람2");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron", "participantNickname3");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
         return channel;
+    }
+
+    @NotNull
+    private Participant getParticipant(String participantDummyName, Channel channel, String participantDummyGameId, String participantDummyNickname) {
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember(participantDummyName));
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus(participantDummyGameId, "platinum", participantDummyNickname);
+        return dummy1;
     }
 
     @Test
@@ -215,7 +224,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "Silver", "iv", 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "참가된사람1");
+        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "participantGameId3");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -337,10 +346,10 @@ class ParticipantControllerTest {
 
         mockMvc.perform(get("/api/profile/player?channelLink=" + channel.getChannelLink()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].nickname").value("참가된사람1"))
-                .andExpect(jsonPath("[0].gameId").value("참가된사람1"))
-                .andExpect(jsonPath("[1].nickname").value("참가된사람2"))
-                .andExpect(jsonPath("[1].gameId").value("참가된사람2"))
+                .andExpect(jsonPath("[0].nickname").value("participantNickname2"))
+                .andExpect(jsonPath("[0].gameId").value("participantGameId2"))
+                .andExpect(jsonPath("[1].nickname").value("participantNickname3"))
+                .andExpect(jsonPath("[1].gameId").value("participantGameId3"))
                 .andDo(print());
 
     }
@@ -367,8 +376,8 @@ class ParticipantControllerTest {
 
         mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].nickname").value("요청한사람"))
-                .andExpect(jsonPath("[0].gameId").value("bronze"))
+                .andExpect(jsonPath("[0].nickname").value("participantNickname1"))
+                .andExpect(jsonPath("[0].gameId").value("participantGameId1"))
                 .andExpect(jsonPath("[0].tier").value("bronze"));
 
     }
@@ -381,9 +390,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("id");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
@@ -398,9 +405,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());
@@ -414,9 +419,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("id");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isOk());
@@ -430,9 +433,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());
@@ -446,9 +447,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("id");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
         dummy1.approveParticipantMatch();
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
@@ -463,9 +462,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
         dummy1.approveParticipantMatch();
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
@@ -480,9 +477,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("id");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/host/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isOk());
@@ -496,9 +491,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "master", "100", 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/host/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());
@@ -542,19 +535,13 @@ class ParticipantControllerTest {
 
         for (int i = 0; i < nickName.length; i++) {
             nickName[i] = "더미" + i;
-            Member dummyMember = memberRepository.save(UserFixture.createCustomeMember(nickName[i]));
-            Participant dummyParticipant = participantRepository.save(Participant.participateChannel(dummyMember, channel));
-            dummyParticipant.updateParticipantStatus(nickName[i], "platinum", nickName[i]);
+            Participant dummyParticipant = getParticipant(nickName[i], channel, nickName[i], nickName[i]);
             dummyParticipant.approveParticipantMatch();
         }
-        Member dummyMember = memberRepository.save(UserFixture.createCustomeMember("더미13"));
-        Participant dummy = participantRepository.save(Participant.participateChannel(dummyMember, channel));
-        dummy.updateParticipantStatus("더미13", "platinum", "더미13");
+        Participant dummy = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
         participantService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
 
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName2", channel, "DummyGameId2", "DummyNickname2");
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
                 .andExpect(status().isBadRequest());
