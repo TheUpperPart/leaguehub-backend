@@ -515,7 +515,7 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
         dummy1.approveParticipantMatch();
 
         //when
@@ -539,7 +539,7 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
@@ -606,7 +606,7 @@ class ParticipantServiceTest {
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         //when
         participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
@@ -635,10 +635,40 @@ class ParticipantServiceTest {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
 
         assertThatThrownBy(() -> participantService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
+
+    }
+
+    @Test
+    @DisplayName("요청된사람 승인 테스트 (최대 인원수 초과) - 실패")
+    public void approveParticipantCountFailTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("id");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        String[] nickName = new String[13];
+
+        for (int i = 0; i < nickName.length; i++) {
+            nickName[i] = "더미" + i;
+            Member dummyMember = memberRepository.save(UserFixture.createCustomeMember(nickName[i]));
+            Participant dummyParticipant = participantRepository.save(Participant.participateChannel(dummyMember, channel));
+            dummyParticipant.updateParticipantStatus(nickName[i], "platinum", nickName[i]);
+            dummyParticipant.approveParticipantMatch();
+        }
+
+        Member dummyMember = memberRepository.save(UserFixture.createCustomeMember("더미13"));
+        Participant dummy = participantRepository.save(Participant.participateChannel(dummyMember, channel));
+        dummy.updateParticipantStatus("더미13", "platinum", "더미13");
+        participantService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
+
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미"));
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus("더미", "platinum", "더미");
+
+        assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+                .isInstanceOf(ParticipantRealPlayerIsMaxException.class);
 
     }
 
