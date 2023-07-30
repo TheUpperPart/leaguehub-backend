@@ -31,7 +31,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
     }
@@ -61,7 +60,16 @@ public class MemberService {
                 .profileId(member.getPersonalId())
                 .profileImageUrl(member.getProfileImageUrl())
                 .nickName(member.getNickname())
+                .email(getVerifiedEmail(member))
+                .userEmailVerified(member.isEmailUserVerified())
                 .build();
+    }
+
+    public String getVerifiedEmail(Member member) {
+        if (member.getEmail() != null && member.isEmailUserVerified()) {
+            return member.getEmail();
+        }
+        return "N/A";
     }
 
     public void logoutMember(String personalId, UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
