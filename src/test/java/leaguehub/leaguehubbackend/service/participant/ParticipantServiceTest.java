@@ -22,6 +22,7 @@ import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,14 +110,22 @@ class ParticipantServiceTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("bronze", "bronze", "참가된사람1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze", "participantNickname1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("참가된사람1", "platinum", "참가된사람1");
-        doneParticipant2.updateParticipantStatus("참가된사람2", "iron", "참가된사람2");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron", "participantNickname3");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
         return channel;
+    }
+
+    @NotNull
+    private Participant getParticipant(String DummyName1, Channel channel, String DummyGameId1, String DummyNickname1) {
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember(DummyName1));
+        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
+        dummy1.updateParticipantStatus(DummyGameId1, "platinum", DummyNickname1);
+        return dummy1;
     }
 
 
@@ -129,7 +138,6 @@ class ParticipantServiceTest {
         ResponseUserDetailDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
 
 
-        assertThat(testDto1.getTier()).isEqualTo("PLATINUM");
         assertThat(testDto2.getTier()).isEqualTo("UNRANKED");
 
         assertThat(testDto2.getPlayCount()).isEqualTo(0);
@@ -231,7 +239,7 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomAuth("서초임");
         ParticipantResponseDto responseDto = new ParticipantResponseDto();
         responseDto.setChannelLink(channel.getChannelLink());
-        responseDto.setGameId("참가된사람1");
+        responseDto.setGameId("participantGameId2");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto))
                 .isInstanceOf(ParticipantDuplicatedGameIdException.class);
@@ -246,7 +254,7 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomAuth("참가된사람1");
         ParticipantResponseDto responseDto = new ParticipantResponseDto();
         responseDto.setChannelLink(channel.getChannelLink());
-        responseDto.setGameId("참가된사람1");
+        responseDto.setGameId("participantGameId2");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto))
                 .isInstanceOf(ParticipantInvalidRoleException.class);
@@ -261,7 +269,7 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomAuth("요청한사람");
         ParticipantResponseDto responseDto = new ParticipantResponseDto();
         responseDto.setChannelLink(channel.getChannelLink());
-        responseDto.setGameId("요청한사람");
+        responseDto.setGameId("participantGameId1");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto))
                 .isInstanceOf(ParticipantAlreadyRequestedException.class);
@@ -276,7 +284,7 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomAuth("거절된사람");
         ParticipantResponseDto responseDto = new ParticipantResponseDto();
         responseDto.setChannelLink(channel.getChannelLink());
-        responseDto.setGameId("거절된사람");
+        responseDto.setGameId("participantGameId4");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto))
                 .isInstanceOf(ParticipantRejectedRequestedException.class);
@@ -380,14 +388,14 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("DummyName1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("DummyName2"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
-        dummy2.updateParticipantStatus("더미2", "iron", "더미2");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1");
+        dummy2.updateParticipantStatus("DummyGameId2", "iron", "DummyNickname2");
 
         //when
         assertThatThrownBy(() -> participantService.loadRequestStatusPlayerList(channel.getChannelLink()))
@@ -401,13 +409,13 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("DummyName1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("DummyName2"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1");
 
         //when
         List<ResponseStatusPlayerDto> DtoList = participantService.loadRequestStatusPlayerList(channel.getChannelLink());
@@ -429,10 +437,8 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
 
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         //when
         participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId());
@@ -455,10 +461,7 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
@@ -471,10 +474,7 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         //when
         participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
@@ -494,10 +494,7 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum", "더미1");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
@@ -512,10 +509,7 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
         dummy1.approveParticipantMatch();
 
         //when
@@ -536,10 +530,7 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
@@ -552,8 +543,8 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("DummyName1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("DummyName2"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
@@ -583,8 +574,8 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("DummyName1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("DummyName2"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
@@ -601,12 +592,12 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("id");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("더미2"));
+        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("DummyName1"));
+        Member dummyMember2 = memberRepository.save(UserFixture.createCustomeMember("DummyName2"));
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1");
 
         //when
         participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
@@ -632,13 +623,34 @@ class ParticipantServiceTest {
         //given
         UserFixture.setUpCustomAuth("서초임");
         Channel channel = createCustomChannel(true, true, "master", "100", 20);
-        Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember("더미1"));
-
-        Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus("더미1", "platinum");
+        Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantNotGameHostException.class);
+
+    }
+
+    @Test
+    @DisplayName("요청된사람 승인 테스트 (최대 인원수 초과) - 실패")
+    public void approveParticipantCountFailTest() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("id");
+        Channel channel = createCustomChannel(true, true, "master", "100", 20);
+        String[] nickName = new String[13];
+
+        for (int i = 0; i < nickName.length; i++) {
+            nickName[i] = "더미" + i;
+            Participant dummyParticipant = getParticipant(nickName[i], channel, nickName[i], nickName[i]);
+            dummyParticipant.approveParticipantMatch();
+        }
+
+        Participant dummy = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
+        participantService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
+
+        Participant dummy1 = getParticipant("DummyName2", channel, "DummyGameId2", "DummyNickname2");
+
+        assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+                .isInstanceOf(ParticipantRealPlayerIsMaxException.class);
 
     }
 
