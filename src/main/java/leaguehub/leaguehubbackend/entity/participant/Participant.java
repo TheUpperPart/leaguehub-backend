@@ -36,11 +36,11 @@ public class Participant extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private RequestStatus requestStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 

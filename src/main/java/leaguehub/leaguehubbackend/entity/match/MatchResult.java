@@ -20,7 +20,7 @@ public class MatchResult extends BaseTimeEntity {
     @Column(name = "match_code")
     private String matchCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "match_id")
     private Match match;
 

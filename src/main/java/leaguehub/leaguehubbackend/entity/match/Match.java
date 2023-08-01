@@ -26,7 +26,7 @@ public class Match extends BaseTimeEntity {
 
     private String matchPasswd;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
