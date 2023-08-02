@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 
+import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import lombok.*;
 
 
@@ -27,7 +28,9 @@ public class Member extends BaseTimeEntity {
 
     private String refreshToken;
 
-    private String email;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "email_auth_id", referencedColumnName = "email_id")
+    private EmailAuth emailAuth;
 
     private boolean emailUserVerified;
 
@@ -40,7 +43,6 @@ public class Member extends BaseTimeEntity {
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
-    public void updateEmail(String email) { this.email = email; }
     public void updateRole(BaseRole role) { this.baseRole = role; }
 
     public static Member kakaoUserToMember(KakaoUserDto kakaoUserDto) {
@@ -53,5 +55,13 @@ public class Member extends BaseTimeEntity {
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
 
+    }
+
+    public void setEmailAuth(EmailAuth emailAuth) {
+        this.emailAuth = emailAuth;
+    }
+
+    public void setEmailUserVerified(boolean b) {
+        this.emailUserVerified = b;
     }
 }
