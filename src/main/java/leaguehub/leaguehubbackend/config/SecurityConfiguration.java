@@ -32,7 +32,10 @@ public class SecurityConfiguration {
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
-
+            "/api/send/verification/email",
+            "/confirm/**",
+            "/verifiedPage.html",
+            "/invalidPage.html"
     };
 
     @Bean
