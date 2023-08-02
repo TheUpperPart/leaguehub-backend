@@ -13,6 +13,7 @@ import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundExcep
 import leaguehub.leaguehubbackend.repository.email.EmailAuthRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -110,14 +111,14 @@ public class EmailService {
                     .getSubject();
 
             EmailAuth emailAuth = emailAuthRepository.findAuthByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("인증 토큰이 잘못되었습니다."));
+                    .orElseThrow(() -> new RuntimeException("인증 토큰이 잘못되었습니다."));
 
             if (emailAuth.getEmailExpireDate().isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("인증 토큰이 만료되었습니다.");
+                throw new RuntimeException("인증 토큰이 만료되었습니다.");
             }
 
             Member member = memberRepository.findByEmailAuth(emailAuth)
-                    .orElseThrow(() -> new IllegalArgumentException("멤버 정보를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new RuntimeException("멤버 정보를 찾을 수 없습니다."));
 
             member.setEmailUserVerified(true);
 
@@ -129,6 +130,7 @@ public class EmailService {
 
             return true;
         } catch (Exception e) {
+            log.error("이메일 링크 확인 중 에러 발생", e);
             return false;
         }
     }
