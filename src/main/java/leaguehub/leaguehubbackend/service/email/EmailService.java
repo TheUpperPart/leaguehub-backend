@@ -76,8 +76,8 @@ public class EmailService {
     private EmailAuth createAndSaveEmailAuth(String email, Member member, String uniqueToken) {
         EmailAuth emailAuth = new EmailAuth(email, uniqueToken);
 
-        member.setEmailUserVerified(false);
-        member.setEmailAuth(emailAuth);
+        member.unverifyEmail();
+        member.assignEmailAuth(emailAuth);
 
         emailAuthRepository.save(emailAuth);
         memberRepository.save(member);
@@ -87,7 +87,7 @@ public class EmailService {
     private void removeExistingEmailAuth(Member member) {
         if (member.isEmailUserVerified() && member.getEmailAuth() != null) {
             emailAuthRepository.delete(member.getEmailAuth());
-            member.setEmailAuth(null);
+            member.assignEmailAuth(null);
         }
     }
 
@@ -120,7 +120,7 @@ public class EmailService {
             Member member = memberRepository.findByEmailAuth(emailAuth)
                     .orElseThrow(() -> new RuntimeException("멤버 정보를 찾을 수 없습니다."));
 
-            member.setEmailUserVerified(true);
+            member.verifyEmail();
 
             if (member.getBaseRole() == BaseRole.GUEST) {
                 member.updateRole(BaseRole.USER);

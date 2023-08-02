@@ -56,12 +56,13 @@ public class Member extends BaseTimeEntity {
                 .build();
 
     }
-
-    public void setEmailAuth(EmailAuth emailAuth) {
+    public void assignEmailAuth(EmailAuth emailAuth) {
         this.emailAuth = emailAuth;
     }
-
-    public void setEmailUserVerified(boolean b) {
-        this.emailUserVerified = b;
+    public void verifyEmail() {
+        this.emailUserVerified = true;
+    }
+    public void unverifyEmail() {
+        this.emailUserVerified = false;
     }
 }
