@@ -1,6 +1,8 @@
 package leaguehub.leaguehubbackend.entity.match;
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.MatchFixture;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +26,8 @@ class MatchRankTest {
     @Test
     @DisplayName("순위 생성 테스트")
     void createMatchRankTest() throws Exception {
-        Match match = MatchFixture.createMatch();
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver", "iv", 100);
+        Match match = Match.createMatch(16, channel);
         MatchResult matchResult = MatchResult.createMatchResult("ab12345", match);
         MatchRank matchRank = MatchRank.createMatchRank("가나다", "1등", matchResult);
         MatchRank save = matchRankRepository.save(matchRank);

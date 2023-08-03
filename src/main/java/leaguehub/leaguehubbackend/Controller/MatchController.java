@@ -25,9 +25,11 @@ public class MatchController {
         return new ResponseEntity<>("매치 결과가 생성되었습니다.", HttpStatus.CREATED);
     }
 
-    @GetMapping("/match/matchRank")
-    public List<MatchRankResultDto> matchRankResult(String matchId){
+    @GetMapping("/match/matchRank/{matchCode}")
+    public ResponseEntity matchRankResult(@PathVariable("matchCode") String matchCode){
 
-        return matchRankService.getMatchDetail(matchId);
+        List<MatchRankResultDto> resultDto = matchRankService.getMatchDetail(matchCode);
+
+        return new ResponseEntity<>(resultDto, HttpStatus.OK);
     }
 }

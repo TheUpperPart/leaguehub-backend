@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.fixture;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
 
 public class ChannelFixture {
 
@@ -88,5 +89,16 @@ public class ChannelFixture {
         ChannelBoardDto channelBoardDto = new ChannelBoardDto("test1", "test1");
 
         return channelBoardDto;
+    }
+
+    public static Channel createDummyChannel(Boolean tier, Boolean playCount, String tierMax, String gradeMax, int playCountMin){
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, gradeMax, playCountMin);
+
+        return Channel.createChannel(channelDto.getTitle(),
+                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getPlayCount(),
+                channelDto.getPlayCountMin());
     }
 }
