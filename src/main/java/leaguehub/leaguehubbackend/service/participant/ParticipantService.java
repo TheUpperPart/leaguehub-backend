@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -46,6 +47,15 @@ public class ParticipantService {
     private final ChannelRepository channelRepository;
     @Value("${riot-api-key-1}")
     private String riot_api_key;
+
+    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+        if (channelRule.getTier()) {
+            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
+            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            if (userRankScore > limitedRankScore)
+                throw new ParticipantInvalidRankException();
+        }
+    }
 
     public int findParticipantPermission(String channelLink) {
 
@@ -97,6 +107,8 @@ public class ParticipantService {
 
     public Participant getParticipant(String channelLink) {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        checkEmail(userDetails);
 
         if (userDetails == null) {
             throw new ParticipantInvalidLoginException();
@@ -309,17 +321,6 @@ public class ParticipantService {
         }
     }
 
-
-    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
-        if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
-                throw new ParticipantInvalidRankException();
-        }
-    }
-
-
     public void checkDuplicateNickname(String gameId, String channelLink) {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
 
@@ -467,6 +468,11 @@ public class ParticipantService {
                     return responsePlayerDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void checkEmail(UserDetails userDetails) {
+        if (!userDetails.getAuthorities().toString().equals("[ROLE_USER]"))
+            throw new UnauthorizedEmailException();
     }
 
 
