@@ -3,6 +3,7 @@ package leaguehub.leaguehubbackend.exception.channel;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelUpdateException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,19 @@ public class ChannelExceptionHandler {
     @ExceptionHandler(ChannelNotFoundException.class)
     public ResponseEntity<ExceptionResponse> channelNotFoundException(
             ChannelNotFoundException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(ChannelUpdateException.class)
+    public ResponseEntity<ExceptionResponse> channelUpdateException(
+            ChannelUpdateException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());
