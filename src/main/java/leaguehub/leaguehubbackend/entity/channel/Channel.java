@@ -34,8 +34,6 @@ public class Channel extends BaseTimeEntity {
     @Column(unique = true)
     private String channelLink;
 
-    private String accessCode;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MatchFormat matchFormat;
@@ -66,7 +64,6 @@ public class Channel extends BaseTimeEntity {
         channel.channelStatus = ChannelStatus.PREPARING;
         channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.channelLink = channel.createParticipationLink(uuid);
-        channel.accessCode = channel.createAccessCode(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
         channel.channelRule = ChannelRule.createChannelRule(tierMax
                 , gradeMax
@@ -85,12 +82,6 @@ public class Channel extends BaseTimeEntity {
         } else if (this.getMatchFormat() == null) {
             throw new ChannelCreateException();
         }
-    }
-
-    private String createAccessCode(String uuid) {
-        String accessCode = uuid.substring(0, 8);
-
-        return accessCode;
     }
 
     public String createParticipationLink(String uuid) {

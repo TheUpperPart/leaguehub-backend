@@ -25,7 +25,7 @@ public class MatchPlayer extends BaseTimeEntity {
     @JoinColumn(name = "participant_id")
     private Participant participant;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "match_id")
     private Match match;
 }

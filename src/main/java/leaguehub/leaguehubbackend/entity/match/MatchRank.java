@@ -19,7 +19,7 @@ public class MatchRank extends BaseTimeEntity {
 
     private String placement;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "match_result_id")
     private MatchResult matchResult;
 
