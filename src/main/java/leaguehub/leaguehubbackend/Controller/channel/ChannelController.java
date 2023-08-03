@@ -70,4 +70,13 @@ public class ChannelController {
 
         return new ResponseEntity(participantChannelList, OK);
     }
+
+    @PostMapping("/channel/{channelLink}")
+    public ResponseEntity updateChannel(@PathVariable("channelLink") String channelLink,
+                                        UpdateChannelDto updateChannelDto) {
+
+        channelService.updateChannel(channelLink, updateChannelDto);
+
+        return new ResponseEntity("Channel successfully updated",OK);
+    }
 }

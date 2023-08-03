@@ -4,7 +4,7 @@ import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.exception.channel.ChannelExceptionCode.*;
 
-public class ChannelCreateException extends RuntimeException {
+public class ChannelCreateException extends IllegalArgumentException {
 
     private final ExceptionCode exceptionCode;
 

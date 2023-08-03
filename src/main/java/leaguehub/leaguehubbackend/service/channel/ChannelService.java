@@ -1,14 +1,14 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelUpdateException;
+import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -19,8 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -90,6 +90,40 @@ public class ChannelService {
         return channelDto;
     }
 
+    @Transactional
+    public void updateChannel(String channelLink, UpdateChannelDto updateChannelDto) {
+        Member member = getMember();
+        Channel channel = validateChannel(channelLink);
+        Participant participant = getParticipant(channel.getId(), member.getId());
+        checkAuth(participant.getRole());
+
+
+        Optional.ofNullable(updateChannelDto.getTitle()).ifPresent(channel::updateTitle);
+        Optional.ofNullable(updateChannelDto.getParticipationNum()).ifPresent(channel::updateMaxPlayer);
+        Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
+
+        Optional<Boolean> tierOpt = Optional.ofNullable(updateChannelDto.getTier());
+        if (tierOpt.isPresent()) {
+            if (tierOpt.get() == true) {
+                validateTier(updateChannelDto.getTierMax(), updateChannelDto.getGradeMax());
+                channel.updateChannelTierRule(true, updateChannelDto.getTierMax(), updateChannelDto.getGradeMax());
+            } else {
+                channel.updateChannelTierRule(false);
+            }
+        }
+
+        Optional<Boolean> playCountOpt = Optional.ofNullable(updateChannelDto.getPlayCount());
+        if (playCountOpt.isPresent()) {
+            if (playCountOpt.get() == true) {
+                validatePlayCount(updateChannelDto.getPlayCountMin());
+                channel.updateChannelPlayCountRule(true, updateChannelDto.getPlayCountMin());
+            } else {
+                channel.updateChannelPlayCountRule(false);
+            }
+        }
+
+    }
+
     public Channel validateChannel(String channelLink) {
         Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
@@ -103,5 +137,28 @@ public class ChannelService {
         return memberService.validateMember(personalId);
     }
 
+    private Participant getParticipant(Long channelId, Long memberId) {
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
+                .orElseThrow(() -> new InvalidParticipantAuthException());
+        return participant;
+    }
+
+    private void checkAuth(Role role) {
+        if (role != Role.HOST) {
+            throw new InvalidParticipantAuthException();
+        }
+    }
+
+    private void validateTier(String tierMax, String gradeMax) {
+        if(tierMax == null || gradeMax == null) {
+            throw new ChannelUpdateException();
+        }
+    }
+
+    private void validatePlayCount(Integer playCountMin) {
+        if(playCountMin == null) {
+            throw new ChannelUpdateException();
+        }
+    }
 
 }

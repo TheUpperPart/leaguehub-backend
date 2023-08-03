@@ -55,4 +55,23 @@ public class ChannelRule extends BaseTimeEntity {
 
         return channelRule;
     }
+
+    public void updateTierRule(boolean tier, String tierMax, String gradeMax) {
+        this.tier = tier;
+        this.limitedTier = tierMax;
+        this.limitedGrade = gradeMax;
+    }
+
+    public void updatePlayCountMin(boolean playCount, Integer playCountMin) {
+        this.playCount = playCount;
+        this.limitedPlayCount = playCountMin;
+    }
+
+    public void updateTierRule(boolean tier) {
+        this.tier = tier;
+    }
+
+    public void updatePlayCountMin(boolean playCount) {
+        this.playCount = playCount;
+    }
 }
