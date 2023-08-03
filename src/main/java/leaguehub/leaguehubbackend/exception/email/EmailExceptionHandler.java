@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.exception.email;
 
 import leaguehub.leaguehubbackend.exception.email.exception.DuplicateEmailException;
 import leaguehub.leaguehubbackend.exception.email.exception.InvalidEmailAddressException;
+import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,19 @@ public class EmailExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ExceptionResponse> invalidEmailAddress(
             DuplicateEmailException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(UnauthorizedEmailException.class)
+    public ResponseEntity<ExceptionResponse> UnauthorizedEmailException(
+            UnauthorizedEmailException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());
