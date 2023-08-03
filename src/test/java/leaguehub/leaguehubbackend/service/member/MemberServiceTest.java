@@ -5,8 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.member.exception.DuplicateEmailException;
-import leaguehub.leaguehubbackend.exception.member.exception.InvalidEmailAddressException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -156,41 +154,6 @@ class MemberServiceTest {
 
     }
 
-    @Test
-    @DisplayName("유효한 이메일로 멤버 이메일 업데이트")
-    void updateEmailWithValidEmail() {
-        String testEmail = "test@example.com";
-        String testId = "12345678";
-
-        Member testMember = UserFixture.createMember();
-        when(memberRepository.findMemberByEmail(testEmail)).thenReturn(Optional.empty());
-        when(memberRepository.findMemberByPersonalId(testId)).thenReturn(Optional.of(testMember));
-
-        assertDoesNotThrow(() -> memberService.updateEmail(testEmail, testId));
-        verify(memberRepository, times(1)).save(any(Member.class));
-    }
-
-    @Test
-    @DisplayName("유효하지 않은 이메일로 멤버 이메일 업데이트 시도")
-    void updateEmailWithInvalidEmail() {
-        String testEmail = "invalidemail";
-        String testId = "12345678";
-
-        assertThrows(InvalidEmailAddressException.class, () -> memberService.updateEmail(testEmail, testId));
-    }
-
-    @Test
-    @DisplayName("중복된 이메일로 멤버 이메일 업데이트 시도")
-    void updateEmailWithDuplicateEmail() {
-        String testEmail = "id@example.com";
-        String testId = "12345678";
-
-        Member duplicateMember = UserFixture.createMember();
-
-        when(memberRepository.findMemberByEmail(testEmail)).thenReturn(Optional.of(duplicateMember));
-
-        assertThrows(DuplicateEmailException.class, () -> memberService.updateEmail(testEmail, testId));
-    }
 
 
 }

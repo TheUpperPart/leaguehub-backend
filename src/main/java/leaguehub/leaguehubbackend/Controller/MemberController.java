@@ -58,19 +58,4 @@ public class MemberController  {
         return ResponseEntity.ok("Logout Success!");
     }
 
-    @Operation(summary = "멤버 이메일 등록", description = "멤버의 이메일을 등록한다.")
-    @Parameter(in = ParameterIn.PATH, name = "email", description = "email", required = true)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 등록 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "MB-C-003 유효하지 않은 이메일 형식입니다.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "409", description = "MB-C-004 중복되는 이메일입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
-    })
-    @PostMapping("/member/email")
-    public ResponseEntity<String> updateEmail(@RequestParam String email) {
-
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        memberService.updateEmail(email, userDetails.getUsername());
-
-        return ResponseEntity.ok(email);
-    }
 }

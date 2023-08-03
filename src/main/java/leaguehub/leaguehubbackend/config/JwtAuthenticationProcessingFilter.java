@@ -40,7 +40,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/v3/api-docs/**",
             "/h2-console/**",
             "/api/app/login/kakao",
-            "/api/reissue/token"
+            "/api/reissue/token",
+            "/confirm/**",
+            "/verifiedPage.html",
+            "/invalidPage.html"
+
     );
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
