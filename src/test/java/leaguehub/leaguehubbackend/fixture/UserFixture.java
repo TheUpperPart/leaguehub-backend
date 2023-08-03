@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.fixture;
 
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.LoginProvider;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -17,7 +18,7 @@ public class UserFixture {
         Member member = Member.builder()
                 .personalId("id").profileImageUrl("url")
                 .nickname("id").refreshToken("refreshToken")
-                .email("id@example.com")
+                .emailAuth(new EmailAuth("id@example.com", "authToken"))
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
 
