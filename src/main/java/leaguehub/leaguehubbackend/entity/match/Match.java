@@ -3,9 +3,12 @@ package leaguehub.leaguehubbackend.entity.match;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -22,6 +25,8 @@ public class Match extends BaseTimeEntity {
 
     private Integer matchRound;
 
+    private String matchLink;
+
     private String matchName;
 
     private String matchPasswd;
@@ -36,5 +41,17 @@ public class Match extends BaseTimeEntity {
         this.matchRound = matchRound;
         this.matchName = matchName;
         this.matchPasswd = matchPasswd;
+    }
+    public static Match createMatch(Integer matchRound, Channel channel){
+        Match match = new Match();
+        String uuid = UUID.randomUUID().toString();
+        match.matchStatus = MatchStatus.READY;
+        match.matchRound = matchRound;
+        match.matchLink = uuid.substring(16);
+        match.matchName = GlobalConstant.NO_DATA.getData();
+        match.matchPasswd = GlobalConstant.NO_DATA.getData();
+        match.channel = channel;
+
+        return match;
     }
 }

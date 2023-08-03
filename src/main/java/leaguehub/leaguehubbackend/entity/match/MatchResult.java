@@ -24,7 +24,7 @@ public class MatchResult extends BaseTimeEntity {
     @JoinColumn(name = "match_id")
     private Match match;
 
-    public static MatchResult createMatchResult(String matchCode,Match match){
+    public static MatchResult createMatchResult(String matchCode, Match match){
         MatchResult matchResult = new MatchResult();
         matchResult.matchCode = matchCode;
         matchResult.match = match;
