@@ -5,9 +5,7 @@ import lombok.Data;
 @Data
 public class MatchResponseDto {
 
-    String matchName;
-
-    String matchPasswd;
+    String matchLink;
 
     String nickName;
 }
