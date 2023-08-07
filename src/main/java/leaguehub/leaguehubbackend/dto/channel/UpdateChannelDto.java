@@ -20,6 +20,9 @@ public class UpdateChannelDto {
     @JsonProperty("tierMax")
     private String tierMax;
 
+    @JsonProperty("tierMin")
+    private String tierMin;
+
     @JsonProperty("channelImageUrl")
     private String channelImageUrl;
 

@@ -37,6 +37,8 @@ public class CreateChannelDto {
     @JsonProperty("tierMax")
     private String tierMax;
 
+    @JsonProperty("tierMin")
+    private String tierMin;
 
     @JsonProperty("channelImageUrl")
     private String channelImageUrl;
@@ -49,15 +51,18 @@ public class CreateChannelDto {
     private Integer playCountMin;
 
     @Builder
-    public CreateChannelDto(int game, Integer tournament, String title,
-                            Integer participationNum, Boolean tier, String tierMax,
-                            Boolean playCount, Integer playCountMin) {
+    public CreateChannelDto(@NotNull int game, @NotNull Integer tournament, @NotNull String title,
+                            @NotNull Integer participationNum, @NotNull Boolean tier,
+                            String tierMax, String tierMin, String channelImageUrl,
+                            @NotNull Boolean playCount, Integer playCountMin) {
         this.game = game;
         this.tournament = tournament;
         this.title = title;
         this.participationNum = participationNum;
         this.tier = tier;
         this.tierMax = tierMax;
+        this.tierMin = tierMin;
+        this.channelImageUrl = channelImageUrl;
         this.playCount = playCount;
         this.playCountMin = playCountMin;
     }

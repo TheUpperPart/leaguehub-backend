@@ -7,7 +7,7 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelUpdateException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -33,19 +33,18 @@ public class ChannelService {
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
 
-    /**
-     * @param createChannelDto
-     * @return
-     */
     @Transactional
     public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
 
         Member member = getMember();
 
+        validateChannelRule(createChannelDto);
+
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
                 createChannelDto.getGame(), createChannelDto.getParticipationNum(),
                 createChannelDto.getTournament(), createChannelDto.getChannelImageUrl(),
                 createChannelDto.getTier(), createChannelDto.getTierMax(),
+                createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -102,26 +101,25 @@ public class ChannelService {
         Optional.ofNullable(updateChannelDto.getParticipationNum()).ifPresent(channel::updateMaxPlayer);
         Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
 
-        Optional<Boolean> tierOpt = Optional.ofNullable(updateChannelDto.getTier());
-        if (tierOpt.isPresent()) {
-            if (tierOpt.get() == true) {
-                validateTier(updateChannelDto.getTierMax());
-                channel.updateChannelTierRule(true, updateChannelDto.getTierMax());
-            } else {
-                channel.updateChannelTierRule(false);
-            }
-        }
+        Optional.ofNullable(updateChannelDto.getTier())
+                .ifPresent(tier -> {
+                    if (tier) {
+                        validateTier(updateChannelDto.getTierMax(), updateChannelDto.getTierMin());
+                        channel.updateChannelTierRule(true, updateChannelDto.getTierMax(), updateChannelDto.getTierMin());
+                    } else {
+                        channel.updateChannelTierRule(false);
+                    }
+                });
 
-        Optional<Boolean> playCountOpt = Optional.ofNullable(updateChannelDto.getPlayCount());
-        if (playCountOpt.isPresent()) {
-            if (playCountOpt.get() == true) {
-                validatePlayCount(updateChannelDto.getPlayCountMin());
-                channel.updateChannelPlayCountRule(true, updateChannelDto.getPlayCountMin());
-            } else {
-                channel.updateChannelPlayCountRule(false);
-            }
-        }
-
+        Optional.ofNullable(updateChannelDto.getPlayCount())
+                .ifPresent(playCount -> {
+                    if (playCount) {
+                        validatePlayCount(updateChannelDto.getPlayCountMin());
+                        channel.updateChannelPlayCountRule(true, updateChannelDto.getPlayCountMin());
+                    } else {
+                        channel.updateChannelPlayCountRule(false);
+                    }
+                });
     }
 
     public Channel validateChannel(String channelLink) {
@@ -149,15 +147,25 @@ public class ChannelService {
         }
     }
 
-    private void validateTier(String tierMax) {
-        if(tierMax == null) {
-            throw new ChannelUpdateException();
+    private void validateTier(String tierMax, String tierMin) {
+        if (tierMax == null && tierMin == null) {
+            throw new ChannelRequestException();
         }
     }
 
     private void validatePlayCount(Integer playCountMin) {
-        if(playCountMin == null) {
-            throw new ChannelUpdateException();
+        if (playCountMin == null) {
+            throw new ChannelRequestException();
+        }
+    }
+
+    private void validateChannelRule(CreateChannelDto createChannelDto) {
+        if (createChannelDto.getTier()) {
+            validateTier(createChannelDto.getTierMax(), createChannelDto.getTierMin());
+        }
+
+        if (createChannelDto.getPlayCount()) {
+            validatePlayCount(createChannelDto.getPlayCountMin());
         }
     }
 
