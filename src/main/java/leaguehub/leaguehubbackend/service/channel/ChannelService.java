@@ -45,7 +45,7 @@ public class ChannelService {
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
                 createChannelDto.getGame(), createChannelDto.getParticipationNum(),
                 createChannelDto.getTournament(), createChannelDto.getChannelImageUrl(),
-                createChannelDto.getTier(), createChannelDto.getTierMax(), createChannelDto.getGradeMax(),
+                createChannelDto.getTier(), createChannelDto.getTierMax(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -105,8 +105,8 @@ public class ChannelService {
         Optional<Boolean> tierOpt = Optional.ofNullable(updateChannelDto.getTier());
         if (tierOpt.isPresent()) {
             if (tierOpt.get() == true) {
-                validateTier(updateChannelDto.getTierMax(), updateChannelDto.getGradeMax());
-                channel.updateChannelTierRule(true, updateChannelDto.getTierMax(), updateChannelDto.getGradeMax());
+                validateTier(updateChannelDto.getTierMax());
+                channel.updateChannelTierRule(true, updateChannelDto.getTierMax());
             } else {
                 channel.updateChannelTierRule(false);
             }
@@ -149,8 +149,8 @@ public class ChannelService {
         }
     }
 
-    private void validateTier(String tierMax, String gradeMax) {
-        if(tierMax == null || gradeMax == null) {
+    private void validateTier(String tierMax) {
+        if(tierMax == null) {
             throw new ChannelUpdateException();
         }
     }

@@ -17,6 +17,7 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -311,8 +312,14 @@ public class ParticipantService {
 
 
     private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+
         if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
+            String[] s = channelRule.getLimitedTier().split(" ");
+            System.out.println("s = " + s[0].toString());
+            System.out.println("s = " + s[1].toString());
+            String ruleTier = s[0];
+            String ruleGrade = s[1];
+            int limitedRankScore = GameTier.rankToScore(ruleTier, ruleGrade);
             int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
             if (userRankScore > limitedRankScore)
                 throw new ParticipantInvalidRankException();
@@ -349,7 +356,12 @@ public class ParticipantService {
 
         checkRule(channelRule, userDetail, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString(), responseDto.getNickname());
+        participant.updateParticipantStatus(responseDto.getGameId(), getGameTier(tier), responseDto.getNickname());
+    }
+
+    @NotNull
+    private static String getGameTier(GameRankDto tier) {
+        return tier.getGameRank().toString() + " " + tier.getGameGrade();
     }
 
     /**
