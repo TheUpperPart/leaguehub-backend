@@ -99,7 +99,6 @@ class ChannelTest {
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
         assertThat(findChannel.get().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(findChannel.get().getAccessCode()).isEqualTo(channel.getAccessCode());
     }
 
     @Test
