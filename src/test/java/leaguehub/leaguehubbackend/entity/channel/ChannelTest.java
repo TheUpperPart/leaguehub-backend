@@ -49,7 +49,7 @@ class ChannelTest {
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -75,11 +75,11 @@ class ChannelTest {
     public void 채널_생성_테스트_제한() throws Exception {
         //given
         Member member = memberRepository.save(UserFixture.createMember());
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, "Silver", "iv",100);
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, "Silver iv",100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -99,7 +99,6 @@ class ChannelTest {
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
         assertThat(findChannel.get().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(findChannel.get().getAccessCode()).isEqualTo(channel.getAccessCode());
     }
 
     @Test
@@ -109,7 +108,7 @@ class ChannelTest {
         assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);
@@ -122,7 +121,7 @@ class ChannelTest {
         assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin()))
                 .isInstanceOf(ChannelCreateException.class);

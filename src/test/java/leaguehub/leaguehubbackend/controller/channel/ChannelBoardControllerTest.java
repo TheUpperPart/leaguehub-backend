@@ -68,17 +68,17 @@ class ChannelBoardControllerTest {
 
     }
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, String gradeMax, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("1"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("2"));
         Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("3"));
         Member masterMember = memberRepository.save(UserFixture.createCustomeMember("4"));
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, gradeMax, playCountMin);
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -113,7 +113,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 만들기 - 실패(권한없음)")
     void 트FailCreateChannelBoard() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
+        Channel customChannel = createCustomChannel(false, false, "Silver i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
@@ -186,7 +186,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 업데이트 - 실패(권한없음)")
     void failUpdateChannelBoard_NoAuth() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver", "i", 100);
+        Channel customChannel = createCustomChannel(false, false, "Silver i", 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");

@@ -26,7 +26,7 @@ class MatchRankTest {
     @Test
     @DisplayName("순위 생성 테스트")
     void createMatchRankTest() throws Exception {
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver", "iv", 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", 100);
         Match match = Match.createMatch(16, channel);
         MatchResult matchResult = MatchResult.createMatchResult("ab12345", match);
         MatchRank matchRank = MatchRank.createMatchRank("가나다", "1등", matchResult);

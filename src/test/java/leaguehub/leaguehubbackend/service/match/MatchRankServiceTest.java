@@ -49,7 +49,7 @@ class MatchRankServiceTest {
     @DisplayName("경기 검색 테스트 - 성공")
     void searchMatchSuccessTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver", "iv", 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel);
         matchRepository.save(match);
@@ -65,7 +65,7 @@ class MatchRankServiceTest {
     @DisplayName("경기 검색 테스트 - 실패")
     void searchMatchFailTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver", "iv", 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel);
         matchRepository.save(match);
