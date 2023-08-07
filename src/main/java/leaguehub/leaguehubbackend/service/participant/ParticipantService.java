@@ -49,14 +49,7 @@ public class ParticipantService {
     @Value("${riot-api-key-1}")
     private String riot_api_key;
 
-    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
-        if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
-                throw new ParticipantInvalidRankException();
-        }
-    }
+
 
     public int findParticipantPermission(String channelLink) {
 
@@ -326,16 +319,18 @@ public class ParticipantService {
     private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
 
         if (channelRule.getTier()) {
-            String[] s = channelRule.getLimitedTier().split(" ");
-            System.out.println("s = " + s[0].toString());
-            System.out.println("s = " + s[1].toString());
-            String ruleTier = s[0];
-            String ruleGrade = s[1];
-            int limitedRankScore = GameTier.rankToScore(ruleTier, ruleGrade);
+            int limitedRankScore = getRuleTierAndGrade(channelRule.getLimitedTier());
             int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
             if (userRankScore > limitedRankScore)
                 throw new ParticipantInvalidRankException();
         }
+    }
+
+    public static int getRuleTierAndGrade(String channelRuleRank){
+        String[] ruleRank = channelRuleRank.split(" ");
+        String ruleTier = ruleRank[0];
+        String ruleGrade = ruleRank[1];
+        return GameTier.rankToScore(ruleTier, ruleGrade);
     }
 
 
@@ -371,8 +366,8 @@ public class ParticipantService {
         participant.updateParticipantStatus(responseDto.getGameId(), getGameTier(tier), responseDto.getNickname());
     }
 
-    @NotNull
-    private static String getGameTier(GameRankDto tier) {
+
+    private String getGameTier(GameRankDto tier) {
         return tier.getGameRank().toString() + " " + tier.getGameGrade();
     }
 
