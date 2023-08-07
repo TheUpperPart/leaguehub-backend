@@ -20,9 +20,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequiredArgsConstructor
 public class ChannelBoardController {
 
-    private final ChannelService channelService;
     private final ChannelBoardService channelBoardService;
-    private final ParticipantService participantService;
 
     @PostMapping("/channel/{channelLink}/new")
     public ResponseEntity createChannelBoard(@PathVariable("channelLink") String channelLink,
@@ -64,5 +62,13 @@ public class ChannelBoardController {
         channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
 
         return new ResponseEntity("BoardIndex successfully updated", OK);
+    }
+
+    @GetMapping("/channel/{channelLink}/boards")
+    public ResponseEntity loadChannelBoards(@PathVariable("channelLink") String channelLink) {
+
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+
+        return new ResponseEntity(channelBoardLoadDtoList, OK);
     }
 }
