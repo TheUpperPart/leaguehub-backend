@@ -48,10 +48,8 @@ public class ChannelController {
     public ResponseEntity getChannel(@PathVariable("channelLink") String channelLink) {
 
         ChannelDto channelInfo = channelService.findChannel(channelLink);
-        List<ChannelBoardLoadDto> channelBoards = channelBoardService.loadChannelBoards(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
-                .channelBoardLoadDtoList(channelBoards)
                 .game(channelInfo.getCategory().name())
                 .hostName(participantService.findChannelHost(channelLink))
                 .participateNum(channelInfo.getRealPlayer())
@@ -73,7 +71,7 @@ public class ChannelController {
 
     @PostMapping("/channel/{channelLink}")
     public ResponseEntity updateChannel(@PathVariable("channelLink") String channelLink,
-                                        UpdateChannelDto updateChannelDto) {
+                                        @RequestBody UpdateChannelDto updateChannelDto) {
 
         channelService.updateChannel(channelLink, updateChannelDto);
 

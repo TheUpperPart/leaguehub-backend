@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 public class ResponseChannelDto {
@@ -23,17 +21,14 @@ public class ResponseChannelDto {
     @JsonProperty("maxPlayer")
     private Integer maxPlayer;
 
-    private List<ChannelBoardLoadDto> boards;
-
     private Integer permission;
 
     @Builder
-    public ResponseChannelDto(String hostName, String leagueTitle, String game, Integer participateNum, Integer maxPlayer,List<ChannelBoardLoadDto> channelBoardLoadDtoList, Integer permission) {
+    public ResponseChannelDto(String hostName, String leagueTitle, String game, Integer participateNum, Integer maxPlayer, Integer permission) {
         this.hostName = hostName;
         this.leagueTitle = leagueTitle;
         this.game = game;
         this.participateNum = participateNum;
-        this.boards = channelBoardLoadDtoList;
         this.permission = permission;
         this.maxPlayer = maxPlayer;
     }
