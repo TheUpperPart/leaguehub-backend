@@ -100,26 +100,6 @@ public class ChannelService {
         Optional.ofNullable(updateChannelDto.getTitle()).ifPresent(channel::updateTitle);
         Optional.ofNullable(updateChannelDto.getParticipationNum()).ifPresent(channel::updateMaxPlayer);
         Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
-
-        Optional.ofNullable(updateChannelDto.getTier())
-                .ifPresent(tier -> {
-                    if (tier) {
-                        validateTier(updateChannelDto.getTierMax(), updateChannelDto.getTierMin());
-                        channel.updateChannelTierRule(true, updateChannelDto.getTierMax(), updateChannelDto.getTierMin());
-                    } else {
-                        channel.updateChannelTierRule(false);
-                    }
-                });
-
-        Optional.ofNullable(updateChannelDto.getPlayCount())
-                .ifPresent(playCount -> {
-                    if (playCount) {
-                        validatePlayCount(updateChannelDto.getPlayCountMin());
-                        channel.updateChannelPlayCountRule(true, updateChannelDto.getPlayCountMin());
-                    } else {
-                        channel.updateChannelPlayCountRule(false);
-                    }
-                });
     }
 
     public Channel validateChannel(String channelLink) {
