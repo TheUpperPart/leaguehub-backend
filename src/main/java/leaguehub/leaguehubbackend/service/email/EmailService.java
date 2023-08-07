@@ -91,7 +91,7 @@ public class EmailService {
         }
     }
 
-    private String generateUniqueTokenForUser(String email) {
+    public String generateUniqueTokenForUser(String email) {
         return JWT.create()
                 .withSubject(email)
                 .sign(Algorithm.HMAC256(secretKey));
@@ -102,13 +102,25 @@ public class EmailService {
         return pat.matcher(email).matches();
     }
 
-    @Transactional
-    public boolean confirmUserEmail(String token) {
+    public String getEmailFromToken(String token) {
         try {
-            String email = JWT.require(Algorithm.HMAC256(secretKey))
+            return JWT.require(Algorithm.HMAC256(secretKey))
                     .build()
                     .verify(token)
                     .getSubject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    @Transactional
+    public boolean confirmUserEmail(String token) {
+        try {
+
+            String email = getEmailFromToken(token);
+
+            if (email == null) {
+                throw new RuntimeException("인증 토큰이 잘못되었습니다.");
+            }
 
             EmailAuth emailAuth = emailAuthRepository.findAuthByEmail(email)
                     .orElseThrow(() -> new RuntimeException("인증 토큰이 잘못되었습니다."));

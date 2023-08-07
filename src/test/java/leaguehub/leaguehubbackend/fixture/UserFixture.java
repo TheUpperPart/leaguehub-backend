@@ -25,8 +25,16 @@ public class UserFixture {
         return member;
     }
 
+    public static Member createGuestMember() {
+        Member member = Member.builder()
+                .personalId("idGuest").profileImageUrl("urlGuest")
+                .nickname("nickNameGuest").refreshToken("refreshTokenGuest")
+                .emailAuth(new EmailAuth("idGuest@example.com", "authToken"))
+                .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.GUEST)
+                .build();
 
-
+        return member;
+    }
 
     public static Member createCustomeMember(String name){
         Member member = Member.builder()
