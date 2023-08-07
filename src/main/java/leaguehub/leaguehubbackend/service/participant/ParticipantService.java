@@ -18,6 +18,7 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -48,14 +49,7 @@ public class ParticipantService {
     @Value("${riot-api-key-1}")
     private String riot_api_key;
 
-    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
-        if (channelRule.getTier()) {
-            int limitedRankScore = GameTier.rankToScore(channelRule.getLimitedTier(), channelRule.getLimitedGrade());
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
-                throw new ParticipantInvalidRankException();
-        }
-    }
+
 
     public int findParticipantPermission(String channelLink) {
 
@@ -321,6 +315,25 @@ public class ParticipantService {
         }
     }
 
+
+    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+
+        if (channelRule.getTier()) {
+            int limitedRankScore = getRuleTierAndGrade(channelRule.getLimitedTier());
+            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            if (userRankScore > limitedRankScore)
+                throw new ParticipantInvalidRankException();
+        }
+    }
+
+    public static int getRuleTierAndGrade(String channelRuleRank){
+        String[] ruleRank = channelRuleRank.split(" ");
+        String ruleTier = ruleRank[0];
+        String ruleGrade = ruleRank[1];
+        return GameTier.rankToScore(ruleTier, ruleGrade);
+    }
+
+
     public void checkDuplicateNickname(String gameId, String channelLink) {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
 
@@ -350,7 +363,12 @@ public class ParticipantService {
 
         checkRule(channelRule, userDetail, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.getGameRank().toString(), responseDto.getNickname());
+        participant.updateParticipantStatus(responseDto.getGameId(), getGameTier(tier), responseDto.getNickname());
+    }
+
+
+    private String getGameTier(GameRankDto tier) {
+        return tier.getGameRank().toString() + " " + tier.getGameGrade();
     }
 
     /**

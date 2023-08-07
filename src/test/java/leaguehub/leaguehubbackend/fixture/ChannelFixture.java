@@ -22,7 +22,7 @@ public class ChannelFixture {
 
 
     public static CreateChannelDto createAllPropertiesCustomChannelDto(Boolean tier, Boolean playCount,
-                                                                       String tierMax, String gradeMax, int playCountMin) {
+                                                                       String tierMax, int playCountMin) {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
                 .game(0)
                 .title("test")
@@ -30,7 +30,6 @@ public class ChannelFixture {
                 .participationNum(16)
                 .tier(tier)
                 .tierMax(tierMax)
-                .gradeMax(gradeMax)
                 .playCount(playCount)
                 .playCountMin(playCountMin)
                 .build();
@@ -91,13 +90,13 @@ public class ChannelFixture {
         return channelBoardDto;
     }
 
-    public static Channel createDummyChannel(Boolean tier, Boolean playCount, String tierMax, String gradeMax, int playCountMin){
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, gradeMax, playCountMin);
+    public static Channel createDummyChannel(Boolean tier, Boolean playCount, String tierMax, int playCountMin){
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, playCountMin);
 
         return Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getGradeMax(),
+                channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
     }
