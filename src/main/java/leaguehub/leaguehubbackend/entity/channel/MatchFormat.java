@@ -1,5 +1,11 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
+import lombok.Getter;
+
+import java.util.Arrays;
+
+@Getter
 public enum MatchFormat {
     SINGLE_ELIMINATION(1), FREE_FOR_ALL(0);
 
@@ -9,12 +15,11 @@ public enum MatchFormat {
         this.num = num;
     }
 
-    public static MatchFormat getByNumber(int number) {
-        for (MatchFormat matchFormat : MatchFormat.values()) {
-            if (matchFormat.num == number) {
-                return matchFormat;
-            }
-        }
-        return null; // 해당하는 값이 없을 경우 null 반환
+
+    public static MatchFormat getByNumber(int tournament) {
+        return Arrays.stream(MatchFormat.values())
+                .filter(matchFormat -> matchFormat.num == tournament)
+                .findFirst()
+                .orElseThrow(ChannelRequestException::new);
     }
 }

@@ -1,6 +1,9 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum Category {
@@ -13,12 +16,10 @@ public enum Category {
     }
 
 
-    public static Category getByNumber(int number) {
-        for (Category category : Category.values()) {
-            if (category.num == number) {
-                return category;
-            }
-        }
-        return null; // 해당하는 값이 없을 경우 null 반환
+    public static Category getByNumber(int game) {
+        return Arrays.stream(Category.values())
+                .filter(category -> category.num == game)
+                .findFirst()
+                .orElseThrow(ChannelRequestException::new);
     }
 }
