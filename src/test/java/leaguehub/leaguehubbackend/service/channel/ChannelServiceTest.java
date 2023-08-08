@@ -1,15 +1,15 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -40,6 +39,8 @@ class ChannelServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    ChannelRuleRepository channelRuleRepository;
 
     @BeforeEach
     void setUp() {
@@ -53,10 +54,31 @@ class ChannelServiceTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 
+
         Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getMaxPlayer()).isEqualTo(createChannelDto.getParticipationNum());
         assertThat(findChannel.get().getTitle()).isEqualTo(createChannelDto.getTitle());
+        assertThat(findChannel.get().getChannelRule().getTier()).isFalse();
+    }
+
+    @Test
+    @DisplayName("채널 생성 실패 테스트 - 서비스(티어 유효성)")
+    void createChannel_TierValid() {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        createChannelDto.setTier(true);
+        assertThatThrownBy(() ->channelService.createChannel(createChannelDto))
+                .isInstanceOf(ChannelRequestException.class);
+    }
+
+    @Test
+    @DisplayName("채널 생성 실패 테스트 - 서비스(판수 유효성)")
+    void createChannel_PlayCountValid() {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        createChannelDto.setPlayCount(true);
+        createChannelDto.setPlayCountMin(null);
+        assertThatThrownBy(() ->channelService.createChannel(createChannelDto))
+                .isInstanceOf(ChannelRequestException.class);
     }
 
     @Test
@@ -95,6 +117,25 @@ class ChannelServiceTest {
         List<ParticipantChannelDto> participantChannelList = channelService.findParticipantChannelList();
 
         assertThat(participantChannelList.size()).isEqualTo(2);
+    }
+
+
+    @Test
+    @DisplayName("채널 업데이트 - 제목, 참가자수, 채널 이미지")
+    void updateChannel() {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+
+        UpdateChannelDto updateChannelDto = ChannelFixture.updateChannelDto();
+
+        channelService.updateChannel(responseCreateChannelDto.getChannelLink(), updateChannelDto);
+
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+
+        assertThat(findChannel.get().getTitle()).isEqualTo(updateChannelDto.getTitle());
+        assertThat(findChannel.get().getMaxPlayer()).isEqualTo(updateChannelDto.getParticipationNum());
+        assertThat(findChannel.get().getChannelImageUrl()).isEqualTo(updateChannelDto.getChannelImageUrl());
+
     }
 
 }

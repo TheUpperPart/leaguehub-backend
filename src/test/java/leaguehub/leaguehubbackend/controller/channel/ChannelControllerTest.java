@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.controller.channel.ChannelController;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -124,6 +125,21 @@ class ChannelControllerTest {
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channels"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("채널 업데이트")
+    void updateChannel() throws Exception {
+        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        UpdateChannelDto updateChannelDto = ChannelFixture.updateChannelDto();
+        String json = objectMapper.writeValueAsString(updateChannelDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
     }

@@ -68,17 +68,24 @@ class ChannelBoardControllerTest {
 
     }
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, String tierMin, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
-        Member ironMember = memberRepository.save(UserFixture.createCustomeMember("1"));
-        Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("2"));
-        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("3"));
-        Member masterMember = memberRepository.save(UserFixture.createCustomeMember("4"));
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, playCountMin);
+        Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
+        Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
+        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));
+        Member masterMember = memberRepository.save(UserFixture.createCustomeMember("채수채수밭"));
+        Member alreadyMember = memberRepository.save(UserFixture.createCustomeMember("요청한사람"));
+        Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
+        Member doneMember1 = memberRepository.save(UserFixture.createCustomeMember("참가된사람1"));
+        Member doneMember2 = memberRepository.save(UserFixture.createCustomeMember("참가된사람2"));
+        Member observer1 = memberRepository.save(UserFixture.createCustomeMember("관전자1"));
+        Member observer2 = memberRepository.save(UserFixture.createCustomeMember("관전자2"));
+
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -88,6 +95,20 @@ class ChannelBoardControllerTest {
         participantRepository.save(Participant.participateChannel(ironMember, channel));
         participantRepository.save(Participant.participateChannel(platinumMember, channel));
         participantRepository.save(Participant.participateChannel(masterMember, channel));
+        participantRepository.save(Participant.participateChannel(observer1, channel));
+        participantRepository.save(Participant.participateChannel(observer2, channel));
+
+        Participant alreadyParticipant = participantRepository.save(Participant.participateChannel(alreadyMember, channel));
+        Participant rejectedParticipant = participantRepository.save(Participant.participateChannel(rejectedMember, channel));
+        Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
+        Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
+
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
+        rejectedParticipant.rejectParticipantRequest();
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
+        doneParticipant1.approveParticipantMatch();
+        doneParticipant2.approveParticipantMatch();
 
         return channel;
     }
@@ -113,7 +134,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 만들기 - 실패(권한없음)")
     void 트FailCreateChannelBoard() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver i", 100);
+        Channel customChannel = createCustomChannel(false, false, "Silver i", null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
@@ -167,7 +188,7 @@ class ChannelBoardControllerTest {
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
-        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
+        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
                                 + channel.get().getChannelLink() + "/" + channelBoards.get(0).getId())
@@ -186,7 +207,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 업데이트 - 실패(권한없음)")
     void failUpdateChannelBoard_NoAuth() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver i", 100);
+        Channel customChannel = createCustomChannel(false, false, "Silver i", null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
@@ -211,7 +232,7 @@ class ChannelBoardControllerTest {
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
-        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelDto();
+        ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
                                 + channel.get().getChannelLink() + "/123141515")
