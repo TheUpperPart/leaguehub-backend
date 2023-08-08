@@ -63,7 +63,7 @@ public class Channel extends BaseTimeEntity {
         channel.matchFormat = MatchFormat.getByNumber(tournament);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
-        channel.channelRule = ChannelRule.createChannelRule(tier
+        channel.channelRule = ChannelRule.createChannelRule(channel,tier
                 , tierMax
                 , tierMin
                 , playCount

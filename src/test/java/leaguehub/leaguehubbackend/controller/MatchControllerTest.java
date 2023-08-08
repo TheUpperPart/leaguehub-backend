@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,9 +45,9 @@ public class MatchControllerTest {
 
     @Test
     @DisplayName("경기 결과 생성 테스트 - 성공")
-    public void createMatchRankSuccessTest() throws Exception{
+    public void createMatchRankSuccessTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel);
         matchRepository.save(match);
@@ -59,17 +58,17 @@ public class MatchControllerTest {
         String dtoToJson = mapper.writeValueAsString(matchResponseDto);
         //when
         mockMvc.perform(post("/api/match/matchResult")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(dtoToJson))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(dtoToJson))
                 .andExpect(status().isCreated());
 
     }
 
     @Test
     @DisplayName("경기 결과 생성 테스트 - 실패")
-    public void createMatchRankFailTest() throws Exception{
+    public void createMatchRankFailTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel);
         matchRepository.save(match);

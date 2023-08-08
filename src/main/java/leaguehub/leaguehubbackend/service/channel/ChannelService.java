@@ -11,6 +11,7 @@ import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestExce
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
@@ -32,6 +33,7 @@ public class ChannelService {
     private final MemberService memberService;
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
+    private final ChannelRuleRepository channelRuleRepository;
 
     @Transactional
     public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -108,20 +110,20 @@ public class ChannelService {
         return channel;
     }
 
-    private Member getMember() {
+    public Member getMember() {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         String personalId = userDetails.getUsername();
 
         return memberService.validateMember(personalId);
     }
 
-    private Participant getParticipant(Long channelId, Long memberId) {
+    public Participant getParticipant(Long channelId, Long memberId) {
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
                 .orElseThrow(() -> new InvalidParticipantAuthException());
         return participant;
     }
 
-    private void checkAuth(Role role) {
+    public void checkAuth(Role role) {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }

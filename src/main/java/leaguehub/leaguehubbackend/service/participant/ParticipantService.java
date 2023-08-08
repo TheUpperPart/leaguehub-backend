@@ -1,8 +1,12 @@
 package leaguehub.leaguehubbackend.service.participant;
 
-import leaguehub.leaguehubbackend.dto.participant.*;
+import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
+import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -18,7 +22,6 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -48,7 +51,6 @@ public class ParticipantService {
     private final ChannelRepository channelRepository;
     @Value("${riot-api-key-1}")
     private String riot_api_key;
-
 
 
     public int findParticipantPermission(String channelLink) {
@@ -320,18 +322,23 @@ public class ParticipantService {
 
         if (channelRule.getTier()) {
             int tierMax = getRuleTierAndGrade(channelRule.getTierMax());
+            if (tierMax == -1) tierMax = Integer.MAX_VALUE;
             int tierMin = getRuleTierAndGrade(channelRule.getTierMin());
+            if (tierMin == -1) tierMin = Integer.MIN_VALUE;
             int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > tierMax && userRankScore < tierMin)
-                throw new ParticipantInvalidRankException();
+            if (userRankScore > tierMax || userRankScore < tierMin) throw new ParticipantInvalidRankException();
         }
     }
 
-    public static int getRuleTierAndGrade(String channelRuleRank){
-        String[] ruleRank = channelRuleRank.split(" ");
-        String ruleTier = ruleRank[0];
-        String ruleGrade = ruleRank[1];
-        return GameTier.rankToScore(ruleTier, ruleGrade);
+    public static int getRuleTierAndGrade(String channelRuleRank) {
+        if (!channelRuleRank.equals(GlobalConstant.NO_DATA.getData())) {
+            String[] ruleRank = channelRuleRank.split(" ");
+            String ruleTier = ruleRank[0];
+            String ruleGrade = ruleRank[1];
+            return GameTier.rankToScore(ruleTier, ruleGrade);
+        }
+
+        return -1;
     }
 
 

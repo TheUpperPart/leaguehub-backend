@@ -36,11 +36,11 @@ class ChannelBoardTest {
 
     public Channel createChannel() {
         Member member = memberRepository.save(UserFixture.createMember());
-        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, "Silver iv",100);
+        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, "Silver iv","Iron iv",100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
                 channelDto.getTournament(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
@@ -78,7 +78,7 @@ class ChannelBoardTest {
         ChannelBoard saved = channelBoardRepository.save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto().getTitle(),
                 createChannelBoardDto().getContent(), channelBoards.size()));
         channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
-        ChannelBoardDto updateChannelBoardDto = updateChannelDto();
+        ChannelBoardDto updateChannelBoardDto = updateChannelBoardDto();
 
 
         channelBoardRepository.save(saved.updateChannelBoard(updateChannelBoardDto.getTitle(), updateChannelBoardDto.getContent()));

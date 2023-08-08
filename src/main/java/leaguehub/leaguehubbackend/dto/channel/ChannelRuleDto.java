@@ -2,10 +2,10 @@ package leaguehub.leaguehubbackend.dto.channel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class ChannelRuleDto {
 
