@@ -34,4 +34,8 @@ public class EmailAuth extends BaseTimeEntity {
         this.authToken = authToken;
         this.emailExpireDate = LocalDateTime.now().plusMinutes(10);
     }
+
+    public void changeExpireDate(LocalDateTime localDateTime) {
+        this.emailExpireDate = emailExpireDate;
+    }
 }
