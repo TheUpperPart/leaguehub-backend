@@ -106,19 +106,4 @@ public class Channel extends BaseTimeEntity {
         this.channelImageUrl = channelImageUrl;
     }
 
-    public void updateChannelTierRule(boolean tier, String tierMax, String tierMin) {
-        this.channelRule.updateTierRule(tier, tierMax, tierMin);
-    }
-
-    public void updateChannelTierRule(boolean tier) {
-        this.channelRule.updateTierRule(tier);
-    }
-
-    public void updateChannelPlayCountRule(boolean playCount, Integer playCountMin) {
-        this.channelRule.updatePlayCountMin(playCount, playCountMin);
-    }
-
-    public void updateChannelPlayCountRule(boolean playCount) {
-        this.channelRule.updatePlayCountMin(playCount);
-    }
 }

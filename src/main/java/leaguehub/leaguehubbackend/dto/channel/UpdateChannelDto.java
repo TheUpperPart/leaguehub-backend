@@ -14,21 +14,7 @@ public class UpdateChannelDto {
     @JsonProperty("maxPlayer")
     private Integer participationNum;
 
-    @JsonProperty("tier")
-    private Boolean tier;
-
-    @JsonProperty("tierMax")
-    private String tierMax;
-
-    @JsonProperty("tierMin")
-    private String tierMin;
-
     @JsonProperty("channelImageUrl")
     private String channelImageUrl;
 
-    @JsonProperty("playCount")
-    private Boolean playCount;
-
-    @JsonProperty("playCountMin")
-    private Integer playCountMin;
 }
