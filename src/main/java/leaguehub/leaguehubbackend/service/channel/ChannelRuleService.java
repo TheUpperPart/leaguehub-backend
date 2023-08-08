@@ -1,11 +1,11 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,11 @@ public class ChannelRuleService {
 
     @Transactional
     public ChannelRuleDto updateChannelRule(String channelLink, ChannelRuleDto channelRuleDto) {
-        channelService.validateChannel(channelLink);
+        Channel channel = channelService.validateChannel(channelLink);
+        Member member = channelService.getMember();
+        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        channelService.checkAuth(participant.getRole());
+
         ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(channelLink);
 
         Optional.ofNullable(channelRuleDto.getTier())
