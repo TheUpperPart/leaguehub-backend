@@ -40,7 +40,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     @Transactional
-    public void sendEmailWithConfirmation(String email, UserDetails userDetails) {
+    public String sendEmailWithConfirmation(String email, UserDetails userDetails) {
 
         validateEmail(email);
 
@@ -55,6 +55,7 @@ public class EmailService {
 
         sendConfirmationEmail(emailAuth, uniqueToken);
 
+        return email;
     }
 
     private void validateEmail(String email) {

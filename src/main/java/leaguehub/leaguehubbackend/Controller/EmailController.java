@@ -23,9 +23,9 @@ public class EmailController {
 
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        emailService.sendEmailWithConfirmation(emailDto.getEmail(), userDetails);
+        String email = emailService.sendEmailWithConfirmation(emailDto.getEmail(), userDetails);
 
-        return ResponseEntity.ok("Email Sent Success");
+        return ResponseEntity.ok("Email Successfully Sent to" + email);
     }
 
     @GetMapping("/confirm/Email")
