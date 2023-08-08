@@ -7,6 +7,8 @@ import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -19,7 +21,9 @@ public class ChannelRule extends BaseTimeEntity {
 
     private Integer limitedPlayCount;
 
-    private String limitedTier;
+    private String tierMax;
+
+    private String tierMin;
 
     private Boolean tier;
 
@@ -30,20 +34,22 @@ public class ChannelRule extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    public static ChannelRule createChannelRule(String tierMax,  Boolean tier,
+    public static ChannelRule createChannelRule(Boolean tier, String tierMax, String tierMin,
                                                 Boolean playCount, Integer playCountMin) {
         ChannelRule channelRule = new ChannelRule();
 
         channelRule.playCount = playCount;
         channelRule.tier = tier;
 
-        if (tier == true) {
-            channelRule.limitedTier = tierMax;
+        if (tier) {
+            channelRule.tierMax = Optional.ofNullable(tierMax).orElse(GlobalConstant.NO_DATA.getData());
+            channelRule.tierMin = Optional.ofNullable(tierMin).orElse(GlobalConstant.NO_DATA.getData());
         } else {
-            channelRule.limitedTier = GlobalConstant.NO_DATA.getData();
+            channelRule.tierMax = GlobalConstant.NO_DATA.getData();
+            channelRule.tierMin = GlobalConstant.NO_DATA.getData();
         }
 
-        if (playCount == true) {
+        if (playCount) {
             channelRule.limitedPlayCount = playCountMin;
         } else {
             channelRule.limitedPlayCount = Integer.MAX_VALUE;
@@ -52,9 +58,11 @@ public class ChannelRule extends BaseTimeEntity {
         return channelRule;
     }
 
-    public void updateTierRule(boolean tier, String tierMax) {
+    public void updateTierRule(boolean tier, String tierMax, String tierMin) {
         this.tier = tier;
-        this.limitedTier = tierMax;
+
+        this.tierMax = Optional.ofNullable(tierMax).orElse(GlobalConstant.NO_DATA.getData());
+        this.tierMin = Optional.ofNullable(tierMin).orElse(GlobalConstant.NO_DATA.getData());
     }
 
     public void updatePlayCountMin(boolean playCount, Integer playCountMin) {

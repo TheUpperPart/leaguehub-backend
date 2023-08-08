@@ -1,9 +1,8 @@
 package leaguehub.leaguehubbackend.exception.channel;
 
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelUpdateException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RequiredArgsConstructor
 public class ChannelExceptionHandler {
 
-    @ExceptionHandler(ChannelCreateException.class)
+    @ExceptionHandler(ChannelRequestException.class)
     public ResponseEntity<ExceptionResponse> channelCreateException(
-            ChannelCreateException e
+            ChannelRequestException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());
@@ -56,16 +55,4 @@ public class ChannelExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ChannelUpdateException.class)
-    public ResponseEntity<ExceptionResponse> channelUpdateException(
-            ChannelUpdateException e
-    ) {
-        ExceptionCode exceptionCode = e.getExceptionCode();
-        log.error("{}", exceptionCode.getMessage());
-
-        return new ResponseEntity<>(
-                new ExceptionResponse(exceptionCode),
-                exceptionCode.getHttpStatus()
-        );
-    }
 }

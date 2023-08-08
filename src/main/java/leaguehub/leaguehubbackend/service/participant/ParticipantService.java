@@ -319,9 +319,10 @@ public class ParticipantService {
     private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
 
         if (channelRule.getTier()) {
-            int limitedRankScore = getRuleTierAndGrade(channelRule.getLimitedTier());
+            int tierMax = getRuleTierAndGrade(channelRule.getTierMax());
+            int tierMin = getRuleTierAndGrade(channelRule.getTierMin());
             int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
-            if (userRankScore > limitedRankScore)
+            if (userRankScore > tierMax && userRankScore < tierMin)
                 throw new ParticipantInvalidRankException();
         }
     }

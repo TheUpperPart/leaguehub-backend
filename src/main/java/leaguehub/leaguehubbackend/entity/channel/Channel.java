@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelCreateException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,41 +49,31 @@ public class Channel extends BaseTimeEntity {
 
 
     //-- 비즈니스 로직 --//
-
-    public static Channel createChannel(String title, Integer category, int maxPlayer,
-                                        Integer matchFormat, String channelImageUrl,
-                                        boolean tier, String tierMax,
+    public static Channel createChannel(String title, int game, int maxPlayer,
+                                        int tournament, String channelImageUrl,
+                                        boolean tier, String tierMax, String tierMin,
                                         boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
         String uuid = UUID.randomUUID().toString();
         channel.title = title;
-        channel.category = Category.getByNumber(category);
+        channel.category = Category.getByNumber(game);
         channel.maxPlayer = maxPlayer;
         channel.realPlayer = 0;
         channel.channelStatus = ChannelStatus.PREPARING;
-        channel.matchFormat = MatchFormat.getByNumber(matchFormat);
+        channel.matchFormat = MatchFormat.getByNumber(tournament);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
-        channel.channelRule = ChannelRule.createChannelRule(tierMax
-                , tier
+        channel.channelRule = ChannelRule.createChannelRule(tier
+                , tierMax
+                , tierMin
                 , playCount
                 , playCountMin);
-
-        channel.validateChannelData();
 
         return channel;
     }
 
-    private void validateChannelData() {
-        if (this.getCategory() == null) {
-            throw new ChannelCreateException();
-        } else if (this.getMatchFormat() == null) {
-            throw new ChannelCreateException();
-        }
-    }
-
     public String createParticipationLink(String uuid) {
-        String channelLink = uuid.substring(24,uuid.length());
+        String channelLink = uuid.substring(24, uuid.length());
 
         return channelLink;
     }
@@ -99,7 +88,7 @@ public class Channel extends BaseTimeEntity {
     }
 
     //실제 참가자 수를 업데이트 한다.
-    public Channel updateRealPlayer(Integer realPlayer){
+    public Channel updateRealPlayer(Integer realPlayer) {
         this.realPlayer = realPlayer;
 
         return this;
@@ -117,8 +106,8 @@ public class Channel extends BaseTimeEntity {
         this.channelImageUrl = channelImageUrl;
     }
 
-    public void updateChannelTierRule(boolean tier, String tierMax) {
-        this.channelRule.updateTierRule(tier, tierMax);
+    public void updateChannelTierRule(boolean tier, String tierMax, String tierMin) {
+        this.channelRule.updateTierRule(tier, tierMax, tierMin);
     }
 
     public void updateChannelTierRule(boolean tier) {

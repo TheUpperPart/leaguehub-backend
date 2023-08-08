@@ -4,13 +4,13 @@ import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.exception.channel.ChannelExceptionCode.*;
 
-public class ChannelCreateException extends IllegalArgumentException {
+public class ChannelRequestException extends IllegalArgumentException {
 
     private final ExceptionCode exceptionCode;
 
-    public ChannelCreateException() {
-        super(INVALID_CREATE_CHANNEL.getMessage());
-        this.exceptionCode = INVALID_CREATE_CHANNEL;
+    public ChannelRequestException() {
+        super(INVALID_REQUEST_CHANNEL.getMessage());
+        this.exceptionCode = INVALID_REQUEST_CHANNEL;
     }
 
     public ExceptionCode getExceptionCode() {
