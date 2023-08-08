@@ -34,10 +34,11 @@ public class ChannelRule extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    public static ChannelRule createChannelRule(Boolean tier, String tierMax, String tierMin,
+    public static ChannelRule createChannelRule(Channel channel,Boolean tier, String tierMax, String tierMin,
                                                 Boolean playCount, Integer playCountMin) {
         ChannelRule channelRule = new ChannelRule();
 
+        channelRule.channel = channel;
         channelRule.playCount = playCount;
         channelRule.tier = tier;
 
