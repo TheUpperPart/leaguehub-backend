@@ -44,6 +44,9 @@ public class Participant extends BaseTimeEntity {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
+    @Column(name = "custom_channel_index")
+    private int index;
+
     public static Participant createHostChannel(Member member, Channel channel) {
         Participant participant = new Participant();
         participant.nickname = member.getNickname();
@@ -51,6 +54,7 @@ public class Participant extends BaseTimeEntity {
         participant.role = Role.HOST;
         participant.member = member;
         participant.channel = channel;
+
 
         participant.requestStatus = RequestStatus.NOREQUEST;
 
@@ -109,5 +113,10 @@ public class Participant extends BaseTimeEntity {
         this.role = Role.HOST;
 
         return this;
+    }
+
+    public void createCustomChannelIndex(Integer index) {
+        if(index != null) this.index = index + 1;
+        else this.index = 0;
     }
 }
