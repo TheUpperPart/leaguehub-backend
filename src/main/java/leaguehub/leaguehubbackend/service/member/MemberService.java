@@ -4,13 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
-import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
+import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
-
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
-
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
@@ -47,19 +47,6 @@ public class MemberService {
         return member;
     }
 
-    public ProfileResponseDto getMemberProfile(String personalId) {
-        Member member = memberRepository.findMemberByPersonalId(personalId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        return ProfileResponseDto.builder()
-                .profileId(member.getPersonalId())
-                .profileImageUrl(member.getProfileImageUrl())
-                .nickName(member.getNickname())
-                .email(getVerifiedEmail(member))
-                .userEmailVerified(member.isEmailUserVerified())
-                .build();
-    }
-
     public String getVerifiedEmail(Member member) {
         if (member.getEmailAuth() != null && member.isEmailUserVerified()) {
             return member.getEmailAuth().getEmail();
@@ -84,6 +71,27 @@ public class MemberService {
         }
     }
 
+    public ProfileDto getProfile(String personalId) {
+        Member member = memberRepository.findMemberByPersonalId(personalId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        return ProfileDto.builder()
+                .profileImageUrl(member.getProfileImageUrl())
+                .nickName(member.getNickname())
+                .build();
+    }
+
+    public MypageResponseDto getMypageProfile(String personalId) {
+        Member member = memberRepository.findMemberByPersonalId(personalId)
+                .orElseThrow(MemberNotFoundException::new);
+
+        return MypageResponseDto.builder()
+                .profileImageUrl(member.getProfileImageUrl())
+                .nickName(member.getNickname())
+                .email(getVerifiedEmail(member))
+                .userEmailVerified(member.isEmailUserVerified())
+                .build();
+    }
 
 }
 
