@@ -438,8 +438,7 @@ public class ParticipantService {
 
         checkRealPlayerCount(channelLink);
 
-        Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
-                        .orElseThrow(ParticipantNotFoundException::new);
+        Participant findParticipant = getFindParticipant(channelLink, participantId);
 
         findParticipant.approveParticipantMatch();
 
@@ -463,8 +462,7 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
-                        .orElseThrow(ParticipantNotFoundException::new);
+        Participant participant = getFindParticipant(channelLink, participantId);
 
         participant.rejectParticipantRequest();
 
@@ -478,8 +476,7 @@ public class ParticipantService {
     public void updateHostRole(String channelLink, Long participantId) {
         checkRoleHost(channelLink);
 
-        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
-                        .orElseThrow(ParticipantNotFoundException::new);
+        Participant participant = getFindParticipant(channelLink, participantId);
 
 
         participant.updateHostRole();
@@ -524,9 +521,7 @@ public class ParticipantService {
      * @return Participant participant
      */
     public Participant participateChannel(String channelLink) {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        String personalId = userDetails.getUsername();
-        Member member = memberService.validateMember(personalId);
+        Member member = getMember();
 
         Channel channel = channelRepository.findByChannelLink(channelLink).orElseThrow(ChannelNotFoundException::new);
 
@@ -554,15 +549,48 @@ public class ParticipantService {
      * @param channelLink
      */
     public void leaveChannel(String channelLink){
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        String personalId = userDetails.getUsername();
-        Member member = memberService.validateMember(personalId);
-        
-        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
-                .orElseThrow(ParticipantNotFoundException::new);
+        Member member = getMember();
+
+        Participant participant = getParticipant(channelLink, member);
 
         participantRepository.deleteById(participant.getId());
     }
+
+    /**
+     * channelLink와 member로 해당 채널에서의 참가자 찾기
+     * @param channelLink
+     * @param member
+     * @return
+     */
+    private Participant getParticipant(String channelLink, Member member) {
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
+                .orElseThrow(ParticipantNotFoundException::new);
+        return participant;
+    }
+
+    /**
+     * channelLink와 participantId로 해당 채널에서의 참가자 찾기
+     * @param channelLink
+     * @param participantId
+     * @return
+     */
+    public Participant getFindParticipant(String channelLink, Long participantId) {
+        Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                .orElseThrow(ParticipantNotFoundException::new);
+        return findParticipant;
+    }
+
+    /**
+     * member 찾기
+     * @return
+     */
+    private Member getMember() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        String personalId = userDetails.getUsername();
+        Member member = memberService.validateMember(personalId);
+        return member;
+    }
+
 
 
 }
