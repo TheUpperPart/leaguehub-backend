@@ -438,7 +438,8 @@ public class ParticipantService {
 
         checkRealPlayerCount(channelLink);
 
-        Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+        Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                        .orElseThrow(ParticipantNotFoundException::new);
 
         findParticipant.approveParticipantMatch();
 
@@ -462,21 +463,33 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                        .orElseThrow(ParticipantNotFoundException::new);
 
         participant.rejectParticipantRequest();
 
     }
 
+    /**
+     * 사용자를 관리자로 권한을 변경한다.
+     * @param channelLink
+     * @param participantId
+     */
     public void updateHostRole(String channelLink, Long participantId) {
         checkRoleHost(channelLink);
 
-        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink);
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                        .orElseThrow(ParticipantNotFoundException::new);
 
 
         participant.updateHostRole();
     }
 
+    /**
+     * 해당 채널의 관전자인 유저들을 조회
+     * @param channelLink
+     * @return
+     */
     public List<ResponseStatusPlayerDto> loadObserverPlayerList(String channelLink) {
 
         checkRoleHost(channelLink);
@@ -496,9 +509,59 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 이메일이 인증되었는지 확인
+     * @param userDetails
+     */
     public void checkEmail(UserDetails userDetails) {
         if (!userDetails.getAuthorities().toString().equals("[ROLE_USER]"))
             throw new UnauthorizedEmailException();
+    }
+
+    /**
+     * 사용자가 지정한 Channel을 참가
+     * @param channelLink
+     * @return Participant participant
+     */
+    public Participant participateChannel(String channelLink) {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        String personalId = userDetails.getUsername();
+        Member member = memberService.validateMember(personalId);
+
+        Channel channel = channelRepository.findByChannelLink(channelLink).orElseThrow(ChannelNotFoundException::new);
+
+        //중복 검사 추가
+        duplicateParticipant(member, channelLink);
+
+        Participant participant = Participant.participateChannel(member, channel);
+        participantRepository.save(participant);
+
+        return participant;
+    }
+
+    /**
+     * 해당 채널에 이미 참가했는지 중복검사
+     * @param member
+     * @param channelLink
+     */
+    public void duplicateParticipant(Member member, String channelLink) {
+        participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
+                .ifPresent( a ->{throw new ParticipantDuplicatedGameIdException();});
+    }
+
+    /**
+     * 해당 채널 나가기
+     * @param channelLink
+     */
+    public void leaveChannel(String channelLink){
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        String personalId = userDetails.getUsername();
+        Member member = memberService.validateMember(personalId);
+        
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
+                .orElseThrow(ParticipantNotFoundException::new);
+
+        participantRepository.deleteById(participant.getId());
     }
 
 
