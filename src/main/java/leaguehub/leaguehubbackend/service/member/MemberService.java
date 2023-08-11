@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,8 +55,10 @@ public class MemberService {
         return "N/A";
     }
 
-    public void logoutMember(String personalId, UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
-        Member member = memberRepository.findMemberByPersonalId(personalId)
+    public void logoutMember(HttpServletRequest request, HttpServletResponse response) {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.getPersonalId().equals(userDetails.getUsername())) {
@@ -71,8 +74,10 @@ public class MemberService {
         }
     }
 
-    public ProfileDto getProfile(String personalId) {
-        Member member = memberRepository.findMemberByPersonalId(personalId)
+    public ProfileDto getProfile() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
                 .orElseThrow(MemberNotFoundException::new);
 
         return ProfileDto.builder()
@@ -81,8 +86,10 @@ public class MemberService {
                 .build();
     }
 
-    public MypageResponseDto getMypageProfile(String personalId) {
-        Member member = memberRepository.findMemberByPersonalId(personalId)
+    public MypageResponseDto getMypageProfile() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
                 .orElseThrow(MemberNotFoundException::new);
 
         return MypageResponseDto.builder()
@@ -92,6 +99,5 @@ public class MemberService {
                 .userEmailVerified(member.isEmailUserVerified())
                 .build();
     }
-
 }
 

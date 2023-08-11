@@ -39,7 +39,7 @@ public class MemberController  {
     @GetMapping("/profile")
     public ProfileDto getProfile() {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        return memberService.getProfile(userDetails.getUsername());
+        return memberService.getProfile();
     }
 
     @Operation(summary = "사용자 마이페이지 조회", description = "사용자의 이미지 URL, 닉네임, 이메일, 이메일 인증 상태를 조회")
@@ -50,8 +50,7 @@ public class MemberController  {
     })
     @GetMapping("/mypage")
     public MypageResponseDto getMypage() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        return memberService.getMypageProfile(userDetails.getUsername());
+        return memberService.getMypageProfile();
     }
 
     @Operation(summary = "앱 로그아웃", description = "앱에서 사용자를 로그아웃")
@@ -62,9 +61,8 @@ public class MemberController  {
     })
     @PostMapping("/app/logout")
     public ResponseEntity<String> handleKakaoLogout(HttpServletRequest request, HttpServletResponse response) {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        memberService.logoutMember(userDetails.getUsername(), userDetails, request, response);
+        memberService.logoutMember( request, response);
 
         return ResponseEntity.ok("Logout Success!");
     }
