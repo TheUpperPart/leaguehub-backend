@@ -82,4 +82,18 @@ public class UserFixture {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
+
+    public static void setUpCustomGuest(String name) {
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+                .username(name)
+                .password("id")
+                .roles("GUEST")
+                .build();
+
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetailsUser, null
+                , authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 }
