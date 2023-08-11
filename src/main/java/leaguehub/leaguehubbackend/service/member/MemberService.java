@@ -56,29 +56,22 @@ public class MemberService {
     }
 
     public void logoutMember(HttpServletRequest request, HttpServletResponse response) {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = findCurrentMember();
 
-        if (member.getPersonalId().equals(userDetails.getUsername())) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null){
-                new SecurityContextLogoutHandler().logout(request, response, auth);
-                member.updateRefreshToken(null);
-                SecurityContextHolder.clearContext();
-                memberRepository.save(member);
-            }
-        } else {
-            throw new MemberNotFoundException();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+            member.updateRefreshToken(null);
+            SecurityContextHolder.clearContext();
+            memberRepository.save(member);
         }
     }
 
     public ProfileDto getProfile() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = findCurrentMember();
 
         return ProfileDto.builder()
                 .profileImageUrl(member.getProfileImageUrl())
@@ -87,10 +80,8 @@ public class MemberService {
     }
 
     public MypageResponseDto getMypageProfile() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = findCurrentMember();
 
         return MypageResponseDto.builder()
                 .profileImageUrl(member.getProfileImageUrl())
@@ -99,5 +90,11 @@ public class MemberService {
                 .userEmailVerified(member.isEmailUserVerified())
                 .build();
     }
+    public Member findCurrentMember() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        return validateMember(userDetails.getUsername());
+    }
+
 }
 
