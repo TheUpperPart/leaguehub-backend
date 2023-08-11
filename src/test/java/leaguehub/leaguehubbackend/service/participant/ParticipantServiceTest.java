@@ -11,6 +11,7 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -663,6 +664,79 @@ class ParticipantServiceTest {
 
         assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantRealPlayerIsMaxException.class);
+
+    }
+
+    @Test
+    @DisplayName("채널 참여 - 성공")
+    void participantChannelSuccess() throws Exception {
+        //given
+        Member dummyMember = memberRepository.save(UserFixture.createCustomeMember("참가할사람"));
+        UserFixture.setUpCustomAuth("참가할사람");
+        Channel channel = createCustomChannel(true, true, "master 100", null, 20);
+
+        //when
+        Participant participant = participantService.participateChannel(channel.getChannelLink());
+        //then
+
+        assertThat(participant.getChannel().getChannelLink()).isEqualTo(channel.getChannelLink());
+        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+        assertThat(participant.getRole()).isEqualTo(Role.OBSERVER);
+    }
+
+    @Test
+    @DisplayName("채널 중복 참여 - 실패")
+    void participantChannelDuplicateFail() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master 100", null, 20);
+
+        //then
+        assertThatThrownBy(() -> participantService.participateChannel(channel.getChannelLink()))
+                .isInstanceOf(ParticipantDuplicatedGameIdException.class);
+
+    }
+
+    @Test
+    @DisplayName("채널 나가기 - 성공")
+    void participantChannelLeaveSuccess() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master 100", null, 20);
+
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        String personalId = userDetails.getUsername();
+        Member member = memberService.validateMember(personalId);
+
+        System.out.println("member nickname = " + member.getNickname());
+        System.out.println("member nickname = " + member.getId());
+
+        long count = participantRepository.count();
+
+        //when
+        participantService.leaveChannel(channel.getChannelLink());
+
+        //then
+        long deleteCount = participantRepository.count();
+
+        assertThat(deleteCount).isEqualTo(count - 1);
+
+    }
+
+    @Test
+    @DisplayName("해당 채널의 경기 참가 테스트 (이메일 미인증) - 실패")
+    void participateUnAuthMatchFailTest() throws Exception {
+        //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
+        Member guestMember = memberRepository.save(UserFixture.createGuestMember());
+        UserFixture.setUpCustomGuest("idGuest");
+
+        Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
+        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        responseDto.setChannelLink(channel.getChannelLink());
+        responseDto.setGameId("urlGuestGameId");
+
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+                .isInstanceOf(UnauthorizedEmailException.class);
 
     }
 
