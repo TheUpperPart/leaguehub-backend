@@ -455,7 +455,7 @@ class ParticipantServiceTest {
         //when
         participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
-        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
         Optional<Channel> channel1 = channelRepository.findByChannelLink(channel.getChannelLink());
         int updateRealPlayerCount = 3;
 
@@ -491,7 +491,7 @@ class ParticipantServiceTest {
         //when
         participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
-        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
 
         //then
         assertThat(updateDummy.getId()).isEqualTo(dummy1.getId());
@@ -527,7 +527,7 @@ class ParticipantServiceTest {
         //when
         participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
-        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
+        Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
 
         //then
         assertThat(updateDummy.getId()).isEqualTo(dummy1.getId());
@@ -615,8 +615,8 @@ class ParticipantServiceTest {
         participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
         participantService.updateHostRole(channel.getChannelLink(), dummy2.getId());
 
-        Participant updateDummy1 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink());
-        Participant updateDummy2 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy2.getId(), channel.getChannelLink());
+        Participant updateDummy1 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
+        Participant updateDummy2 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy2.getId(), channel.getChannelLink()).get();
 
         //then
         assertThat(updateDummy1.getId()).isEqualTo(dummy1.getId());

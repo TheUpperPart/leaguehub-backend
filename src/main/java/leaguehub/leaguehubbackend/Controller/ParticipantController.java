@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -174,6 +175,22 @@ public class ParticipantController {
 
 
         return new ResponseEntity<>(responsePlayers, HttpStatus.OK);
+    }
+
+    @PostMapping("/participant/{channelLink}")
+    public ResponseEntity participateChannel(@PathVariable("channelLink") String channelLink){
+
+        Participant participant = participantService.participateChannel(channelLink);
+
+        return new ResponseEntity<>(participant.getNickname(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/participant/{channelLink}")
+    public ResponseEntity leaveChannel(@PathVariable("channelLink") String channelLink){
+
+        participantService.leaveChannel(channelLink);
+
+        return new ResponseEntity<>("Leave this Channel", HttpStatus.OK);
     }
 
 

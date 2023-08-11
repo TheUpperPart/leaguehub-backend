@@ -156,4 +156,16 @@ public class ParticipantExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ParticipantNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> ParticipantNotFoundException(
+            ParticipantNotFoundException e
+    ){
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
 }
