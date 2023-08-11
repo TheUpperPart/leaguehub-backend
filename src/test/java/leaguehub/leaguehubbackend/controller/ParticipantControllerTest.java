@@ -559,5 +559,50 @@ class ParticipantControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("채널 참여 - 성공")
+    void participantChannelSuccess() throws Exception {
+        //given
+        memberRepository.save(UserFixture.createCustomeMember("참가할사람"));
+        UserFixture.setUpCustomAuth("참가할사람");
+        Channel channel = createCustomChannel(true, true, "master 100", null, 20);
+
+        mockMvc.perform(post("/api/participant/" + channel.getChannelLink()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("채널 중복 참여 - 실패")
+    void participantChannelDuplicateFail() throws Exception {
+        //given
+        UserFixture.setUpCustomAuth("서초임");
+        Channel channel = createCustomChannel(true, true, "master 100", null, 20);
+
+        //then
+        mockMvc.perform(post("/api/participant/" + channel.getChannelLink()))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @DisplayName("해당 채널의 경기 참가 테스트 (이메일 미인증) - 실패")
+    void participateUnAuthMatchFailTest() throws Exception {
+        //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
+        Member guestMember = memberRepository.save(UserFixture.createGuestMember());
+        UserFixture.setUpCustomGuest("idGuest");
+
+        Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
+
+        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        String dtoToJson = mapper.writeValueAsString(participantResponseDto);
+
+        mockMvc.perform(post("/api/participant/match")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(dtoToJson))
+                .andExpect(status().isUnauthorized());
+
+
+    }
+
 
 }
