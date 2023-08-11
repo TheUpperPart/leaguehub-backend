@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -83,7 +83,7 @@ public class KakaoControllerTest {
         when(memberService.saveMember(kakaoUserDto)).thenReturn(Optional.of(member));
         when(jwtService.createTokens(String.valueOf(kakaoUserDto.getId()))).thenReturn(loginMemberResponse);
 
-        mockMvc.perform(get("/api/app/login/kakao")
+        mockMvc.perform(post("/api/app/login/kakao")
                         .header("Kakao-Code", "testCode")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
