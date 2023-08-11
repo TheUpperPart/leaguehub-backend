@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -115,8 +117,11 @@ public class Participant extends BaseTimeEntity {
         return this;
     }
 
-    public void createCustomChannelIndex(Integer index) {
-        if(index != null) this.index = index + 1;
-        else this.index = 0;
+    public void newCustomChannelIndex(Optional<Integer> index) {
+        this.index = index.map(i -> i + 1).orElse(0);
+    }
+
+    public void updateCustomChannelIndex(Integer index) {
+        this.index = index;
     }
 }

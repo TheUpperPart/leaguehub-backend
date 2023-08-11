@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.repository.particiapnt;
 
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
@@ -35,5 +36,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Participant> findParticipantByMemberIdAndChannel_Id(Long memberId, Long channelId);
 
     @Query("SELECT MAX(p.index) from Participant p WHERE p.member.id = :memberId")
-    Integer findMaxIndexByParticipant(Long memberId);
+    Optional<Integer> findMaxIndexByParticipant(Long memberId);
+
+    List<Participant> findAllByMemberIdAndAndIndexGreaterThan(Long memberId, int deleteIndex);
 }
