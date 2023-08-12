@@ -31,17 +31,18 @@ public class UserUtil {
     public void addDefaultUsers() {
         Member member1 = Member.builder()
                 .personalId("1234")
-                .nickname("member1")
+                .nickname("member1이메일인증안됨")
                 .profileImageUrl("https://robohash.org/1234?set=set2&size=180x180")
-                .baseRole(BaseRole.USER)
+                .baseRole(BaseRole.GUEST)
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
 
         Member member2 = Member.builder()
                 .personalId("4321")
-                .nickname("member2")
+                .nickname("member2이메일인증됨")
                 .profileImageUrl("https://robohash.org/4321?set=set2&size=180x180")
                 .baseRole(BaseRole.USER)
+                .emailUserVerified(true)
                 .loginProvider(LoginProvider.KAKAO)
                 .build();
 
