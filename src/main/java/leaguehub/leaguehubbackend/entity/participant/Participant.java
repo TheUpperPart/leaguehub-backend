@@ -83,8 +83,7 @@ public class Participant extends BaseTimeEntity {
     }
 
 
-
-    public Participant approveParticipantMatch(){
+    public Participant approveParticipantMatch() {
         this.requestStatus = RequestStatus.DONE;
         this.role = Role.PLAYER;
 
@@ -92,7 +91,7 @@ public class Participant extends BaseTimeEntity {
     }
 
 
-    public Participant rejectParticipantRequest(){
+    public Participant rejectParticipantRequest() {
         this.requestStatus = RequestStatus.REJECT;
         this.role = Role.OBSERVER;
 
@@ -100,7 +99,7 @@ public class Participant extends BaseTimeEntity {
     }
 
 
-    public Participant updateParticipantStatus(String gameId, String gameTier, String nickname){
+    public Participant updateParticipantStatus(String gameId, String gameTier, String nickname) {
         this.gameId = gameId;
         this.gameTier = gameTier;
         this.nickname = nickname;
@@ -110,7 +109,7 @@ public class Participant extends BaseTimeEntity {
         return this;
     }
 
-    public Participant updateHostRole(){
+    public Participant updateHostRole() {
         this.requestStatus = RequestStatus.NOREQUEST;
         this.role = Role.HOST;
 
@@ -118,7 +117,7 @@ public class Participant extends BaseTimeEntity {
     }
 
     public void newCustomChannelIndex(Optional<Integer> index) {
-        this.index = index.map(i -> i + 1).orElse(0);
+        this.index = index.map(i -> i + 1).orElseGet(() -> 0);
     }
 
     public void updateCustomChannelIndex(Integer index) {
