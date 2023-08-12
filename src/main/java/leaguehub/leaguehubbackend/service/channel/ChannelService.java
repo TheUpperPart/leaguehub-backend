@@ -49,12 +49,11 @@ public class ChannelService {
                 createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
-        Integer maxCustomIndex = participantRepository.findMaxIndexByParticipant(member.getId());
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
 
         Participant participant = Participant.createHostChannel(member, channel);
-        participant.createCustomChannelIndex(maxCustomIndex);
+        participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
 
         participantRepository.save(participant);
 
