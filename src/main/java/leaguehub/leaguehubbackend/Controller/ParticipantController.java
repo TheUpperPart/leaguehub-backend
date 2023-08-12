@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
@@ -15,11 +16,12 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @Tag(name = "Participants", description = "참가자 관련 API")
 @RestController
@@ -45,7 +47,7 @@ public class ParticipantController {
 
         ResponseUserDetailDto userDetailDto = participantService.selectGameCategory(nickname, category);
 
-        return new ResponseEntity<>(userDetailDto, HttpStatus.OK);
+        return new ResponseEntity<>(userDetailDto, OK);
     }
 
 
@@ -60,7 +62,7 @@ public class ParticipantController {
 
         participantService.checkParticipateMatch(channelLink);
 
-        return new ResponseEntity<>("Valid OBSERVER ROLE", HttpStatus.OK);
+        return new ResponseEntity<>("Valid OBSERVER ROLE", OK);
     }
 
 
@@ -74,7 +76,7 @@ public class ParticipantController {
 
         participantService.participateMatch(responseDto);
 
-        return new ResponseEntity<>("Update Participant ROLE", HttpStatus.OK);
+        return new ResponseEntity<>("Update Participant ROLE", OK);
     }
 
 
@@ -90,7 +92,7 @@ public class ParticipantController {
 
         List<ResponseStatusPlayerDto> players = participantService.loadPlayers(channelLink);
 
-        return new ResponseEntity<>(players, HttpStatus.OK);
+        return new ResponseEntity<>(players, OK);
     }
 
 
@@ -105,7 +107,7 @@ public class ParticipantController {
 
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadRequestStatusPlayerList(channelLink);
 
-        return new ResponseEntity<>(responsePlayers, HttpStatus.OK);
+        return new ResponseEntity<>(responsePlayers, OK);
     }
 
     @Operation(summary = "참가요청 승인", description = "관리자가 해당 게임 참가요청자(request)를 승인")
@@ -123,7 +125,7 @@ public class ParticipantController {
 
         participantService.approveParticipantRequest(channelLink, participantId);
 
-        return new ResponseEntity<>("approve participant", HttpStatus.OK);
+        return new ResponseEntity<>("approve participant", OK);
     }
 
     @Operation(summary = "참가요청 거절", description = "관리자가 해당 게임 참가요청자(request)를 거절")
@@ -141,7 +143,7 @@ public class ParticipantController {
 
         participantService.rejectedParticipantRequest(channelLink, participantId);
 
-        return new ResponseEntity<>("reject participant", HttpStatus.OK);
+        return new ResponseEntity<>("reject participant", OK);
     }
 
     @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")
@@ -159,7 +161,7 @@ public class ParticipantController {
 
         participantService.updateHostRole(channelLink, participantId);
 
-        return new ResponseEntity<>("update HOST", HttpStatus.OK);
+        return new ResponseEntity<>("update HOST", OK);
     }
 
     @Operation(summary = "채널 관전자(Observer) 조회 ", description = "채널 내 게임 관전자(Observer) 모두 조회")
@@ -174,23 +176,37 @@ public class ParticipantController {
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadObserverPlayerList(channelLink);
 
 
-        return new ResponseEntity<>(responsePlayers, HttpStatus.OK);
+        return new ResponseEntity<>(responsePlayers, OK);
     }
 
     @PostMapping("/participant/{channelLink}")
-    public ResponseEntity participateChannel(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity participateChannel(@PathVariable("channelLink") String channelLink) {
 
         Participant participant = participantService.participateChannel(channelLink);
 
-        return new ResponseEntity<>(participant.getNickname(), HttpStatus.OK);
+        return new ResponseEntity<>(participant.getNickname(), OK);
     }
 
     @DeleteMapping("/participant/{channelLink}")
-    public ResponseEntity leaveChannel(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity leaveChannel(@PathVariable("channelLink") String channelLink) {
 
         participantService.leaveChannel(channelLink);
 
-        return new ResponseEntity<>("Leave this Channel", HttpStatus.OK);
+        return new ResponseEntity<>("Leave this Channel", OK);
+    }
+
+
+    @Operation(summary = "채널 순서를 커스텀하게 구성 - 로그인시 사이드바 화면 구성을 커스텀할 수 있음",
+            description = "입력과 반환 Dto가 동일하게 되어서 API요청 필요 없이 바로 회면 구성 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dto를 리스트로 반환",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantChannelDto.class))),
+    })
+    @PostMapping("/participant/index")
+    public ResponseEntity updateCustomChannelIndex(@RequestBody List<ParticipantChannelDto> participantChannelDtoList) {
+
+        List<ParticipantChannelDto> updateCustomChannelIndexList = participantService.updateCustomChannelIndex(participantChannelDtoList);
+
+        return new ResponseEntity<>(updateCustomChannelIndexList, OK);
     }
 
 

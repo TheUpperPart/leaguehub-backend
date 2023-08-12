@@ -49,9 +49,14 @@ public class ChannelService {
                 createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
+        Integer maxCustomIndex = participantRepository.findMaxIndexByParticipant(member.getId());
         channelRepository.save(channel);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
-        participantRepository.save(Participant.createHostChannel(member, channel));
+
+        Participant participant = Participant.createHostChannel(member, channel);
+        participant.createCustomChannelIndex(maxCustomIndex);
+
+        participantRepository.save(participant);
 
         return new ResponseCreateChannelDto(channel.getChannelLink());
     }
@@ -69,7 +74,8 @@ public class ChannelService {
                             channel.getChannelLink(),
                             channel.getTitle(),
                             channel.getCategory().getNum(),
-                            channel.getChannelImageUrl()
+                            channel.getChannelImageUrl(),
+                            participant.getIndex()
                     );
                 })
                 .collect(Collectors.toList());

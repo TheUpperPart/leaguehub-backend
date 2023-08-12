@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.participant;
 
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
@@ -18,6 +19,7 @@ import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorEx
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class ParticipantService {
     private final WebClient webClient;
     private final JSONParser jsonParser;
     private final ChannelRepository channelRepository;
+    private final ChannelService channelService;
     @Value("${riot-api-key-1}")
     private String riot_api_key;
 
@@ -470,6 +473,7 @@ public class ParticipantService {
 
     /**
      * 사용자를 관리자로 권한을 변경한다.
+     *
      * @param channelLink
      * @param participantId
      */
@@ -484,6 +488,7 @@ public class ParticipantService {
 
     /**
      * 해당 채널의 관전자인 유저들을 조회
+     *
      * @param channelLink
      * @return
      */
@@ -508,6 +513,7 @@ public class ParticipantService {
 
     /**
      * 이메일이 인증되었는지 확인
+     *
      * @param userDetails
      */
     public void checkEmail(UserDetails userDetails) {
@@ -517,6 +523,7 @@ public class ParticipantService {
 
     /**
      * 사용자가 지정한 Channel을 참가
+     *
      * @param channelLink
      * @return Participant participant
      */
@@ -529,6 +536,7 @@ public class ParticipantService {
         duplicateParticipant(member, channelLink);
 
         Participant participant = Participant.participateChannel(member, channel);
+        participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
         participantRepository.save(participant);
 
         return participant;
@@ -536,28 +544,54 @@ public class ParticipantService {
 
     /**
      * 해당 채널에 이미 참가했는지 중복검사
+     *
      * @param member
      * @param channelLink
      */
     public void duplicateParticipant(Member member, String channelLink) {
         participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
-                .ifPresent( a ->{throw new ParticipantDuplicatedGameIdException();});
+                .ifPresent(a -> {
+                    throw new ParticipantDuplicatedGameIdException();
+                });
     }
 
     /**
      * 해당 채널 나가기
+     *
      * @param channelLink
      */
-    public void leaveChannel(String channelLink){
+    public void leaveChannel(String channelLink) {
         Member member = getMember();
 
         Participant participant = getParticipant(channelLink, member);
 
         participantRepository.deleteById(participant.getId());
+
+        List<Participant> participantAfterDelete = participantRepository.findAllByMemberIdAndAndIndexGreaterThan(
+                member.getId(), participant.getIndex());
+
+        for (Participant allParticipantByMember : participantAfterDelete) {
+            allParticipantByMember.updateCustomChannelIndex(allParticipantByMember.getIndex() - 1);
+        }
+    }
+
+    public List<ParticipantChannelDto> updateCustomChannelIndex(List<ParticipantChannelDto> participantChannelDtoList) {
+        Member member = getMember();
+
+        List<Participant> allByMemberId = participantRepository.findAllByMemberId(member.getId());
+
+        participantChannelDtoList.forEach(participantChannelDto -> {
+            allByMemberId.stream()
+                    .filter(participant -> participant.getChannel().getChannelLink().equals(participantChannelDto.getChannelLink()))
+                    .forEach(participant -> participant.updateCustomChannelIndex(participantChannelDto.getCustomChannelIndex()));
+        });
+
+        return channelService.findParticipantChannelList();
     }
 
     /**
      * channelLink와 member로 해당 채널에서의 참가자 찾기
+     *
      * @param channelLink
      * @param member
      * @return
@@ -570,6 +604,7 @@ public class ParticipantService {
 
     /**
      * channelLink와 participantId로 해당 채널에서의 참가자 찾기
+     *
      * @param channelLink
      * @param participantId
      * @return
@@ -582,6 +617,7 @@ public class ParticipantService {
 
     /**
      * member 찾기
+     *
      * @return
      */
     private Member getMember() {
@@ -590,7 +626,6 @@ public class ParticipantService {
         Member member = memberService.validateMember(personalId);
         return member;
     }
-
 
 
 }

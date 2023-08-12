@@ -15,10 +15,13 @@ public class ParticipantChannelDto {
 
     private String imgSrc;
 
-    public ParticipantChannelDto(String channelLink, String title, Integer category, String imgSrc) {
+    private Integer customChannelIndex;
+
+    public ParticipantChannelDto(String channelLink, String title, Integer category, String imgSrc, Integer customChannelIndex) {
         this.channelLink = channelLink;
         this.title = title;
         this.category = category;
         this.imgSrc = imgSrc;
+        this.customChannelIndex = customChannelIndex;
     }
 }
