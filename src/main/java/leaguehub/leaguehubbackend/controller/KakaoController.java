@@ -43,7 +43,6 @@ public class KakaoController {
     private final JwtService jwtService;
 
     @Operation(summary = "카카오 로그인/회원가입", description = "카카오 AccessCode를 사용하여 로그인/회원가입을 한다")
-    @Parameter(in = ParameterIn.HEADER, name = "Kakao-Code", description = "{kakao-Code}", required = true)
     @SecurityRequirements
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인/회원가입 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginMemberResponse.class))),

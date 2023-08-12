@@ -40,7 +40,6 @@ public class JwtController {
     private final JwtService jwtService;
 
     @Operation(summary = "토큰 재발급", description = "refreshToken을 사용해서 accessToken 과 refreshToken 재발급")
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization-refresh", description = "Bearer {refresh-token}", required = true)
     @SecurityRequirements
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginMemberResponse.class))),

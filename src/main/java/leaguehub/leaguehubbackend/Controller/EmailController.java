@@ -34,7 +34,6 @@ public class EmailController {
     private final EmailService emailService;
 
     @Operation(summary = "인증 메일 보내기", description = "엑세스 토큰이 유효하면 받은 email 주소로 인증 메일을 보낸다")
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "Bearer {access-token}", required = true)
     @SecurityRequirements
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Email Successfully Sent", content = @Content(mediaType = "string", schema = @Schema(implementation = String.class))),
