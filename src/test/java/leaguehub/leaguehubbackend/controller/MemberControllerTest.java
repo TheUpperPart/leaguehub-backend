@@ -2,8 +2,10 @@ package leaguehub.leaguehubbackend.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
-import leaguehub.leaguehubbackend.fixture.ProfileResponseFixture;
+import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.dto.member.ProfileDto;
+import leaguehub.leaguehubbackend.fixture.MypageResponseFixture;
+import leaguehub.leaguehubbackend.fixture.ProfileFixture;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import org.junit.jupiter.api.*;
@@ -23,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -59,33 +60,42 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("로그인한 상태에서 사용자 정보 요청시 사용자 정보 return")
+    @DisplayName("로그인한 상태에서 /profile 요청시 사용자 프로필 정보 반환")
     public void whenAuthenticated_thenReturnProfile() throws Exception {
 
-        ProfileResponseDto mockResponse = ProfileResponseFixture.createProfileResponse();
+        ProfileDto mockProfileResponse = ProfileFixture.createProfile();
 
-        UserDetails userDetail = SecurityUtils.getAuthenticatedUser();
-
-        when(memberService.getMemberProfile(userDetail.getUsername()))
-                .thenReturn(mockResponse);
+        when(memberService.getProfile())
+                .thenReturn(mockProfileResponse);
 
         mockMvc.perform(get("/api/profile"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.profileId").value("12345"))
                 .andExpect(jsonPath("$.profileImageUrl").value("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1Y"))
                 .andExpect(jsonPath("$.nickName").value("성우"));
+    }
 
+    @Test
+    @DisplayName("로그인한 상태에서 /mypage 요청시 사용자 마이페이지 정보 반환")
+    public void whenAuthenticated_thenReturnMypage() throws Exception {
+
+        MypageResponseDto mockMypageResponse = MypageResponseFixture.createMypageResponse();
+
+        when(memberService.getMypageProfile())
+                .thenReturn(mockMypageResponse);
+
+        mockMvc.perform(get("/api/mypage"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.profileImageUrl").value(mockMypageResponse.getProfileImageUrl()))
+                .andExpect(jsonPath("$.nickName").value(mockMypageResponse.getNickName()))
+                .andExpect(jsonPath("$.email").value(mockMypageResponse.getEmail()))
+                .andExpect(jsonPath("$.userEmailVerified").value(mockMypageResponse.isUserEmailVerified()));
     }
 
     @Test
     @DisplayName("로그아웃 요청시 성공 메시지 return")
-    public void whenLogout_thenReturnSuccessMessage() throws Exception {
-
-        UserDetails userDetail = SecurityUtils.getAuthenticatedUser();
+    void whenLogout_thenReturnSuccessMessage() throws Exception {
 
         doNothing().when(memberService).logoutMember(
-                eq(userDetail.getUsername()),
-                eq(userDetail),
                 any(HttpServletRequest.class),
                 any(HttpServletResponse.class)
         );
@@ -95,8 +105,6 @@ class MemberControllerTest {
                 .andExpect(content().string("Logout Success!"));
 
         verify(memberService).logoutMember(
-                eq(userDetail.getUsername()),
-                eq(userDetail),
                 any(HttpServletRequest.class),
                 any(HttpServletResponse.class)
         );
