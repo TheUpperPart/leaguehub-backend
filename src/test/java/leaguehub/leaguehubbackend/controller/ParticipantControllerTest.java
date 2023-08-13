@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -136,30 +136,6 @@ class ParticipantControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
-
-    @Test
-    @DisplayName("참여 여부 테스트 - 성공")
-    void participateMatchSuccessTest() throws Exception {
-        Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
-        UserFixture.setUpCustomAuth("서초임");
-        mockMvc.perform(get(("/api/participant/") + channel.getChannelLink()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(print());
-
-    }
-
-    @Test
-    @DisplayName("참여 여부 테스트 (관리자) - 실패")
-    void participateMatchFailTest() throws Exception {
-        Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
-        UserFixture.setUpCustomAuth("id");
-
-        mockMvc.perform(get(("/api/participant/") + channel.getChannelLink()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("이미 참가하였거나 경기 관리자입니다."));
-
-    }
-
     @Test
     @DisplayName("해당 채널의 경기 참가 테스트 (티어, 판수 제한 x) - 성공")
     void participateDefaultMatchSuccessTest() throws Exception {
@@ -167,7 +143,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("썹맹구");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "썹맹구");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "썹맹구");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -184,7 +160,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, true, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("손성한");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -201,7 +177,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, "master 100000", null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -219,7 +195,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "participantGameId3");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "participantGameId3");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -237,7 +213,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "참가된사람1");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "참가된사람1");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -254,7 +230,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("요청한사람");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "요청한사람");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "요청한사람");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -271,7 +247,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("거절된사람");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "거절된사람");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "거절된사람");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -288,7 +264,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, "Silver iv", null, 20);
         UserFixture.setUpCustomAuth("손성한");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -305,7 +281,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "서초임");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "서초임");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -322,7 +298,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, "master 100", null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -340,7 +316,7 @@ class ParticipantControllerTest {
                 "CHALLENGER 2000", 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")
@@ -593,7 +569,7 @@ class ParticipantControllerTest {
 
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
 
-        ParticipantResponseDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/participant/match")

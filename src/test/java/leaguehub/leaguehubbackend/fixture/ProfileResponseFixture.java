@@ -1,6 +1,5 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileResponseDto;
 
 public class ProfileResponseFixture {

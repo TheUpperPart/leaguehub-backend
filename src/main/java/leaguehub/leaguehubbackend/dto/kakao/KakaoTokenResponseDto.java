@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Data;
 
 @Data
 public class KakaoTokenResponseDto {

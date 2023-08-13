@@ -1,11 +1,11 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 
 public class ParticipantFixture {
 
-    public static ParticipantResponseDto createParticipantResponseDto(String channelLink, String nickname){
-        ParticipantResponseDto participantResponseDto = new ParticipantResponseDto();
+    public static ParticipantDto createParticipantResponseDto(String channelLink, String nickname){
+        ParticipantDto participantResponseDto = new ParticipantDto();
         participantResponseDto.setChannelLink(channelLink);
         participantResponseDto.setGameId(nickname);
 

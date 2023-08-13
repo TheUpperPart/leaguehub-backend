@@ -1,11 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.entity.match.MatchStatus;
-
-import java.util.UUID;
 
 public class MatchFixture {
 

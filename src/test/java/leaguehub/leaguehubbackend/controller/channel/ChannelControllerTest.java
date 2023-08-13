@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import leaguehub.leaguehubbackend.controller.channel.ChannelController;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;

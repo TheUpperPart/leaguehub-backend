@@ -3,7 +3,6 @@ package leaguehub.leaguehubbackend.entity.member;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import lombok.*;
 
