@@ -9,7 +9,7 @@ import java.util.Arrays;
 public enum MatchFormat {
     SINGLE_ELIMINATION(1), FREE_FOR_ALL(0);
 
-    private int num;
+    private final int num;
 
     MatchFormat(int num) {
         this.num = num;
