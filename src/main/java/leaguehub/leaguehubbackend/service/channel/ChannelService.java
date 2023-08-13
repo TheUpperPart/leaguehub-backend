@@ -42,6 +42,8 @@ public class ChannelService {
 
         Member member = memberService.findCurrentMember();
 
+        checkEmail(SecurityUtils.getAuthenticatedUser());
+
         validateChannelRule(createChannelDto);
 
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
@@ -67,7 +69,6 @@ public class ChannelService {
 
         Member member = memberService.findCurrentMember();
 
-        checkEmail(SecurityUtils.getAuthenticatedUser());
 
         List<Participant> allByParticipantList = participantRepository
                 .findAllByMemberIdOrderByIndex(member.getId());
