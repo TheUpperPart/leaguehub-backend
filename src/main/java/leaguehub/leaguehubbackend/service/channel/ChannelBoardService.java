@@ -54,7 +54,7 @@ public class ChannelBoardService {
     public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
         Channel channel = channelService.validateChannel(channelLink);
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
                 .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex()))
@@ -115,7 +115,7 @@ public class ChannelBoardService {
 
         channelService.checkRoleHost(participant.getRole());
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
         channelBoardLoadDtoList.forEach(channelBoardLoadDto -> {
             channelBoards.stream()

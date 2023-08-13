@@ -69,7 +69,8 @@ public class ChannelService {
 
         checkEmail(SecurityUtils.getAuthenticatedUser());
 
-        List<Participant> allByParticipantList = participantRepository.findAllByMemberId(member.getId());
+        List<Participant> allByParticipantList = participantRepository
+                .findAllByMemberIdOrderByIndex(member.getId());
 
         List<ParticipantChannelDto> participantChannelDtoList = allByParticipantList.stream()
                 .map(participant -> {

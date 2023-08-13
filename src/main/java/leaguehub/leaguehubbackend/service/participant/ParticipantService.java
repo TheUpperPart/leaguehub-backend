@@ -71,7 +71,7 @@ public class ParticipantService {
     }
 
     public String findChannelHost(String channelLink) {
-        return participantRepository.findParticipantByRoleAndChannel_ChannelLink(HOST, channelLink).getNickname();
+        return participantRepository.findParticipantByRoleAndChannel_ChannelLinkOrderById(HOST, channelLink).getNickname();
     }
 
     /**
