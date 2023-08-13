@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum GlobalConstant {
     NO_DATA("NO_DATA");
 
-    private String data;
+    private final String data;
 
     GlobalConstant(String data) {
         this.data = data;

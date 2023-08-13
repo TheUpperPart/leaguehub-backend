@@ -58,7 +58,7 @@ public class Participant extends BaseTimeEntity {
         participant.channel = channel;
 
 
-        participant.requestStatus = RequestStatus.NOREQUEST;
+        participant.requestStatus = RequestStatus.NO_REQUEST;
 
         participant.gameId = GlobalConstant.NO_DATA.getData();
         participant.gameTier = GlobalConstant.NO_DATA.getData();
@@ -74,7 +74,7 @@ public class Participant extends BaseTimeEntity {
         participant.member = member;
         participant.channel = channel;
 
-        participant.requestStatus = RequestStatus.NOREQUEST;
+        participant.requestStatus = RequestStatus.NO_REQUEST;
 
         participant.gameId = GlobalConstant.NO_DATA.getData();
         participant.gameTier = GlobalConstant.NO_DATA.getData();
@@ -110,7 +110,7 @@ public class Participant extends BaseTimeEntity {
     }
 
     public Participant updateHostRole() {
-        this.requestStatus = RequestStatus.NOREQUEST;
+        this.requestStatus = RequestStatus.NO_REQUEST;
         this.role = Role.HOST;
 
         return this;

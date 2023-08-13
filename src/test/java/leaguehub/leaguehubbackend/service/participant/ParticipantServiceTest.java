@@ -571,13 +571,13 @@ class ParticipantServiceTest {
         assertThat(dummy1.getNickname()).isEqualTo(DtoList.get(0).getNickname());
         assertThat(dummy1.getGameId()).isEqualTo(DtoList.get(0).getGameId());
         assertThat(dummy1.getGameTier()).isEqualTo(DtoList.get(0).getTier());
-        assertThat(dummy1.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+        assertThat(dummy1.getRequestStatus()).isEqualTo(RequestStatus.NO_REQUEST);
 
         assertThat(dummy2.getId()).isEqualTo(DtoList.get(1).getPk());
         assertThat(dummy2.getNickname()).isEqualTo(DtoList.get(1).getNickname());
         assertThat(dummy2.getGameId()).isEqualTo(DtoList.get(1).getGameId());
         assertThat(dummy2.getGameTier()).isEqualTo(DtoList.get(1).getTier());
-        assertThat(dummy2.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+        assertThat(dummy2.getRequestStatus()).isEqualTo(RequestStatus.NO_REQUEST);
 
     }
 
@@ -622,11 +622,11 @@ class ParticipantServiceTest {
         //then
         assertThat(updateDummy1.getId()).isEqualTo(dummy1.getId());
         assertThat(updateDummy1.getRole().getNum()).isEqualTo(Role.HOST.getNum());
-        assertThat(updateDummy1.getRequestStatus().getNum()).isEqualTo(RequestStatus.NOREQUEST.getNum());
+        assertThat(updateDummy1.getRequestStatus().getNum()).isEqualTo(RequestStatus.NO_REQUEST.getNum());
 
         assertThat(updateDummy2.getId()).isEqualTo(dummy2.getId());
         assertThat(updateDummy2.getRole().getNum()).isEqualTo(Role.HOST.getNum());
-        assertThat(updateDummy2.getRequestStatus().getNum()).isEqualTo(RequestStatus.NOREQUEST.getNum());
+        assertThat(updateDummy2.getRequestStatus().getNum()).isEqualTo(RequestStatus.NO_REQUEST.getNum());
 
     }
 
@@ -680,7 +680,7 @@ class ParticipantServiceTest {
         //then
 
         assertThat(participant.getChannel().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NOREQUEST);
+        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NO_REQUEST);
         assertThat(participant.getRole()).isEqualTo(Role.OBSERVER);
     }
 
