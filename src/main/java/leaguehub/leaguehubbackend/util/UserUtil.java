@@ -67,7 +67,7 @@ public class UserUtil {
             String accessToken = jwtService.createAccessToken(member.getPersonalId());
             System.out.println("--------------------------");
             System.out.printf("해당 멤버 : '%s':%n", member.getNickname());
-            System.out.printf("Access Token : %s%n", accessToken);
+            System.out.printf("Access Token : Bearer %s%n", accessToken);
             System.out.println("--------------------------");
             System.out.println();
 
