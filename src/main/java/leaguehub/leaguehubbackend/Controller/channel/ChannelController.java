@@ -9,19 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j
