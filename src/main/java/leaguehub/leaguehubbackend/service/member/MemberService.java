@@ -89,6 +89,7 @@ public class MemberService {
                 .userEmailVerified(member.isEmailUserVerified())
                 .build();
     }
+
     public Member findCurrentMember() {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 

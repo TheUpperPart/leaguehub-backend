@@ -9,11 +9,13 @@ import leaguehub.leaguehubbackend.exception.email.exception.InvalidEmailAddressE
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.email.EmailAuthRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,11 +33,14 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class EmailServiceTest {
 
     @InjectMocks
     private EmailService emailService;
+    @Mock
+    private MemberService memberService;
     @Mock
     private MemberRepository memberRepository;
     @Mock
@@ -62,8 +67,9 @@ public class EmailServiceTest {
 
         when(userDetails.getUsername()).thenReturn(personalId);
         when(memberRepository.findMemberByPersonalId(personalId)).thenReturn(Optional.of(member));
+        when(memberService.findCurrentMember()).thenReturn(member);
 
-        emailService.sendEmailWithConfirmation(email, userDetails);
+        emailService.sendEmailWithConfirmation(email);
 
         verify(emailAuthRepository, times(1)).save(any(EmailAuth.class));
     }
@@ -77,7 +83,7 @@ public class EmailServiceTest {
         String invalidEmail = "invalid-email-format";
 
 
-        assertThrows(InvalidEmailAddressException.class, () -> emailService.sendEmailWithConfirmation(invalidEmail, userDetails));
+        assertThrows(InvalidEmailAddressException.class, () -> emailService.sendEmailWithConfirmation(invalidEmail));
     }
 
     @Test
@@ -92,7 +98,7 @@ public class EmailServiceTest {
         when(memberRepository.findMemberByPersonalId(personalId)).thenReturn(Optional.of(member));
         when(memberRepository.findMemberByEmail(email)).thenReturn(Optional.of(member));
 
-        assertThrows(DuplicateEmailException.class, () -> emailService.sendEmailWithConfirmation(email, userDetails));
+        assertThrows(DuplicateEmailException.class, () -> emailService.sendEmailWithConfirmation(email));
     }
 
 
@@ -116,8 +122,10 @@ public class EmailServiceTest {
         String personalId = "id";
         when(userDetails.getUsername()).thenReturn(personalId);
         when(memberRepository.findMemberByPersonalId(personalId)).thenReturn(Optional.of(member));
+        when(memberService.findCurrentMember()).thenReturn(member);
 
-        emailService.sendEmailWithConfirmation(email, userDetails);
+        emailService.sendEmailWithConfirmation(email);
+
         verify(emailAuthRepository, times(1)).delete(any(EmailAuth.class));
     }
 
