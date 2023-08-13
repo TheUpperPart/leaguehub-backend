@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "Member-Controller", description = "사용자 API")
-public class MemberController  {
+public class MemberController {
 
     private final MemberService memberService;
 
@@ -57,7 +57,7 @@ public class MemberController  {
     @PostMapping("/app/logout")
     public ResponseEntity<String> handleKakaoLogout(HttpServletRequest request, HttpServletResponse response) {
 
-        memberService.logoutMember( request, response);
+        memberService.logoutMember(request, response);
 
         return ResponseEntity.ok("Logout Success!");
     }

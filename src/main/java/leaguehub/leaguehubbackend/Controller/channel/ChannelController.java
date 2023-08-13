@@ -9,19 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j
@@ -31,7 +27,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class ChannelController {
 
     private final ChannelService channelService;
-    private final ChannelBoardService channelBoardService;
     private final ParticipantService participantService;
 
     @Operation(summary = "채널 생성")
@@ -40,16 +35,7 @@ public class ChannelController {
             @ApiResponse(responseCode = "400", description = "Dto 유효성 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/channel")
-    public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto
-            , BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<ObjectError> errors = bindingResult.getAllErrors();
-            for (ObjectError error : errors) {
-                log.error(error.getObjectName());
-            }
-
-            return new ResponseEntity<>(errors, BAD_REQUEST);
-        }
+    public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto) {
 
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 
