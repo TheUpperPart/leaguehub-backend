@@ -31,15 +31,15 @@ public class ChannelController {
 
     @Operation(summary = "채널 생성")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseCreateChannelDto.class))),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantChannelDto.class))),
             @ApiResponse(responseCode = "400", description = "Dto 유효성 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/channel")
     public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto) {
 
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
 
-        return new ResponseEntity<>(responseCreateChannelDto, OK);
+        return new ResponseEntity<>(participantChannelDto, OK);
     }
 
     @Operation(summary = "채널 가져오기 - 단일 채널(화면 구성)")
@@ -67,7 +67,7 @@ public class ChannelController {
 
     @Operation(summary = "채널 가져오기 - 여러 채널(로그인시 사이드바 화면 구성)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Dto를 리스트로 반환",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantChannelDto.class))),
+            @ApiResponse(responseCode = "200", description = "Dto를 리스트로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantChannelDto.class))),
     })
     @GetMapping("/channels")
     public ResponseEntity loadChannels() {
@@ -90,6 +90,6 @@ public class ChannelController {
 
         channelService.updateChannel(channelLink, updateChannelDto);
 
-        return new ResponseEntity("Channel successfully updated",OK);
+        return new ResponseEntity("Channel successfully updated", OK);
     }
 }
