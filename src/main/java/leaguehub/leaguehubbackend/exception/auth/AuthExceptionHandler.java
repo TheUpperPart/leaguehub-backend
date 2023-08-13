@@ -1,14 +1,15 @@
 package leaguehub.leaguehubbackend.exception.auth;
 
-import leaguehub.leaguehubbackend.exception.auth.exception.*;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidRefreshToken;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j

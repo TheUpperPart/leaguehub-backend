@@ -6,15 +6,12 @@ import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +31,10 @@ public class ChannelBoardService {
     @Transactional
     public ChannelBoardLoadDto createChannelBoard(String channelLink, ChannelBoardDto request) {
 
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         Integer maxIndexByChannel = channelBoardRepository.findMaxIndexByChannel(channel);
 
@@ -81,11 +78,11 @@ public class ChannelBoardService {
     @Transactional
     public void updateChannelBoard(String channelLink, Long boardId, ChannelBoardDto update) {
 
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
 
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
@@ -95,12 +92,12 @@ public class ChannelBoardService {
 
     @Transactional
     public void deleteChannelBoard(String channelLink, Long boardId) {
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
 
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
 
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
@@ -114,12 +111,12 @@ public class ChannelBoardService {
 
     @Transactional
     public void updateChannelBoardIndex(String channelLink, List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
 
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
 
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
 
@@ -129,14 +126,6 @@ public class ChannelBoardService {
                     .findFirst()
                     .ifPresent(channelBoard -> channelBoard.updateIndex(channelBoardLoadDto.getBoardIndex()));
         });
-    }
-
-    private Member getMember() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        String personalId = userDetails.getUsername();
-
-        Member member = memberService.validateMember(personalId);
-        return member;
     }
 
     private Participant getParticipant(Long channelId, Long memberId) {
@@ -150,9 +139,4 @@ public class ChannelBoardService {
                 .orElseThrow(() -> new ChannelBoardNotFoundException());
     }
 
-    private void checkAuth(Role role) {
-        if (role != Role.HOST) {
-            throw new InvalidParticipantAuthException();
-        }
-    }
 }

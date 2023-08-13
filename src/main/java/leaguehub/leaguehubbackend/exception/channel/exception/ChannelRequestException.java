@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.exception.channel.exception;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 
-import static leaguehub.leaguehubbackend.exception.channel.ChannelExceptionCode.*;
+import static leaguehub.leaguehubbackend.exception.channel.ChannelExceptionCode.INVALID_REQUEST_CHANNEL;
 
 public class ChannelRequestException extends IllegalArgumentException {
 

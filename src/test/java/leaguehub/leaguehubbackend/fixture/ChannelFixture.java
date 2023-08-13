@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.fixture;
 
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 

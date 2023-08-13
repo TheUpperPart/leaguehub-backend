@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.jwt;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.auth0.jwt.JWT;
 
 import java.util.Date;
 import java.util.Optional;

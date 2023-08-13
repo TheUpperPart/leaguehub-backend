@@ -11,12 +11,9 @@ import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestExce
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +30,11 @@ public class ChannelService {
     private final MemberService memberService;
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
-    private final ChannelRuleRepository channelRuleRepository;
 
     @Transactional
     public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
 
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
 
         validateChannelRule(createChannelDto);
 
@@ -62,7 +58,7 @@ public class ChannelService {
 
     @Transactional
     public List<ParticipantChannelDto> findParticipantChannelList() {
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
 
         List<Participant> allByParticipantList = participantRepository.findAllByMemberId(member.getId());
 
@@ -98,10 +94,10 @@ public class ChannelService {
 
     @Transactional
     public void updateChannel(String channelLink, UpdateChannelDto updateChannelDto) {
-        Member member = getMember();
+        Member member = memberService.findCurrentMember();
         Channel channel = validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        checkRoleHost(participant.getRole());
 
 
         Optional.ofNullable(updateChannelDto.getTitle()).ifPresent(channel::updateTitle);
@@ -115,12 +111,6 @@ public class ChannelService {
         return channel;
     }
 
-    public Member getMember() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        String personalId = userDetails.getUsername();
-
-        return memberService.validateMember(personalId);
-    }
 
     public Participant getParticipant(Long channelId, Long memberId) {
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
@@ -128,7 +118,7 @@ public class ChannelService {
         return participant;
     }
 
-    public void checkAuth(Role role) {
+    public void checkRoleHost(Role role) {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }

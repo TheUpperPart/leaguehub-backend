@@ -9,15 +9,14 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.email.exception.DuplicateEmailException;
 import leaguehub.leaguehubbackend.exception.email.exception.InvalidEmailAddressException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.repository.email.EmailAuthRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +30,8 @@ public class EmailService {
 
     private final EmailAuthRepository emailAuthRepository;
 
+    private final MemberService memberService;
+
     @Value("${EMAIL_SECRET_KEY}")
     private String secretKey;
 
@@ -40,12 +41,11 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     @Transactional
-    public String sendEmailWithConfirmation(String email, UserDetails userDetails) {
+    public String sendEmailWithConfirmation(String email) {
 
         validateEmail(email);
 
-        Member member = memberRepository.findMemberByPersonalId(userDetails.getUsername())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = memberService.findCurrentMember();
 
         removeExistingEmailAuth(member);
 

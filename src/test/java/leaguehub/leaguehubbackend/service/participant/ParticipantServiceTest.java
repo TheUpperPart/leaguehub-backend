@@ -2,9 +2,9 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
+import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -134,9 +134,9 @@ class ParticipantServiceTest {
     @DisplayName("티어, 플레이 횟수 검색 테스트 - 성공")
     void getDetailSuccessTest() throws Exception {
 
-        ResponseUserDetailDto testDto1 = participantService.getTierAndPlayCount("손성한");
-        ResponseUserDetailDto testDto2 = participantService.getTierAndPlayCount("서초임");
-        ResponseUserDetailDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
+        ResponseUserGameInfoDto testDto1 = participantService.getTierAndPlayCount("손성한");
+        ResponseUserGameInfoDto testDto2 = participantService.getTierAndPlayCount("서초임");
+        ResponseUserGameInfoDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
 
 
         assertThat(testDto2.getTier()).isEqualTo("UNRANKED");
@@ -161,7 +161,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("서초임");
 
@@ -186,7 +186,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, true, "diamond iii", null, 100);
         UserFixture.setUpCustomAuth("손성한");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("손성한");
 
@@ -210,7 +210,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, true, "master 20000", null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("채수채수밭");
 
@@ -234,7 +234,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("서초임");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("participantGameId2");
 
@@ -249,7 +249,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("참가된사람1");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("participantGameId2");
 
@@ -264,7 +264,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("요청한사람");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("participantGameId1");
 
@@ -279,7 +279,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("거절된사람");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("participantGameId4");
 
@@ -294,7 +294,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, false, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("손성한");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("손성한");
 
@@ -309,7 +309,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, false, null, "Master 2000", 100);
         UserFixture.setUpCustomAuth("손성한");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("손성한");
 
@@ -325,7 +325,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(false, true, "Silver iv", null, 100);
         UserFixture.setUpCustomAuth("서초임");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("서초임");
 
@@ -340,7 +340,7 @@ class ParticipantServiceTest {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, true, "master 100", null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("채수채수밭");
 
@@ -731,7 +731,7 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomGuest("idGuest");
 
         Channel channel = createCustomChannel(false, false, "Silver iv", null, 100);
-        ParticipantResponseDto responseDto = new ParticipantResponseDto();
+        ParticipantDto responseDto = new ParticipantDto();
         responseDto.setChannelLink(channel.getChannelLink());
         responseDto.setGameId("urlGuestGameId");
 

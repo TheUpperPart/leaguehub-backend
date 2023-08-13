@@ -3,7 +3,6 @@ package leaguehub.leaguehubbackend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.email.EmailDto;
 import leaguehub.leaguehubbackend.service.email.EmailService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -62,18 +62,16 @@ public class EmailControllerTest {
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-
-        when(emailService.sendEmailWithConfirmation(emailDto.getEmail(), userDetails))
+        when(emailService.sendEmailWithConfirmation(emailDto.getEmail()))
                 .thenReturn(email);
 
         mockMvc.perform(post("/api/member/verify/email")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(emailDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(emailDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Email Successfully Sent to" + email));
 
-        verify(emailService, times(1)).sendEmailWithConfirmation(emailDto.getEmail(), userDetails);
+        verify(emailService, times(1)).sendEmailWithConfirmation(emailDto.getEmail());
     }
 
     @Test

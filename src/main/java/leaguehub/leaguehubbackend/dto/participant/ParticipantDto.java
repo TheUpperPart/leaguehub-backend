@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-public class ParticipantResponseDto {
+public class ParticipantDto {
 
     @Schema(description = "조회하는 매치 링크", example = "42aa1b11ab88")
     String channelLink;

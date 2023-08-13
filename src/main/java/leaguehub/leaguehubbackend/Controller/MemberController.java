@@ -1,8 +1,6 @@
 package leaguehub.leaguehubbackend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,12 +12,13 @@ import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -37,7 +36,6 @@ public class MemberController  {
     })
     @GetMapping("/profile")
     public ProfileDto getProfile() {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         return memberService.getProfile();
     }
 

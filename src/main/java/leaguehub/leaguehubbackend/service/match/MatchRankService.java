@@ -8,7 +8,6 @@ import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorEx
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

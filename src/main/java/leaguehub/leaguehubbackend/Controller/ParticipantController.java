@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantResponseDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserDetailDto;
+import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -38,33 +38,17 @@ public class ParticipantController {
             @Parameter(name = "gamecategory", description = "게임 종류 (tft, lol, ...)", example = "0, 1, 2")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseUserDetailDto.class))),
+            @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseUserGameInfoDto.class))),
             @ApiResponse(responseCode = "404", description = "게임 ID를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/stat")
     public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname,
                                         @RequestParam(value = "gamecategory") Integer category) {
 
-        ResponseUserDetailDto userDetailDto = participantService.selectGameCategory(nickname, category);
+        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(nickname, category);
 
         return new ResponseEntity<>(userDetailDto, OK);
     }
-
-
-    @Operation(summary = "관전자 확인", description = "참가 버튼을 누르면 관전자인지 확인하는 주소")
-    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "관전자 확인"),
-            @ApiResponse(responseCode = "400", description = "해당 게임에 참여할 수 없는 상태입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @GetMapping("/participant/{channelLink}")
-    public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink) {
-
-        participantService.checkParticipateMatch(channelLink);
-
-        return new ResponseEntity<>("Valid OBSERVER ROLE", OK);
-    }
-
 
     @Operation(summary = "경기에 참가요청(TFT 만)", description = "관전자가 게임에 참가 요청")
     @ApiResponses(value = {
@@ -72,7 +56,7 @@ public class ParticipantController {
             @ApiResponse(responseCode = "400", description = "해당 게임에 참여할 수 없는 상태입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/participant/match")
-    public ResponseEntity participateMatch(@RequestBody ParticipantResponseDto responseDto) {
+    public ResponseEntity participateMatch(@RequestBody ParticipantDto responseDto) {
 
         participantService.participateMatch(responseDto);
 

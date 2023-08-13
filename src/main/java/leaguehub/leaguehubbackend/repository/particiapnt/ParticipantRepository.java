@@ -1,8 +1,5 @@
 package leaguehub.leaguehubbackend.repository.particiapnt;
 
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
-import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
@@ -15,20 +12,13 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
-    Participant findParticipantById(Long id);
-
     List<Participant> findAllByMemberId(Long memberId);
-
-    Participant findParticipantByRoleAndChannelId(Role role, Long channelId);
 
     Optional<Participant> findParticipantByMemberIdAndChannel_ChannelLink(Long memberId, String channelLink);
 
     Optional<Participant> findParticipantByIdAndChannel_ChannelLink(Long participantId, String channelLink);
 
-    List<Participant> findAllByChannelIdOrderByNicknameAsc(Long channelId);
-
     List<Participant> findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(String channelLink, Role role, RequestStatus requestStatus);
-
 
     List<Participant> findAllByChannel_ChannelLink(String channelLink);
 
