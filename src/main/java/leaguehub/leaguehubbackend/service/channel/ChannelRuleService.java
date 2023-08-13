@@ -27,7 +27,7 @@ public class ChannelRuleService {
         Channel channel = channelService.validateChannel(channelLink);
         Member member = memberService.findCurrentMember();
         Participant participant = channelService.getParticipant(channel.getId(), member.getId());
-        channelService.checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(channelLink);
 

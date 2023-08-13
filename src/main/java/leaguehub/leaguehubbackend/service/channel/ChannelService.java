@@ -13,9 +13,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,6 @@ public class ChannelService {
     private final MemberService memberService;
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
-    private final ChannelRuleRepository channelRuleRepository;
 
     @Transactional
     public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -100,7 +97,7 @@ public class ChannelService {
         Member member = memberService.findCurrentMember();
         Channel channel = validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        checkRoleHost(participant.getRole());
 
 
         Optional.ofNullable(updateChannelDto.getTitle()).ifPresent(channel::updateTitle);
@@ -121,7 +118,7 @@ public class ChannelService {
         return participant;
     }
 
-    public void checkAuth(Role role) {
+    public void checkRoleHost(Role role) {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }

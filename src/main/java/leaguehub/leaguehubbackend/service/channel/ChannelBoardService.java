@@ -34,7 +34,7 @@ public class ChannelBoardService {
         Member member = memberService.findCurrentMember();
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         Integer maxIndexByChannel = channelBoardRepository.findMaxIndexByChannel(channel);
 
@@ -82,7 +82,7 @@ public class ChannelBoardService {
 
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
@@ -97,7 +97,7 @@ public class ChannelBoardService {
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
 
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
@@ -116,7 +116,7 @@ public class ChannelBoardService {
         Channel channel = channelService.validateChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
 
-        checkAuth(participant.getRole());
+        channelService.checkRoleHost(participant.getRole());
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
 
@@ -139,9 +139,4 @@ public class ChannelBoardService {
                 .orElseThrow(() -> new ChannelBoardNotFoundException());
     }
 
-    private void checkAuth(Role role) {
-        if (role != Role.HOST) {
-            throw new InvalidParticipantAuthException();
-        }
-    }
 }

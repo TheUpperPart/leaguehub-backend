@@ -12,20 +12,13 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
-    Participant findParticipantById(Long id);
-
     List<Participant> findAllByMemberId(Long memberId);
-
-    Participant findParticipantByRoleAndChannelId(Role role, Long channelId);
 
     Optional<Participant> findParticipantByMemberIdAndChannel_ChannelLink(Long memberId, String channelLink);
 
     Optional<Participant> findParticipantByIdAndChannel_ChannelLink(Long participantId, String channelLink);
 
-    List<Participant> findAllByChannelIdOrderByNicknameAsc(Long channelId);
-
     List<Participant> findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(String channelLink, Role role, RequestStatus requestStatus);
-
 
     List<Participant> findAllByChannel_ChannelLink(String channelLink);
 
