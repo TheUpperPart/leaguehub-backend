@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.member.BaseRole.*;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.*;
 import static leaguehub.leaguehubbackend.entity.participant.Role.*;
 
@@ -126,7 +127,7 @@ public class ParticipantService {
 
         checkRoleHost(channelLink);
 
-        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, NOREQUEST);
+        List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, NO_REQUEST);
 
         return findParticipants.stream()
                 .map(participant -> mapToResponseStatusPlayerDto(participant))
@@ -342,7 +343,7 @@ public class ParticipantService {
      * @param userDetails
      */
     public void checkEmail(UserDetails userDetails) {
-        if (!userDetails.getAuthorities().toString().equals("[ROLE_USER]"))
+        if (!userDetails.getAuthorities().toString().equals(USER.convertBaseRole()))
             throw new UnauthorizedEmailException();
     }
 
