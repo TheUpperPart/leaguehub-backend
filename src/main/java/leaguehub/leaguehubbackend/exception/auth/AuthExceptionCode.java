@@ -15,7 +15,6 @@ public enum AuthExceptionCode implements ExceptionCode {
      * JWT
      * 001 ~ 099
      */
-
     INVALID_TOKEN(UNAUTHORIZED, "AT-C-001", "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(UNAUTHORIZED, "AT-C-002", "만료된 토큰입니다."),
     NOT_EXPIRED_TOKEN(BAD_REQUEST, "AT-C-003", "만료되지 않은 토큰입니다."),
@@ -35,14 +34,17 @@ public enum AuthExceptionCode implements ExceptionCode {
     INVALID_REDIRECT_URI(UNAUTHORIZED, "AT-C-104", "허용되지 않은 리다이렉션 URI 입니다."),
     AUTH_MEMBER_NOT_FOUND(NOT_FOUND, "AT-C-105", "존재하지 않는 회원입니다."),
 
-
     /**
      * Common Exception
      * 200 ~
      */
     AUTHENTICATION_ERROR(UNAUTHORIZED, "AT-C-200", "Authentication exception."),
-    INTERNAL_AUTHENTICATION_SERVICE_EXCEPTION(INTERNAL_SERVER_ERROR, "AT-S-200", "Internal authentication service exception.");
 
+    /**
+     *  Exception
+     * 400 ~
+     */
+    BAD_REQUEST_EXCEPTION(BAD_REQUEST, "AT-S-400", "Bad Request");
 
     private final HttpStatus httpStatus;
     private final String code;
