@@ -31,7 +31,6 @@ public class MemberController  {
     private final MemberService memberService;
 
     @Operation(summary = "사용자 프로필 조회", description = "사용자의 이미지 URL과 닉네임을 조회")
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "Bearer {Access-Token}", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 프로필 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileDto.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
@@ -43,7 +42,6 @@ public class MemberController  {
     }
 
     @Operation(summary = "사용자 마이페이지 조회", description = "사용자의 이미지 URL, 닉네임, 이메일, 이메일 인증 상태를 조회")
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "Bearer {Access-Token}", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 마이페이지 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MypageResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
@@ -54,7 +52,6 @@ public class MemberController  {
     }
 
     @Operation(summary = "앱 로그아웃", description = "앱에서 사용자를 로그아웃")
-    @Parameter(in = ParameterIn.HEADER, name = "Authorization", description = "Bearer {Access-Token}", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),

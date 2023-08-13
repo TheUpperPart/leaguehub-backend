@@ -1,6 +1,8 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +32,7 @@ public class ChannelBoardController {
     private final ChannelBoardService channelBoardService;
 
     @Operation(summary = "채널 보드 만들기")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelBoardLoadDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음, 관리자 권한 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -43,6 +46,10 @@ public class ChannelBoardController {
     }
 
     @Operation(summary = "채널 보드 업데이트")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "boardId", description = "게시판 고유 Id", example = "0, 1, 2")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음, 관리자 권한 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -57,6 +64,10 @@ public class ChannelBoardController {
     }
 
     @Operation(summary = "채널 보드 삭제")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "boardId", description = "게시판 고유 Id", example = "0, 1, 2")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음, 관리자 권한 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -71,6 +82,10 @@ public class ChannelBoardController {
     }
 
     @Operation(summary = "채널 보드 가져오기 - 단일 채널 보드 읽기")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "boardId", description = "게시판 고유 Id", example = "0, 1, 2")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelBoardDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -84,6 +99,7 @@ public class ChannelBoardController {
     }
 
     @Operation(summary = "채널 보드 인덱스 업데이트 - 채널 보드 인덱스 커스텀")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음, 권한x", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -97,6 +113,7 @@ public class ChannelBoardController {
     }
 
     @Operation(summary = "채널 보드 가져오기 - 채널 로드시 제목과 보드ID 가져오기 리스트로 반환")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelBoardLoadDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))

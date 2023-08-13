@@ -179,6 +179,12 @@ public class ParticipantController {
         return new ResponseEntity<>(responsePlayers, OK);
     }
 
+    @Operation(summary = "채널 참가", description = "채널 링크를 통하여 해당 채널 참가")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "그 채널의 정보 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantChannelDto.class))),
+            @ApiResponse(responseCode = "403", description = "해당 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @PostMapping("/participant/{channelLink}")
     public ResponseEntity participateChannel(@PathVariable("channelLink") String channelLink) {
 
@@ -187,6 +193,12 @@ public class ParticipantController {
         return new ResponseEntity<>(participant.getNickname(), OK);
     }
 
+    @Operation(summary = "채널 나가기", description = "채널 링크를 통하여 해당 채널 나가기")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채널을 나갔습니다."),
+            @ApiResponse(responseCode = "403", description = "해당 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @DeleteMapping("/participant/{channelLink}")
     public ResponseEntity leaveChannel(@PathVariable("channelLink") String channelLink) {
 

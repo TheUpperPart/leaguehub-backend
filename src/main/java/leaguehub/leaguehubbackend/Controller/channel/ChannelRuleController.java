@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +25,7 @@ public class ChannelRuleController {
     private final ChannelRuleService channelRuleService;
 
     @Operation(summary = "채널 룰 가져오기)")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelRuleDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -36,6 +38,7 @@ public class ChannelRuleController {
     }
 
     @Operation(summary = "채널 룰 업데이트 - 티어, 판수)")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelRuleDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))

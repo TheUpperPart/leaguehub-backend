@@ -61,6 +61,7 @@ public class ChannelController {
     }
 
     @Operation(summary = "채널 가져오기 - 단일 채널(화면 구성)")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseChannelDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
@@ -96,6 +97,7 @@ public class ChannelController {
 
 
     @Operation(summary = "채널 업데이트  - 채널이름, 최대 참가자 수, 채널 이미지)")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
