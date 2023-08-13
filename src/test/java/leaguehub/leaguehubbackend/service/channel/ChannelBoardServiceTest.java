@@ -94,7 +94,7 @@ class ChannelBoardServiceTest {
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
 
         assertThat(channelBoards.size()).isEqualTo(4);
         assertThat(channelBoards.get(channelBoards.size() - 1).getIndex()).isEqualTo(4);
@@ -141,7 +141,7 @@ class ChannelBoardServiceTest {
         Channel customChannel = createCustomChannel(false, false, "Silver iv", null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(findChannel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(findChannel.getId());
 
         assertThatThrownBy(() -> channelBoardService.loadChannelBoards("NO_VALID"))
                 .isInstanceOf(ChannelNotFoundException.class);
@@ -156,7 +156,7 @@ class ChannelBoardServiceTest {
     @DisplayName("게시판 업데이트 테스트 - 성공")
     void updateTest() {
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         Long boardId = channelBoards.get(0).getId();
         ChannelBoardDto update = ChannelFixture.updateChannelBoardDto();
         channelBoardService.updateChannelBoard(channel.get().getChannelLink(), boardId, update);
@@ -173,7 +173,7 @@ class ChannelBoardServiceTest {
         UserFixture.setUpCustomAuth("test231");
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         participantRepository.save(Participant.participateChannel(test, channel.get()));
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         Long boardId = channelBoards.get(0).getId();
         ChannelBoardDto update = ChannelFixture.updateChannelBoardDto();
 
@@ -185,10 +185,10 @@ class ChannelBoardServiceTest {
     @DisplayName("게시판 삭제 테스트 - 성공")
     void deleteTest() {
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         ChannelBoard channelBoard = channelBoards.get(0);
         channelBoardService.deleteChannelBoard(channel.get().getChannelLink(), channelBoard.getId());
-        List<ChannelBoard> flushBoard = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> flushBoard = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
 
         assertThat(flushBoard.size()).isEqualTo(2);
         assertThat(flushBoard).doesNotContain(channelBoard);
@@ -206,7 +206,7 @@ class ChannelBoardServiceTest {
         UserFixture.setUpCustomAuth("test231");
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         participantRepository.save(Participant.participateChannel(test, channel.get()));
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         ChannelBoard channelBoard = channelBoards.get(0);
         assertThatThrownBy(() -> channelBoardService.deleteChannelBoard(channel.get().getChannelLink(), channelBoard.getId()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
@@ -222,7 +222,7 @@ class ChannelBoardServiceTest {
         channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
 
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
-        List<ChannelBoard> allByChannelId = channelBoardRepository.findAllByChannel_Id(channel.get().getId());
+        List<ChannelBoard> allByChannelId = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
 
         for (ChannelBoard channelBoard : allByChannelId) {
             if (channelBoard.getIndex() == 3) {

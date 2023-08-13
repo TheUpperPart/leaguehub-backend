@@ -60,7 +60,8 @@ public class ChannelService {
     public List<ParticipantChannelDto> findParticipantChannelList() {
         Member member = memberService.findCurrentMember();
 
-        List<Participant> allByParticipantList = participantRepository.findAllByMemberId(member.getId());
+        List<Participant> allByParticipantList = participantRepository
+                .findAllByMemberIdOrderByIndex(member.getId());
 
         List<ParticipantChannelDto> participantChannelDtoList = allByParticipantList.stream()
                 .map(participant -> {

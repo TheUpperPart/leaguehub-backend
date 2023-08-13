@@ -54,7 +54,7 @@ class ChannelBoardTest {
     @Test
     public void 채널_보드_기본생성_테스트() throws Exception {
         Channel channel = createChannel();
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
         assertThat(channelBoards.size()).isEqualTo(3);
     }
@@ -62,10 +62,10 @@ class ChannelBoardTest {
     @Test
     public void 채널보드_생성_테스트() throws Exception {
         Channel channel = createChannel();
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
         channelBoardRepository.save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto().getTitle(),
                 createChannelBoardDto().getContent(), channelBoards.size()));
-        channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
         assertThat(channelBoards.size()).isEqualTo(4);
     }
@@ -74,15 +74,15 @@ class ChannelBoardTest {
     @Test
     public void 채널보드_업데이트_테스트() throws Exception {
         Channel channel = createChannel();
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
         ChannelBoard saved = channelBoardRepository.save(ChannelBoard.createChannelBoard(channel, createChannelBoardDto().getTitle(),
                 createChannelBoardDto().getContent(), channelBoards.size()));
-        channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
         ChannelBoardDto updateChannelBoardDto = updateChannelBoardDto();
 
 
         channelBoardRepository.save(saved.updateChannelBoard(updateChannelBoardDto.getTitle(), updateChannelBoardDto.getContent()));
-        channelBoards = channelBoardRepository.findAllByChannel_Id(channel.getId());
+        channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
         assertThat(channelBoards.size()).isEqualTo(4);
         assertThat(channelBoards.get(channelBoards.size() - 1).getTitle()).isEqualTo("test1");
