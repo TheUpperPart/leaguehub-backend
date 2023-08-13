@@ -9,7 +9,7 @@ import java.util.Arrays;
 public enum Category {
     TFT(0);
 
-    private int num;
+    private final int num;
 
     Category(int num) {
         this.num = num;

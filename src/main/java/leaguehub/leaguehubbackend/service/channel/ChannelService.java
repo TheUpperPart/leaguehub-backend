@@ -3,23 +3,29 @@ package leaguehub.leaguehubbackend.service.channel;
 import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
+import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static leaguehub.leaguehubbackend.entity.member.BaseRole.*;
 
 
 @Service
@@ -58,7 +64,10 @@ public class ChannelService {
 
     @Transactional
     public List<ParticipantChannelDto> findParticipantChannelList() {
+
         Member member = memberService.findCurrentMember();
+
+        checkEmail(SecurityUtils.getAuthenticatedUser());
 
         List<Participant> allByParticipantList = participantRepository
                 .findAllByMemberIdOrderByIndex(member.getId());
@@ -145,6 +154,11 @@ public class ChannelService {
         if (createChannelDto.getPlayCount()) {
             validatePlayCount(createChannelDto.getPlayCountMin());
         }
+    }
+
+    private void checkEmail(UserDetails userDetails) {
+        if (!userDetails.getAuthorities().toString().equals(USER.convertBaseRole()))
+            throw new UnauthorizedEmailException();
     }
 
 }

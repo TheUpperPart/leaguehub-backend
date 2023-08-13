@@ -13,7 +13,7 @@ public enum GameTier {
     IV(0), III(100), II(200), I(300);
 
 
-    private int score;
+    private final int score;
 
     GameTier(int score){
         this.score = score;
