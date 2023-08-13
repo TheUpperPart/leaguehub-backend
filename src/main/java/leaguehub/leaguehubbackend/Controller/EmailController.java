@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.email.EmailDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.email.EmailService;
@@ -33,11 +34,11 @@ public class EmailController {
             @ApiResponse(responseCode = "500", description = "G-S-001 Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
     @PostMapping("/api/member/verify/email")
-    public ResponseEntity<String> verifyUser(@RequestBody EmailDto emailDto) {
+    public ResponseEntity<String> verifyUser(@RequestBody @Valid EmailDto emailDto) {
 
         String email = emailService.sendEmailWithConfirmation(emailDto.getEmail());
 
-        return ResponseEntity.ok("Email Successfully Sent to" + email);
+        return ResponseEntity.ok("Email Successfully Sent to " + email);
     }
 
     @GetMapping("/confirm/Email")

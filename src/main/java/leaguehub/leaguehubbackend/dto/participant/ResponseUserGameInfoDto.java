@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class ResponseUserGameInfoDto {
 
-    String tier;
+    private String tier;
 
-    String grade;
+    private String grade;
 
-    Integer playCount;
+    private Integer playCount;
 }

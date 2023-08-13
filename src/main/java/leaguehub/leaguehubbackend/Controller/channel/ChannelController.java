@@ -31,7 +31,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class ChannelController {
 
     private final ChannelService channelService;
-    private final ChannelBoardService channelBoardService;
     private final ParticipantService participantService;
 
     @Operation(summary = "채널 생성")
@@ -40,16 +39,7 @@ public class ChannelController {
             @ApiResponse(responseCode = "400", description = "Dto 유효성 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/channel")
-    public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto
-            , BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            List<ObjectError> errors = bindingResult.getAllErrors();
-            for (ObjectError error : errors) {
-                log.error(error.getObjectName());
-            }
-
-            return new ResponseEntity<>(errors, BAD_REQUEST);
-        }
+    public ResponseEntity createChannel(@Valid @RequestBody CreateChannelDto createChannelDto) {
 
         ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
 

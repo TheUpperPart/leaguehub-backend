@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.dto.channel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class CreateChannelDto {
     private String title;
 
     @NotNull
+    @Min(1)
     @JsonProperty("maxPlayer")
     @Schema(description = "매치 최대 참가자 수", example = "8, 16, 32, 64")
     private Integer participationNum;
@@ -55,6 +57,7 @@ public class CreateChannelDto {
     @Schema(description = "최소 경기 제한의 유무", example = "true, false")
     private Boolean playCount;
 
+    @Min(0)
     @JsonProperty("playCountMin")
     @Schema(description = "최소 경기 수", example = "30, 40, 50")
     private Integer playCountMin;

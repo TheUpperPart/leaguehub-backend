@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
@@ -14,6 +15,7 @@ import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +38,8 @@ public class ChannelBoardController {
     })
     @PostMapping("/channel/{channelLink}/new")
     public ResponseEntity createChannelBoard(@PathVariable("channelLink") String channelLink,
-                                             @RequestBody ChannelBoardDto request) {
+                                             @RequestBody @Valid ChannelBoardDto request,
+                                             BindingResult bindingResult) {
         ChannelBoardLoadDto channelBoardLoadDto = channelBoardService.createChannelBoard(channelLink, request);
 
         return new ResponseEntity(channelBoardLoadDto, OK);
@@ -103,7 +106,7 @@ public class ChannelBoardController {
     })
     @PostMapping("/channel/{channelLink}/index")
     public ResponseEntity updateChannelBoardIndex(@PathVariable("channelLink") String channelLink,
-                                                  @RequestBody List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
+                                                  @RequestBody @Valid List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
         channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
 
         return new ResponseEntity("BoardIndex successfully updated", OK);

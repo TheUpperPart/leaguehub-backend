@@ -5,14 +5,14 @@ import lombok.Data;
 @Data
 public class ResponseStatusPlayerDto {
 
-    Long pk;
+    private Long pk;
 
-    String nickname;
+    private String nickname;
 
-    String imgSrc;
+    private String imgSrc;
 
-    String gameId;
+    private String gameId;
 
-    String tier;
+    private String tier;
 
 }

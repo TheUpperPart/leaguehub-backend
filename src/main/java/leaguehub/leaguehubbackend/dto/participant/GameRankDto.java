@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class GameRankDto {
 
-    GameTier gameRank;
+    private GameTier gameRank;
 
-    String gameGrade;
+    private String gameGrade;
 }
