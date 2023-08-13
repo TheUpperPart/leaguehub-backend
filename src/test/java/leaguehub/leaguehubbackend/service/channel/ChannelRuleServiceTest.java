@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
@@ -47,9 +47,9 @@ class ChannelRuleServiceTest {
     void setUp() {
         memberRepository.save(UserFixture.createMember());
         UserFixture.setUpAuth();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
 
-        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         channel = findChannel.get();
     }
