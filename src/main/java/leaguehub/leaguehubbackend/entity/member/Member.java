@@ -21,6 +21,7 @@ public class Member extends BaseTimeEntity {
 
     private String personalId;
 
+    @Column(length = 20)
     private String nickname;
 
     private String profileImageUrl;
@@ -64,4 +65,5 @@ public class Member extends BaseTimeEntity {
     public void unverifyEmail() {
         this.emailUserVerified = false;
     }
+    public void updateNickname(String newNickname) { this.nickname = newNickname; }
 }
