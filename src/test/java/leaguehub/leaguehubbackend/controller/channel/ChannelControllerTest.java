@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -97,8 +97,9 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 정보 가져오기 테스트")
     void getChannelTest() throws Exception {
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + channel.get().getChannelLink()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -110,8 +111,9 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 정보 가져오기 실패 테스트 - 유효하지 않은 채널 링크")
     void getChannelFailTest() throws Exception {
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + "NoValid"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -120,8 +122,9 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 리스트 가져오기")
     void loadChannelsList() throws Exception {
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channels"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -131,14 +134,15 @@ class ChannelControllerTest {
     @Test
     @DisplayName("채널 업데이트")
     void updateChannel() throws Exception {
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         UpdateChannelDto updateChannelDto = ChannelFixture.updateChannelDto();
         String json = objectMapper.writeValueAsString(updateChannelDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
     }

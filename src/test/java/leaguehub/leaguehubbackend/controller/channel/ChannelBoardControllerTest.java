@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -117,8 +117,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 만들기 - 성공")
     void createChannelBoard() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         ChannelBoardDto channelBoardDto = ChannelFixture.createChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
@@ -156,8 +156,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 불러오기(제목 + 내용) - 성공")
     void loadChannelBoard() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/"
@@ -172,8 +172,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 불러오기(제목 + 내용) - 실패(채널에 존재하지 않는 게시판 ID)")
     void FailLoadChannelBoard() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/"
                         + channel.get().getChannelLink() + "/1231145d")
@@ -185,8 +185,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 업데이트 - 성공")
     void updateChannelBoard() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
@@ -229,8 +229,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 업데이트 - 실패(채널에 존재하지 않는 게시판 ID)")
     void failUpdateChannelBoard_Invalid_board_id() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         ChannelBoardDto channelBoardDto = ChannelFixture.updateChannelBoardDto();
         String json = objectMapper.writeValueAsString(channelBoardDto);
@@ -246,8 +246,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 삭제 - 성공")
     void deleteChannelBoard() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
@@ -260,8 +260,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 삭제 - 실패(권한없음)")
     void failDeleteChannelBoard_NoAuth() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.get().getId());
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
@@ -278,8 +278,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 삭제 - 실패(채널에 존재하지 않는 게시판 ID)")
     void failDeleteChannelBoard_Invalid_board_id() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/channel/"
                         + channel.get().getChannelLink() + "/" + "No_valid_id")
@@ -291,8 +291,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 인덱스 업데이트 - 성공")
     void updateIndex() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
@@ -311,8 +311,8 @@ class ChannelBoardControllerTest {
     @DisplayName("게시판 인덱스 업데이트 - 실패(권한 없음)")
     void failUpdateIndex() throws Exception {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
-        Optional<Channel> channel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);

@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.service.channel;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -84,8 +84,9 @@ class ChannelBoardServiceTest {
         memberRepository.save(UserFixture.createMember());
         UserFixture.setUpAuth();
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(ChannelFixture.createChannelDto());
-        channelLink = responseCreateChannelDto.getChannelLink();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
+        channelLink = channel.get().getChannelLink();
     }
 
     @Test

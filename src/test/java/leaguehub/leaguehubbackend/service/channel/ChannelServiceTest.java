@@ -1,6 +1,9 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.*;
+import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
@@ -52,10 +55,9 @@ class ChannelServiceTest {
     @DisplayName("채널 생성 테스트 - 서비스")
     void createChannel() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
 
-
-        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getMaxPlayer()).isEqualTo(createChannelDto.getParticipationNum());
         assertThat(findChannel.get().getTitle()).isEqualTo(createChannelDto.getTitle());
@@ -67,7 +69,7 @@ class ChannelServiceTest {
     void createChannel_TierValid() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         createChannelDto.setTier(true);
-        assertThatThrownBy(() ->channelService.createChannel(createChannelDto))
+        assertThatThrownBy(() -> channelService.createChannel(createChannelDto))
                 .isInstanceOf(ChannelRequestException.class);
     }
 
@@ -77,7 +79,7 @@ class ChannelServiceTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         createChannelDto.setPlayCount(true);
         createChannelDto.setPlayCountMin(null);
-        assertThatThrownBy(() ->channelService.createChannel(createChannelDto))
+        assertThatThrownBy(() -> channelService.createChannel(createChannelDto))
                 .isInstanceOf(ChannelRequestException.class);
     }
 
@@ -93,9 +95,9 @@ class ChannelServiceTest {
     @DisplayName("findChannel 성공 - 서비스")
     void validateTest() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
 
-        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         String validateChannelLink = findChannel.get().getChannelLink();
         ChannelDto channel = channelService.findChannel(validateChannelLink);
@@ -108,11 +110,12 @@ class ChannelServiceTest {
     @DisplayName("참가한 채널 찾기")
     void findParticipantList() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         CreateChannelDto createChannelDto1 = ChannelFixture.createChannelDto();
         createChannelDto1.setTitle("test3");
-        ResponseCreateChannelDto responseCreateChannelDto1 = channelService.createChannel(createChannelDto1);
+        ParticipantChannelDto participantChannelDto1 = channelService.createChannel(createChannelDto1);
 
         List<ParticipantChannelDto> participantChannelList = channelService.findParticipantChannelList();
 
@@ -124,13 +127,14 @@ class ChannelServiceTest {
     @DisplayName("채널 업데이트 - 제목, 참가자수, 채널 이미지")
     void updateChannel() {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto responseCreateChannelDto = channelService.createChannel(createChannelDto);
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         UpdateChannelDto updateChannelDto = ChannelFixture.updateChannelDto();
 
-        channelService.updateChannel(responseCreateChannelDto.getChannelLink(), updateChannelDto);
+        channelService.updateChannel(participantChannelDto.getChannelLink(), updateChannelDto);
 
-        Optional<Channel> findChannel = channelRepository.findByChannelLink(responseCreateChannelDto.getChannelLink());
+        Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         assertThat(findChannel.get().getTitle()).isEqualTo(updateChannelDto.getTitle());
         assertThat(findChannel.get().getMaxPlayer()).isEqualTo(updateChannelDto.getParticipationNum());

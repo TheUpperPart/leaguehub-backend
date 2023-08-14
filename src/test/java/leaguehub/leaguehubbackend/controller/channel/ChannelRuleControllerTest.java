@@ -3,7 +3,8 @@ package leaguehub.leaguehubbackend.controller.channel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ResponseCreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -22,6 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -60,15 +63,16 @@ class ChannelRuleControllerTest {
     @Test
     @DisplayName("체널 룰 업데이트 컨트롤러 테스트")
     void updateChannelRule() throws Exception {
-        CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto channel = channelService.createChannel(channelDto);
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         ChannelRuleDto updateChannelRuleDto = new ChannelRuleDto();
         updateChannelRuleDto.setTier(true);
         updateChannelRuleDto.setTierMax("Sliver iv");
 
         String json = objectMapper.writeValueAsString(updateChannelRuleDto);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.getChannelLink() + "/rule")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/rule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -77,14 +81,15 @@ class ChannelRuleControllerTest {
     @Test
     @DisplayName("체널 룰 업데이트 컨트롤러 테스트 - 실패(티어 유효성)")
     void updateChannelRule_tierValid() throws Exception {
-        CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto channel = channelService.createChannel(channelDto);
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         ChannelRuleDto updateChannelRuleDto = new ChannelRuleDto();
         updateChannelRuleDto.setTier(true);
 
         String json = objectMapper.writeValueAsString(updateChannelRuleDto);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.getChannelLink() + "/rule")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/rule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -93,10 +98,11 @@ class ChannelRuleControllerTest {
     @Test
     @DisplayName("채널 룰 가져오기 테스트")
     void getChannelRule() throws Exception {
-        CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        ResponseCreateChannelDto channel = channelService.createChannel(channelDto);
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + channel.getChannelLink() + "/rule"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + channel.get().getChannelLink() + "/rule"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
     }
