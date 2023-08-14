@@ -8,6 +8,7 @@ public class ParticipantFixture {
         ParticipantDto participantResponseDto = new ParticipantDto();
         participantResponseDto.setChannelLink(channelLink);
         participantResponseDto.setGameId(nickname);
+        participantResponseDto.setNickname(nickname);
 
         return participantResponseDto;
     }

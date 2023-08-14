@@ -412,7 +412,7 @@ class ParticipantServiceTest {
 
         //when
         assertThatThrownBy(() -> participantService.loadRequestStatusPlayerList(channel.getChannelLink()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
 
@@ -477,7 +477,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
 
@@ -511,7 +511,7 @@ class ParticipantServiceTest {
 
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
 
     }
@@ -546,7 +546,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
 
@@ -595,7 +595,7 @@ class ParticipantServiceTest {
 
         //when
         assertThatThrownBy(() -> participantService.loadObserverPlayerList(channel.getChannelLink()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
 
@@ -639,7 +639,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         assertThatThrownBy(() -> participantService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
-                .isInstanceOf(ParticipantNotGameHostException.class);
+                .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
 
