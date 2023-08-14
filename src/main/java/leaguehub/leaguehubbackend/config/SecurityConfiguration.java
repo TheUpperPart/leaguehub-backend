@@ -22,6 +22,7 @@ public class SecurityConfiguration {
 
     private final MemberRepository memberRepository;
     private final JwtService jwtService;
+    private final CorsConfig config;
 
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = new JwtAuthenticationEntryPoint();
 
@@ -65,6 +66,7 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .addFilterAfter(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(config.corsFilter())
                 .build();
 
     }
