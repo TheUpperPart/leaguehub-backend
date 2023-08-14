@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,7 @@ public class JwtService {
         Date now = new Date();
         return JWT.create()
                 .withSubject("RefreshToken")
+                .withClaim("uuid", UUID.randomUUID().toString())
                 .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
