@@ -4,12 +4,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,8 @@ import static org.mockito.Mockito.when;
 class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private ParticipantRepository participantRepository;
     @InjectMocks
     private MemberService memberService;
     private Member member;
@@ -170,4 +175,28 @@ class MemberServiceTest {
         verify(memberRepository).save(any(Member.class));
     }
 
+    @Test
+    @DisplayName("존재하지 않는 멤버의 닉네임 변경 시 예외 발생")
+    void changeMemberParticipantNickname_NotFoundMember() {
+
+        NicknameRequestDto nicknameRequestDto = new NicknameRequestDto();
+        nicknameRequestDto.setNickName("newNickname");
+
+        when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.empty());
+
+        assertThrows(MemberNotFoundException.class, () -> memberService.changeMemberParticipantNickname(nicknameRequestDto));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 참가자의 닉네임 변경 시 예외 발생")
+    void changeMemberParticipantNickname_NotFoundParticipant() {
+
+        NicknameRequestDto nicknameRequestDto = new NicknameRequestDto();
+        nicknameRequestDto.setNickName("newNickname");
+
+        when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.of(member));
+        when(participantRepository.findByNickname(member.getNickname())).thenReturn(Optional.empty());
+
+        assertThrows(ParticipantNotFoundException.class, () -> memberService.changeMemberParticipantNickname(nicknameRequestDto));
+    }
 }

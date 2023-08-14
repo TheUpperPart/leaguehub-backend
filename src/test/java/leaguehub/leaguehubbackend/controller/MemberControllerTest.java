@@ -1,9 +1,12 @@
 package leaguehub.leaguehubbackend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.fixture.MypageResponseFixture;
 import leaguehub.leaguehubbackend.fixture.ProfileFixture;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -42,6 +45,10 @@ class MemberControllerTest {
 
     @MockBean
     private MemberService memberService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @BeforeEach
     void setUp() throws IOException {
@@ -110,6 +117,24 @@ class MemberControllerTest {
                 any(HttpServletResponse.class)
         );
     }
+    @Test
+    @DisplayName("닉네임 변경 요청시 프로필 정보 반환")
+    public void whenChangeNickname_thenReturnProfile() throws Exception {
 
+        NicknameRequestDto nicknameRequest = new NicknameRequestDto();
+        nicknameRequest.setNickName("NewNickname");
+
+        ProfileDto mockProfileResponse = ProfileFixture.createProfile();
+        mockProfileResponse.setNickName("NewNickname");
+
+        when(memberService.changeMemberParticipantNickname(nicknameRequest))
+                .thenReturn(mockProfileResponse);
+
+        mockMvc.perform(post("/api/change/nickname")
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(nicknameRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickName").value("NewNickname"));
+    }
 
 }
