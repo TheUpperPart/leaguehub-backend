@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static leaguehub.leaguehubbackend.entity.member.BaseRole.*;
+import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.*;
 import static leaguehub.leaguehubbackend.entity.participant.Role.*;
 

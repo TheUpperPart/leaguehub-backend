@@ -1,9 +1,11 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.*;
+import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
-import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static leaguehub.leaguehubbackend.entity.member.BaseRole.*;
+import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 
 
 @Service
@@ -38,7 +40,7 @@ public class ChannelService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
-    public ResponseCreateChannelDto createChannel(CreateChannelDto createChannelDto) {
+    public ParticipantChannelDto createChannel(CreateChannelDto createChannelDto) {
 
         Member member = memberService.findCurrentMember();
 
@@ -60,8 +62,8 @@ public class ChannelService {
         participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
 
         participantRepository.save(participant);
-
-        return new ResponseCreateChannelDto(channel.getChannelLink());
+        ParticipantChannelDto participantChannelDto = convertParticipantChannelDto(participant);
+        return participantChannelDto;
     }
 
     @Transactional
@@ -74,16 +76,7 @@ public class ChannelService {
                 .findAllByMemberIdOrderByIndex(member.getId());
 
         List<ParticipantChannelDto> participantChannelDtoList = allByParticipantList.stream()
-                .map(participant -> {
-                    Channel channel = participant.getChannel();
-                    return new ParticipantChannelDto(
-                            channel.getChannelLink(),
-                            channel.getTitle(),
-                            channel.getCategory().getNum(),
-                            channel.getChannelImageUrl(),
-                            participant.getIndex()
-                    );
-                })
+                .map(participant -> convertParticipantChannelDto(participant))
                 .collect(Collectors.toList());
 
         return participantChannelDtoList;
@@ -160,6 +153,17 @@ public class ChannelService {
     private void checkEmail(UserDetails userDetails) {
         if (!userDetails.getAuthorities().toString().equals(USER.convertBaseRole()))
             throw new UnauthorizedEmailException();
+    }
+
+    private ParticipantChannelDto convertParticipantChannelDto(Participant participant) {
+        Channel channel = participant.getChannel();
+        return new ParticipantChannelDto(
+                channel.getChannelLink(),
+                channel.getTitle(),
+                channel.getCategory().getNum(),
+                channel.getChannelImageUrl(),
+                participant.getIndex()
+        );
     }
 
 }
