@@ -67,6 +67,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
+
         Optional<String> optionalToken = jwtService.extractAccessToken(request);
 
         if (optionalToken.isEmpty()) {

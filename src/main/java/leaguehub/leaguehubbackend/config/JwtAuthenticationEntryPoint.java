@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.AUTH_MEMBER_NOT_FOUND;
+import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.*;
 
 
 @Component
@@ -22,16 +22,22 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         String exception = (String) request.getAttribute("exception");
-        AuthExceptionCode errorCode;
 
-
+        /**
+         * 잘못된 요청
+         */
+        if (exception == null) {
+            log.info("잘못된 요청");
+            setResponse(response, BAD_REQUEST_EXCEPTION);
+            return;
+        }
 
         /**
          * 토큰 없는 경우
          */
-        if (exception == null) {
-            errorCode = AuthExceptionCode.REQUEST_TOKEN_NOT_FOUND;
-            setResponse(response, errorCode);
+        if (exception.equals(REQUEST_TOKEN_NOT_FOUND.getCode())) {
+            log.info("AccessToken이 없음");
+            setResponse(response, REQUEST_TOKEN_NOT_FOUND);
             return;
         }
 
@@ -39,25 +45,23 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
          *  해당 멤버가 데이터베이스에 없을 경우
          */
         if (exception.equals(AUTH_MEMBER_NOT_FOUND.getCode())) {
-            errorCode = AUTH_MEMBER_NOT_FOUND;
-            setResponse(response, errorCode);
+            setResponse(response, AUTH_MEMBER_NOT_FOUND);
             return;
         }
 
         /**
          * 토큰 만료된 경우
          */
-        if (exception.equals(AuthExceptionCode.EXPIRED_TOKEN.getCode())) {
-            errorCode = AuthExceptionCode.EXPIRED_TOKEN;
-            setResponse(response, errorCode);
+        if (exception.equals(EXPIRED_TOKEN.getCode())) {
+            setResponse(response, EXPIRED_TOKEN);
             return;
         }
+
         /**
          * 유효하지 않은 토큰일 경우
          */
-        if (exception.equals(AuthExceptionCode.INVALID_TOKEN.getCode())) {
-            errorCode = AuthExceptionCode.INVALID_TOKEN;
-            setResponse(response, errorCode);
+        if (exception.equals(INVALID_TOKEN.getCode())) {
+            setResponse(response, INVALID_TOKEN);
         }
 
     }
