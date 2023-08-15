@@ -25,7 +25,7 @@ class MatchResultTest {
     void createMatchResultTest() throws Exception {
         //given
         Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
-        Match match = Match.createMatch(16, channel);
+        Match match = Match.createMatch(16, channel, "테스트매치 이름");
         MatchResult matchResult = MatchResult.createMatchResult("svkos12d0kr", match);
         MatchResult save = matchResultRepository.save(matchResult);
 

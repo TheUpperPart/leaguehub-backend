@@ -47,7 +47,7 @@ class MatchRankServiceTest {
         //given
         Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel);
+        Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);
         MatchResponseDto matchResponseDto = MatchFixture.createMatchResponseDto(match.getMatchLink());
         List<MatchRankResultDto> save = matchRankService.setMatchRank(matchResponseDto);
@@ -63,7 +63,7 @@ class MatchRankServiceTest {
         //given
         Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel);
+        Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);
         MatchResponseDto matchResponseDto = MatchFixture.createFailResponseDto(match.getMatchLink());
 

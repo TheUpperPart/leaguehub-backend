@@ -49,7 +49,7 @@ public class MatchControllerTest {
         //given
         Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel);
+        Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);
 
         MatchResponseDto matchResponseDto = new MatchResponseDto();
@@ -70,7 +70,7 @@ public class MatchControllerTest {
         //given
         Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
         channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel);
+        Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);
 
         MatchResponseDto matchResponseDto = new MatchResponseDto();
