@@ -33,6 +33,4 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findAllByMemberIdAndAndIndexGreaterThan(Long memberId, int deleteIndex);
 
-    Optional<Participant> findByNickname(String nickname);
-
 }

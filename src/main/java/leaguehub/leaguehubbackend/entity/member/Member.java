@@ -5,6 +5,7 @@ import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 
 @Getter
@@ -12,6 +13,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @Entity
+@DynamicUpdate
 public class Member extends BaseTimeEntity {
 
     @Id

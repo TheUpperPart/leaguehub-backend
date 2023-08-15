@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
@@ -30,6 +31,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -195,8 +198,9 @@ class MemberServiceTest {
         nicknameRequestDto.setNickName("newNickname");
 
         when(memberRepository.findMemberByPersonalId("id")).thenReturn(Optional.of(member));
-        when(participantRepository.findByNickname(member.getNickname())).thenReturn(Optional.empty());
+        when(participantRepository.findAllByMemberId(member.getId())).thenReturn(Collections.emptyList());
 
         assertThrows(ParticipantNotFoundException.class, () -> memberService.changeMemberParticipantNickname(nicknameRequestDto));
     }
+
 }

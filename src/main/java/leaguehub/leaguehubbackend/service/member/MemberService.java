@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -106,14 +107,15 @@ public class MemberService {
     public ProfileDto changeMemberParticipantNickname(NicknameRequestDto nicknameRequestDto) {
 
         Member member = findCurrentMember();
+
         member.updateNickname(nicknameRequestDto.getNickName());
-        memberRepository.save(member);
 
-        Participant participant = participantRepository.findByNickname(member.getNickname())
-                .orElseThrow(ParticipantNotFoundException::new);
+        List<Participant> participants = participantRepository.findAllByMemberId(member.getId());
+        if (participants.isEmpty()) {
+            throw new ParticipantNotFoundException();
+        }
 
-        participant.updateNickname(nicknameRequestDto.getNickName());
-        participantRepository.save(participant);
+        participants.forEach(participant -> participant.updateNickname(member.getNickname()));
 
         return getProfile();
     }
