@@ -32,4 +32,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Integer> findMaxIndexByParticipant(@Param("memberId") Long memberId);
 
     List<Participant> findAllByMemberIdAndAndIndexGreaterThan(Long memberId, int deleteIndex);
+
 }

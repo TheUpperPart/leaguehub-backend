@@ -123,4 +123,6 @@ public class Participant extends BaseTimeEntity {
     public void updateCustomChannelIndex(Integer index) {
         this.index = index;
     }
+
+    public void updateNickname(String newNickname) { this.nickname = newNickname; }
 }

@@ -5,10 +5,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -17,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,6 +30,8 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final ParticipantRepository participantRepository;
 
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
@@ -60,7 +67,7 @@ public class MemberService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth != null){
+        if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
             member.updateRefreshToken(null);
             SecurityContextHolder.clearContext();
@@ -94,6 +101,23 @@ public class MemberService {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
         return validateMember(userDetails.getUsername());
+    }
+
+    @Transactional
+    public ProfileDto changeMemberParticipantNickname(NicknameRequestDto nicknameRequestDto) {
+
+        Member member = findCurrentMember();
+
+        member.updateNickname(nicknameRequestDto.getNickName());
+
+        List<Participant> participants = participantRepository.findAllByMemberId(member.getId());
+        if (participants.isEmpty()) {
+            throw new ParticipantNotFoundException();
+        }
+
+        participants.forEach(participant -> participant.updateNickname(member.getNickname()));
+
+        return getProfile();
     }
 
 }
