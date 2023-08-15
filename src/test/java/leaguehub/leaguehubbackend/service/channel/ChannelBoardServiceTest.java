@@ -54,7 +54,7 @@ class ChannelBoardServiceTest {
 
     private String channelLink;
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, String tierMin, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
@@ -104,7 +104,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 만들기 테스트 - 실패 (권한 없음)")
     void invalidMemberChannelBoard() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver iv", null, 100);
+        Channel customChannel = createCustomChannel(false, false, 800, null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
@@ -139,7 +139,7 @@ class ChannelBoardServiceTest {
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
         memberRepository.save(UserFixture.createCustomeMember("test2"));
         UserFixture.setUpCustomAuth("test2");
-        Channel customChannel = createCustomChannel(false, false, "Silver iv", null, 100);
+        Channel customChannel = createCustomChannel(false, false, 800, null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(findChannel.getId());

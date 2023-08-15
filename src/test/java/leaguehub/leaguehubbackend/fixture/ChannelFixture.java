@@ -24,7 +24,7 @@ public class ChannelFixture {
 
 
     public static CreateChannelDto createAllPropertiesCustomChannelDto(Boolean tier, Boolean playCount,
-                                                                       String tierMax, String tierMin, int playCountMin) {
+                                                                       Integer tierMax, Integer tierMin, int playCountMin) {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
                 .gameCategory(0)
                 .title("test")
@@ -93,7 +93,7 @@ public class ChannelFixture {
         return channelBoardDto;
     }
 
-    public static Channel createDummyChannel(Boolean tier, Boolean playCount, String tierMax, String tierMin,int playCountMin){
+    public static Channel createDummyChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin,int playCountMin){
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin,playCountMin);
 
         return Channel.createChannel(channelDto.getTitle(),
@@ -117,8 +117,8 @@ public class ChannelFixture {
     public static ChannelRuleDto updateChannelRule() {
         ChannelRuleDto channelRuleDto = new ChannelRuleDto();
         channelRuleDto.setTier(true);
-        channelRuleDto.setTierMax("Master 1000");
-        channelRuleDto.setTierMin("Sliver iv");
+        channelRuleDto.setTierMax(2400);
+        channelRuleDto.setTierMin(800);
 
         channelRuleDto.setPlayCount(true);
         channelRuleDto.setPlayCountMin(100);

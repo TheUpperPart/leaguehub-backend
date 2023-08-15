@@ -36,7 +36,7 @@ class ChannelBoardTest {
 
     public Channel createChannel() {
         Member member = memberRepository.save(UserFixture.createMember());
-        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, "Silver iv","Iron iv",100);
+        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, 800,0,100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),

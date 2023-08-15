@@ -43,10 +43,10 @@ class ChannelRuleTest {
         ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(), channelDto.getPlayCount(), channelDto.getPlayCountMin());
         channelRuleRepository.save(channelRule);
-        channelRule.updateTierRule(true, "Sliver iv", null);
+        channelRule.updateTierRule(true, 800, null);
 
-        assertThat(channelRule.getTierMax()).isEqualTo("Sliver iv");
-        assertThat(channelRule.getTierMin()).isEqualTo(GlobalConstant.NO_DATA.getData());
+        assertThat(channelRule.getTierMax()).isEqualTo(800);
+        assertThat(channelRule.getTierMin()).isEqualTo(Integer.MIN_VALUE);
 
         channelRule.updateTierRule(false);
 
