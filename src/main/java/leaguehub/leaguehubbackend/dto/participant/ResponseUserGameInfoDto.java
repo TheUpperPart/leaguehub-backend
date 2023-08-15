@@ -7,7 +7,5 @@ public class ResponseUserGameInfoDto {
 
     private String tier;
 
-    private String grade;
-
     private Integer playCount;
 }

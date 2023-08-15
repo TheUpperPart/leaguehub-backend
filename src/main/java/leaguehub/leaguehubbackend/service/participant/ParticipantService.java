@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.GameRankDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
@@ -260,11 +259,11 @@ public class ParticipantService {
 
         String userGameInfo = requestUserGameInfo(responseDto.getGameId());
 
-        GameRankDto tier = searchTier(userGameInfo);
+        GameTier tier = searchTier(userGameInfo);
 
         checkRule(channelRule, userGameInfo, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), getGameTier(tier), responseDto.getNickname());
+        participant.updateParticipantStatus(responseDto.getGameId(), tier.toString(), responseDto.getNickname());
     }
 
     /**
@@ -274,7 +273,7 @@ public class ParticipantService {
      * @param userGameInfo
      * @param tier
      */
-    public void checkRule(ChannelRule channelRule, String userGameInfo, GameRankDto tier) {
+    public void checkRule(ChannelRule channelRule, String userGameInfo, GameTier tier) {
 
         rankRuleCheck(channelRule, tier);
         playCountRuleCheck(channelRule, userGameInfo);
@@ -291,32 +290,17 @@ public class ParticipantService {
     }
 
 
-    private static void rankRuleCheck(ChannelRule channelRule, GameRankDto tier) {
+    private static void rankRuleCheck(ChannelRule channelRule, GameTier tier) {
 
         if (channelRule.getTier()) {
-            int tierMax = getRuleTierAndGrade(channelRule.getTierMax());
-            if (tierMax == -1) tierMax = Integer.MAX_VALUE;
-            int tierMin = getRuleTierAndGrade(channelRule.getTierMin());
-            if (tierMin == -1) tierMin = Integer.MIN_VALUE;
-            int userRankScore = GameTier.rankToScore(tier.getGameRank().toString(), tier.getGameGrade());
+            int tierMax = channelRule.getTierMax();
+            int tierMin = channelRule.getTierMin();
+
+            int userRankScore = tier.getScore();
             if (userRankScore > tierMax || userRankScore < tierMin) throw new ParticipantInvalidRankException();
         }
     }
 
-    public static int getRuleTierAndGrade(String channelRuleRank) {
-        if (!channelRuleRank.equals(GlobalConstant.NO_DATA.getData())) {
-            String[] ruleRank = channelRuleRank.split(" ");
-            String ruleTier = ruleRank[0];
-            String ruleGrade = ruleRank[1];
-            return GameTier.rankToScore(ruleTier, ruleGrade);
-        }
-
-        return -1;
-    }
-
-    private String getGameTier(GameRankDto tier) {
-        return tier.getGameRank().toString() + " " + tier.getGameGrade();
-    }
 
     /**
      * 해당채널의 관리자가 맞는지 확인
@@ -508,7 +492,7 @@ public class ParticipantService {
      * @return Tier
      */
     @SneakyThrows
-    public GameRankDto searchTier(String userGameInfo) {
+    public GameTier searchTier(String userGameInfo) {
 
         String jsonToString = userGameInfo.replaceAll("[\\[\\[\\]]", "");
 
@@ -519,15 +503,7 @@ public class ParticipantService {
         JSONObject summonerDetail = (JSONObject) jsonParser.parse(jsonToString);
         String tier = summonerDetail.get("tier").toString();
         String rank = summonerDetail.get("rank").toString();
-        String leaguePoints = summonerDetail.get("leaguePoints").toString();
 
-
-        if (tier.equalsIgnoreCase(GameTier.MASTER.toString()) ||
-                tier.equalsIgnoreCase(GameTier.GRANDMASTER.toString())
-                || tier.equalsIgnoreCase(GameTier.CHALLENGER.toString())) {
-
-            return GameTier.getRanked(tier, leaguePoints);
-        }
 
         return GameTier.findGameTier(tier, rank);
 
@@ -573,13 +549,12 @@ public class ParticipantService {
 
         String userGameInfo = requestUserGameInfo(nickname);
 
-        GameRankDto tier = searchTier(userGameInfo);
+        GameTier tier = searchTier(userGameInfo);
 
         Integer playCount = getPlayCount(userGameInfo);
 
         ResponseUserGameInfoDto userGameInfoDto = new ResponseUserGameInfoDto();
-        userGameInfoDto.setTier(tier.getGameRank().toString());
-        userGameInfoDto.setGrade(tier.getGameGrade());
+        userGameInfoDto.setTier(tier.toString());
         userGameInfoDto.setPlayCount(playCount);
 
         return userGameInfoDto;

@@ -53,7 +53,7 @@ public class Channel extends BaseTimeEntity {
     //-- 비즈니스 로직 --//
     public static Channel createChannel(String title, int game, int maxPlayer,
                                         int matchFormat, String channelImageUrl,
-                                        boolean tier, String tierMax, String tierMin,
+                                        boolean tier, Integer tierMax, Integer tierMin,
                                         boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
         String uuid = randomUUID().toString();

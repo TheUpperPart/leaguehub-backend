@@ -18,12 +18,12 @@ public class ChannelRuleDto {
     private Boolean tier;
 
     @JsonProperty("tierMax")
-    @Schema(description = "최대 티어", example = "platinum III")
-    private String tierMax;
+    @Schema(description = "최대 티어", example = "platinum III일 경우 12000")
+    private Integer tierMax;
 
     @JsonProperty("tierMin")
-    @Schema(description = "최소 티어", example = "bronze II")
-    private String tierMin;
+    @Schema(description = "최소 티어", example = "bronze II 일경우 600")
+    private Integer tierMin;
 
     @NotNull
     @JsonProperty("playCount")
@@ -36,7 +36,7 @@ public class ChannelRuleDto {
     private Integer playCountMin;
 
     @Builder
-    public ChannelRuleDto(Boolean tier, String tierMax, String tierMin, Boolean playCount, Integer playCountMin) {
+    public ChannelRuleDto(Boolean tier, Integer tierMax, Integer tierMin, Boolean playCount, Integer playCountMin) {
         this.tier = tier;
         this.tierMax = tierMax;
         this.tierMin = tierMin;
