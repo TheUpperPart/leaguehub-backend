@@ -54,7 +54,7 @@ public class ChannelController {
         ChannelDto channelInfo = channelService.findChannel(channelLink);
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
-                .game(channelInfo.getCategory().name())
+                .game(channelInfo.getGameCategory().getNum())
                 .hostName(participantService.findChannelHost(channelLink))
                 .participateNum(channelInfo.getRealPlayer())
                 .maxPlayer(channelInfo.getMaxPlayer())

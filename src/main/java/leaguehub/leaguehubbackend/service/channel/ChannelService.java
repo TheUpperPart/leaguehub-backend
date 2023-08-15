@@ -49,8 +49,8 @@ public class ChannelService {
         validateChannelRule(createChannelDto);
 
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
-                createChannelDto.getGame(), createChannelDto.getParticipationNum(),
-                createChannelDto.getTournament(), createChannelDto.getChannelImageUrl(),
+                createChannelDto.getGame(), createChannelDto.getMaxPlayer(),
+                createChannelDto.getMatchFormat(), createChannelDto.getChannelImageUrl(),
                 createChannelDto.getTier(), createChannelDto.getTierMax(),
                 createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
@@ -90,7 +90,7 @@ public class ChannelService {
                 .orElseThrow(ChannelNotFoundException::new);
 
         ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
-                .realPlayer(findChannel.getRealPlayer()).category(findChannel.getCategory())
+                .realPlayer(findChannel.getRealPlayer()).gameCategory(findChannel.getGameCategory())
                 .maxPlayer(findChannel.getMaxPlayer()).build();
 
         return channelDto;
@@ -105,7 +105,7 @@ public class ChannelService {
 
 
         Optional.ofNullable(updateChannelDto.getTitle()).ifPresent(channel::updateTitle);
-        Optional.ofNullable(updateChannelDto.getParticipationNum()).ifPresent(channel::updateMaxPlayer);
+        Optional.ofNullable(updateChannelDto.getMaxPlayer()).ifPresent(channel::updateMaxPlayer);
         Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
     }
 
@@ -160,7 +160,7 @@ public class ChannelService {
         return new ParticipantChannelDto(
                 channel.getChannelLink(),
                 channel.getTitle(),
-                channel.getCategory().getNum(),
+                channel.getGameCategory().getNum(),
                 channel.getChannelImageUrl(),
                 participant.getIndex()
         );

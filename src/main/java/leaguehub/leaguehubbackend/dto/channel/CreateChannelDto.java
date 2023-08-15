@@ -22,7 +22,7 @@ public class CreateChannelDto {
     @NotNull
     @JsonProperty("matchFormat")
     @Schema(description = "토너먼트 종류의 숫자", example = "싱글 엘리미네이션(0), 프리 포 올(1)")
-    private Integer tournament;
+    private Integer matchFormat;
 
     @NotNull
     @JsonProperty("title")
@@ -33,7 +33,7 @@ public class CreateChannelDto {
     @Min(1)
     @JsonProperty("maxPlayer")
     @Schema(description = "매치 최대 참가자 수", example = "8, 16, 32, 64")
-    private Integer participationNum;
+    private Integer maxPlayer;
 
     @NotNull
     @JsonProperty("tier")
@@ -63,14 +63,14 @@ public class CreateChannelDto {
     private Integer playCountMin;
 
     @Builder
-    public CreateChannelDto(@NotNull int game, @NotNull Integer tournament, @NotNull String title,
-                            @NotNull Integer participationNum, @NotNull Boolean tier,
+    public CreateChannelDto(@NotNull int game, @NotNull Integer matchFormat, @NotNull String title,
+                            @NotNull Integer maxPlayer, @NotNull Boolean tier,
                             String tierMax, String tierMin, String channelImageUrl,
                             @NotNull Boolean playCount, Integer playCountMin) {
         this.game = game;
-        this.tournament = tournament;
+        this.matchFormat = matchFormat;
         this.title = title;
-        this.participationNum = participationNum;
+        this.maxPlayer = maxPlayer;
         this.tier = tier;
         this.tierMax = tierMax;
         this.tierMin = tierMin;

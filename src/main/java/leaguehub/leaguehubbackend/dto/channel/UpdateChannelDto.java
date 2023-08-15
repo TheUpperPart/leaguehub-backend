@@ -15,7 +15,7 @@ public class UpdateChannelDto {
 
     @JsonProperty("maxPlayer")
     @Schema(description = "매치 최대 참가자 수", example = "8, 16, 32, 64")
-    private Integer participationNum;
+    private Integer maxPlayer;
 
     @JsonProperty("channelImageUrl")
     @Schema(description = "채널의 이미지 주소", example = "https://s3.[aws-region].amazonaws.com/[bucket name]")
