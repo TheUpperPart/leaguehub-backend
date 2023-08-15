@@ -137,7 +137,7 @@ class ChannelServiceTest {
         Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
 
         assertThat(findChannel.get().getTitle()).isEqualTo(updateChannelDto.getTitle());
-        assertThat(findChannel.get().getMaxPlayer()).isEqualTo(updateChannelDto.getParticipationNum());
+        assertThat(findChannel.get().getMaxPlayer()).isEqualTo(updateChannelDto.getMaxPlayer());
         assertThat(findChannel.get().getChannelImageUrl()).isEqualTo(updateChannelDto.getChannelImageUrl());
 
     }

@@ -93,7 +93,7 @@ class ParticipantServiceTest {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
-                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
                 channelDto.getPlayCount(),
@@ -360,7 +360,7 @@ class ParticipantServiceTest {
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGame(), channelDto.getParticipationNum(),
-                channelDto.getTournament(), channelDto.getChannelImageUrl(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
                 channelDto.getPlayCount(),
