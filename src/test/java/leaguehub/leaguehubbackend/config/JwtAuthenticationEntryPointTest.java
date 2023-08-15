@@ -16,6 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
+import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.REQUEST_TOKEN_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -37,9 +38,18 @@ public class JwtAuthenticationEntryPointTest {
     }
 
     @Test
+    @DisplayName("잘못된 요청인 경우 BAD_REQUEST_EXCEPTION")
+    public void testCommence_badRequest() throws IOException {
+        when(request.getAttribute("exception")).thenReturn(null);
+        entryPoint.commence(request, response, authException);
+
+        assertTrue(response.getContentAsString().contains(AuthExceptionCode.BAD_REQUEST_EXCEPTION.getMessage()));
+    }
+
+    @Test
     @DisplayName("토큰이 없는경우 REQUEST_TOKEN_NOT_FOUND")
     public void testCommence_noToken() throws IOException {
-        when(request.getAttribute("exception")).thenReturn(null);
+        when(request.getAttribute("exception")).thenReturn(REQUEST_TOKEN_NOT_FOUND.getCode());
         entryPoint.commence(request, response, authException);
 
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());

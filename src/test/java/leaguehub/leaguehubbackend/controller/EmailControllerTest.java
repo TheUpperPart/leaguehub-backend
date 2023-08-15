@@ -69,7 +69,7 @@ public class EmailControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(emailDto)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Email Successfully Sent to" + email));
+                .andExpect(content().string("Email Successfully Sent to " + email));
 
         verify(emailService, times(1)).sendEmailWithConfirmation(emailDto.getEmail());
     }
