@@ -104,7 +104,7 @@ class ChannelControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/" + channel.get().getChannelLink()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.leagueTitle").value("test"))
-                .andExpect(jsonPath("$.game").value("TFT"))
+                .andExpect(jsonPath("$.gameCategory").value("0"))
                 .andExpect(jsonPath("$.hostName").value("id"));
     }
 

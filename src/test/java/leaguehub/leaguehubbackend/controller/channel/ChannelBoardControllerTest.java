@@ -83,7 +83,7 @@ class ChannelBoardControllerTest {
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGameCategory(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getMaxPlayer(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),

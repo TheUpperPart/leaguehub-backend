@@ -10,10 +10,10 @@ public class ChannelFixture {
 
     public static CreateChannelDto createChannelDto() {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
-                .game(0)
+                .gameCategory(0)
                 .title("test")
-                .tournament(0)
-                .participationNum(16)
+                .matchFormat(0)
+                .maxPlayer(16)
                 .tier(false)
                 .playCount(false)
                 .build();
@@ -26,10 +26,10 @@ public class ChannelFixture {
     public static CreateChannelDto createAllPropertiesCustomChannelDto(Boolean tier, Boolean playCount,
                                                                        String tierMax, String tierMin, int playCountMin) {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
-                .game(0)
+                .gameCategory(0)
                 .title("test")
-                .tournament(0)
-                .participationNum(16)
+                .matchFormat(0)
+                .maxPlayer(16)
                 .tier(tier)
                 .tierMax(tierMax)
                 .tierMin(tierMin)
@@ -43,9 +43,9 @@ public class ChannelFixture {
 
     public static CreateChannelDto bindingResultCheck() {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
-                .game(0)
-                .tournament(0)
-                .participationNum(16)
+                .gameCategory(0)
+                .matchFormat(0)
+                .maxPlayer(16)
                 .tier(false)
                 .build();
 
@@ -55,10 +55,10 @@ public class ChannelFixture {
 
     public static CreateChannelDto invalidatedCategoryData() {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
-                .game(12)
+                .gameCategory(12)
                 .title("test")
-                .tournament(0)
-                .participationNum(16)
+                .matchFormat(0)
+                .maxPlayer(16)
                 .tier(false)
                 .playCount(false)
                 .build();
@@ -69,10 +69,10 @@ public class ChannelFixture {
 
     public static CreateChannelDto invalidatedTournamentData() {
         CreateChannelDto createChannelDto = CreateChannelDto.builder()
-                .game(0)
+                .gameCategory(0)
                 .title("test")
-                .tournament(12)
-                .participationNum(16)
+                .matchFormat(12)
+                .maxPlayer(16)
                 .tier(false)
                 .playCount(false)
                 .build();
@@ -97,7 +97,7 @@ public class ChannelFixture {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin,playCountMin);
 
         return Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGameCategory(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getMaxPlayer(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
