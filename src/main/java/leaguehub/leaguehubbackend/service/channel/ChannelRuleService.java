@@ -67,7 +67,7 @@ public class ChannelRuleService {
     }
 
 
-    private void validateTier(String tierMax, String tierMin) {
+    private void validateTier(Integer tierMax, Integer tierMin) {
         if (tierMax == null && tierMin == null) {
             throw new ChannelRequestException();
         }
