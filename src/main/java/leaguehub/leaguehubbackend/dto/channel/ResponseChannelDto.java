@@ -13,7 +13,7 @@ public class ResponseChannelDto {
 
     private String leagueTitle;
 
-    private String game;
+    private Integer gameCategory;
 
     @JsonProperty("currentPlayer")
     private Integer participateNum;
@@ -24,10 +24,10 @@ public class ResponseChannelDto {
     private Integer permission;
 
     @Builder
-    public ResponseChannelDto(String hostName, String leagueTitle, String game, Integer participateNum, Integer maxPlayer, Integer permission) {
+    public ResponseChannelDto(String hostName, String leagueTitle, Integer gameCategory, Integer participateNum, Integer maxPlayer, Integer permission) {
         this.hostName = hostName;
         this.leagueTitle = leagueTitle;
-        this.game = game;
+        this.gameCategory = gameCategory;
         this.participateNum = participateNum;
         this.permission = permission;
         this.maxPlayer = maxPlayer;

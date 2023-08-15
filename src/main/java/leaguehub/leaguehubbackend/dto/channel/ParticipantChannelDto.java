@@ -15,7 +15,7 @@ public class ParticipantChannelDto {
     private String title;
 
     @Schema(description = "게임 종목(TFT, LOL, FIFA)의 숫자", example = "0, 1, 2")
-    private Integer category;
+    private Integer gameCategory;
 
     @Schema(description = "채널의 이미지 주소", example = "https://s3.[aws-region].amazonaws.com/[bucket name]")
     private String imgSrc;
@@ -23,10 +23,10 @@ public class ParticipantChannelDto {
     @Schema(description = "사이드 바의 채널의 순서 인덱스", example = "0, 1, 2")
     private Integer customChannelIndex;
 
-    public ParticipantChannelDto(String channelLink, String title, Integer category, String imgSrc, Integer customChannelIndex) {
+    public ParticipantChannelDto(String channelLink, String title, Integer gameCategory, String imgSrc, Integer customChannelIndex) {
         this.channelLink = channelLink;
         this.title = title;
-        this.category = category;
+        this.gameCategory = gameCategory;
         this.imgSrc = imgSrc;
         this.customChannelIndex = customChannelIndex;
     }

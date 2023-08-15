@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static java.util.UUID.*;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -23,7 +25,7 @@ public class Channel extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Category category;
+    private GameCategory gameCategory;
 
     @Column(nullable = false)
     private Integer maxPlayer;
@@ -50,17 +52,17 @@ public class Channel extends BaseTimeEntity {
 
     //-- 비즈니스 로직 --//
     public static Channel createChannel(String title, int game, int maxPlayer,
-                                        int tournament, String channelImageUrl,
+                                        int matchFormat, String channelImageUrl,
                                         boolean tier, String tierMax, String tierMin,
                                         boolean playCount, Integer playCountMin) {
         Channel channel = new Channel();
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUUID().toString();
         channel.title = title;
-        channel.category = Category.getByNumber(game);
+        channel.gameCategory = GameCategory.getByNumber(game);
         channel.maxPlayer = maxPlayer;
         channel.realPlayer = 0;
         channel.channelStatus = ChannelStatus.PREPARING;
-        channel.matchFormat = MatchFormat.getByNumber(tournament);
+        channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
         channel.channelRule = ChannelRule.createChannelRule(channel,tier
