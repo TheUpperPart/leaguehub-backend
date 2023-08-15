@@ -352,7 +352,7 @@ class ParticipantControllerTest {
         UserFixture.setUpCustomAuth("참가된사람1");
 
         mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
     }
 
@@ -396,7 +396,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
     }
 
@@ -424,7 +424,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
     }
 
@@ -444,7 +444,7 @@ class ParticipantControllerTest {
     }
 
     @Test
-    @DisplayName("참가한사람 거절 테스트 (관리자 o) - 실패")
+    @DisplayName("참가한사람 거절 테스트 (관리자 x) - 실패")
     public void rejectedPlayerFailTest() throws Exception {
         //given
         Channel channel = createCustomChannel(false, false, "master 100", null, 20);
@@ -454,7 +454,7 @@ class ParticipantControllerTest {
         dummy1.approveParticipantMatch();
 
         mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
     }
 
@@ -482,7 +482,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
         mockMvc.perform(post("/api/player/host/" + channel.getChannelLink() + "/" + dummy1.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
     }
 
@@ -510,7 +510,7 @@ class ParticipantControllerTest {
         UserFixture.setUpCustomAuth("참가된사람1");
 
         mockMvc.perform(get("/api/profile/observer?channelLink=" + channel.getChannelLink()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
