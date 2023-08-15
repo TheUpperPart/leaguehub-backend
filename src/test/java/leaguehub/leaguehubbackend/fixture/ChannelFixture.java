@@ -97,7 +97,7 @@ public class ChannelFixture {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin,playCountMin);
 
         return Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getParticipationNum(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),

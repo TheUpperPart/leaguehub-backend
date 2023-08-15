@@ -49,7 +49,7 @@ public class ChannelService {
         validateChannelRule(createChannelDto);
 
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
-                createChannelDto.getGame(), createChannelDto.getMaxPlayer(),
+                createChannelDto.getGameCategory(), createChannelDto.getMaxPlayer(),
                 createChannelDto.getMatchFormat(), createChannelDto.getChannelImageUrl(),
                 createChannelDto.getTier(), createChannelDto.getTierMax(),
                 createChannelDto.getTierMin(),

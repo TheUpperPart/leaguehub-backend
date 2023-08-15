@@ -41,7 +41,7 @@ class ParticipantTest {
         Member member = memberRepository.save(UserFixture.createMember());
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, "Silver iv", null, 100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getParticipationNum(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),

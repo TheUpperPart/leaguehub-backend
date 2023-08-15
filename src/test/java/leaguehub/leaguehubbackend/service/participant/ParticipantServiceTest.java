@@ -92,7 +92,7 @@ class ParticipantServiceTest {
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getParticipationNum(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
@@ -359,7 +359,7 @@ class ParticipantServiceTest {
         Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
         Channel channel = Channel.createChannel(channelDto.getTitle(),
-                channelDto.getGame(), channelDto.getParticipationNum(),
+                channelDto.getGameCategory(), channelDto.getParticipationNum(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),

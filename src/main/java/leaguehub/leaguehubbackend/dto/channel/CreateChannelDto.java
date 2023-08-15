@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class CreateChannelDto {
 
     @NotNull
-    @JsonProperty("category")
+    @JsonProperty("gameCategory")
     @Schema(description = "게임 종목(TFT, LOL, FIFA)의 숫자", example = "0, 1, 2")
-    private int game;
+    private int gameCategory;
 
     @NotNull
     @JsonProperty("matchFormat")
@@ -63,11 +63,11 @@ public class CreateChannelDto {
     private Integer playCountMin;
 
     @Builder
-    public CreateChannelDto(@NotNull int game, @NotNull Integer matchFormat, @NotNull String title,
+    public CreateChannelDto(@NotNull int gameCategory, @NotNull Integer matchFormat, @NotNull String title,
                             @NotNull Integer maxPlayer, @NotNull Boolean tier,
                             String tierMax, String tierMin, String channelImageUrl,
                             @NotNull Boolean playCount, Integer playCountMin) {
-        this.game = game;
+        this.gameCategory = gameCategory;
         this.matchFormat = matchFormat;
         this.title = title;
         this.maxPlayer = maxPlayer;
