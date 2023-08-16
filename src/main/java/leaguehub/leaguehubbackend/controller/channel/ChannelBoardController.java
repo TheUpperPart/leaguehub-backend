@@ -104,7 +104,7 @@ public class ChannelBoardController {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음, 권한x", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @PostMapping("/channel/{channelLink}/index")
+    @PostMapping("/channel/{channelLink}/order")
     public ResponseEntity updateChannelBoardIndex(@PathVariable("channelLink") String channelLink,
                                                   @RequestBody @Valid List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
         channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);

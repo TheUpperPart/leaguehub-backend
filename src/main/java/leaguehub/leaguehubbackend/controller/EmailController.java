@@ -14,13 +14,11 @@ import leaguehub.leaguehubbackend.service.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api")
 @Tag(name = "Email-Controller", description = "Email 인증")
 public class EmailController {
 
@@ -33,7 +31,7 @@ public class EmailController {
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
             @ApiResponse(responseCode = "500", description = "G-S-001 Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    @PostMapping("/api/member/verify/email")
+    @PostMapping("/member/auth/email")
     public ResponseEntity<String> verifyUser(@RequestBody @Valid EmailDto emailDto) {
 
         String email = emailService.sendEmailWithConfirmation(emailDto.getEmail());
@@ -41,7 +39,7 @@ public class EmailController {
         return ResponseEntity.ok("Email Successfully Sent to " + email);
     }
 
-    @GetMapping("/confirm/Email")
+    @GetMapping("/member/auth/email")
     public String confirmUserEmail(@RequestParam("token") String token) {
         if (emailService.confirmUserEmail(token)) {
             return "redirect:/verifiedPage.html";
