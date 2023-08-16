@@ -47,7 +47,7 @@ public class MatchControllerTest {
     @DisplayName("경기 결과 생성 테스트 - 성공")
     public void createMatchRankSuccessTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, 800, null, 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);
@@ -68,7 +68,7 @@ public class MatchControllerTest {
     @DisplayName("경기 결과 생성 테스트 - 실패")
     public void createMatchRankFailTest() throws Exception {
         //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
+        Channel channel = ChannelFixture.createDummyChannel(false, false, 800, null, 100);
         channelRepository.save(channel);
         Match match = Match.createMatch(16, channel, "테스트매치 이름");
         matchRepository.save(match);

@@ -69,7 +69,7 @@ class ChannelRuleControllerTest {
 
         ChannelRuleDto updateChannelRuleDto = new ChannelRuleDto();
         updateChannelRuleDto.setTier(true);
-        updateChannelRuleDto.setTierMax("Sliver iv");
+        updateChannelRuleDto.setTierMax(800);
 
         String json = objectMapper.writeValueAsString(updateChannelRuleDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/" + channel.get().getChannelLink() + "/rule")

@@ -76,7 +76,7 @@ class ChannelTest {
     @DisplayName("채널 생성 테스트 - 티어, 판수 제한 O")
     public void 채널_생성_테스트_제한() throws Exception {
         //given
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, "Silver iv", "Bronze iv",100);
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, 800, 400,100);
         Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),channelDto.getPlayCount(), channelDto.getPlayCountMin());
         channelRepository.save(channel);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
@@ -95,7 +95,7 @@ class ChannelTest {
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
         assertThat(findChannel.get().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(findChannel.get().getChannelRule().getTierMax()).isEqualTo("Silver iv");
+        assertThat(findChannel.get().getChannelRule().getTierMax()).isEqualTo(800);
     }
 
     @Test

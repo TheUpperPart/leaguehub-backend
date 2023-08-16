@@ -23,9 +23,10 @@ class MatchResultTest {
     @Test
     @DisplayName("순위 결과 생성 테스트")
     void createMatchResultTest() throws Exception {
-        //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, "Silver iv", null, 100);
+
+        Channel channel = ChannelFixture.createDummyChannel(false, false, 800, null, 100);
         Match match = Match.createMatch(16, channel, "테스트매치 이름");
+
         MatchResult matchResult = MatchResult.createMatchResult("svkos12d0kr", match);
         MatchResult save = matchResultRepository.save(matchResult);
 

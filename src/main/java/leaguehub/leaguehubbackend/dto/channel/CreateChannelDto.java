@@ -41,12 +41,12 @@ public class CreateChannelDto {
     private Boolean tier;
 
     @JsonProperty("tierMax")
-    @Schema(description = "최대 티어", example = "platinum III")
-    private String tierMax;
+    @Schema(description = "최대 티어", example = "1200")
+    private Integer tierMax;
 
     @JsonProperty("tierMin")
-    @Schema(description = "최소 티어", example = "bronze II")
-    private String tierMin;
+    @Schema(description = "최소 티어", example = "1600")
+    private Integer tierMin;
 
     @JsonProperty("channelImageUrl")
     @Schema(description = "채널의 이미지 주소", example = "https://s3.[aws-region].amazonaws.com/[bucket name]")
@@ -65,7 +65,7 @@ public class CreateChannelDto {
     @Builder
     public CreateChannelDto(@NotNull int gameCategory, @NotNull Integer matchFormat, @NotNull String title,
                             @NotNull Integer maxPlayer, @NotNull Boolean tier,
-                            String tierMax, String tierMin, String channelImageUrl,
+                            Integer tierMax, Integer tierMin, String channelImageUrl,
                             @NotNull Boolean playCount, Integer playCountMin) {
         this.gameCategory = gameCategory;
         this.matchFormat = matchFormat;

@@ -68,7 +68,7 @@ class ChannelBoardControllerTest {
 
     }
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, String tierMax, String tierMin, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
@@ -134,7 +134,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 만들기 - 실패(권한없음)")
     void 트FailCreateChannelBoard() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver i", null, 100);
+        Channel customChannel = createCustomChannel(false, false, 1100, null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
@@ -207,7 +207,7 @@ class ChannelBoardControllerTest {
     @Test
     @DisplayName("게시판 업데이트 - 실패(권한없음)")
     void failUpdateChannelBoard_NoAuth() throws Exception {
-        Channel customChannel = createCustomChannel(false, false, "Silver i", null, 100);
+        Channel customChannel = createCustomChannel(false, false, 1100, null, 100);
         Channel findChannel = channelRepository.save(customChannel);
 
         Member test = UserFixture.createCustomeMember("test231");
