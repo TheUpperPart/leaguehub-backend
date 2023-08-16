@@ -33,7 +33,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 프로필 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileDto.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    @GetMapping("/profile")
+    @GetMapping("/member/profile")
     public ProfileDto getProfile() {
         return memberService.getProfile();
     }
@@ -43,7 +43,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "사용자 마이페이지 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MypageResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    @GetMapping("/mypage")
+    @GetMapping("/member/mypage")
     public MypageResponseDto getMypage() {
         return memberService.getMypageProfile();
     }
@@ -53,7 +53,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 존재하지 않는 회원입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    @PostMapping("/app/logout")
+    @PostMapping("/member/logout")
     public ResponseEntity<String> handleKakaoLogout(HttpServletRequest request, HttpServletResponse response) {
 
         memberService.logoutMember(request, response);
@@ -67,7 +67,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "닉네임 변경 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileDto.class))),
             @ApiResponse(responseCode = "404", description = "MB-C-001 PA-C-015 멤버 또는 참가자를 찾을 수 없음", content = @Content(mediaType = "application/json")),
     })
-    @PostMapping("/change/nickname")
+    @PostMapping("/member/profile/nickname")
     public ProfileDto changeNickName(@RequestBody @Valid NicknameRequestDto nicknameRequestDto) {
 
         return memberService.changeMemberParticipantNickname(nicknameRequestDto);

@@ -43,7 +43,7 @@ public class KakaoController {
             @ApiResponse(responseCode = "400", description = "KA-C-001 유효하지 않은 카카오 코드입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
             @ApiResponse(responseCode = "500", description = "G-S-001 Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
     })
-    @PostMapping("/app/login/kakao")
+    @PostMapping("/member/oauth/kakao")
     public ResponseEntity<LoginMemberResponse> handleKakaoLogin(@RequestHeader HttpHeaders headers) {
         String kakaoCode = headers.getFirst("Kakao-Code");
 
