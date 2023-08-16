@@ -52,14 +52,15 @@ public class ParticipantController {
     }
 
     @Operation(summary = "경기에 참가요청(TFT 만)", description = "관전자가 게임에 참가 요청")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "참가 요청 확인"),
             @ApiResponse(responseCode = "400", description = "해당 게임에 참여할 수 없는 상태입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/{channelLink}/participant")
-    public ResponseEntity participateMatch(@RequestBody @Valid ParticipantDto responseDto) {
+    public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink, @RequestBody @Valid ParticipantDto responseDto) {
 
-        participantService.participateMatch(responseDto);
+        participantService.participateMatch(responseDto, channelLink);
 
         return new ResponseEntity<>("Update Participant ROLE", OK);
     }
@@ -72,7 +73,7 @@ public class ParticipantController {
             @ApiResponse(responseCode = "404", description = "해당 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/{channelLink}/players")
-    public ResponseEntity loadPlayer(@RequestParam(value = "channelLink") String channelLink) {
+    public ResponseEntity loadPlayer(@PathVariable("channelLink") String channelLink) {
 
 
         List<ResponseStatusPlayerDto> players = participantService.loadPlayers(channelLink);
@@ -88,7 +89,7 @@ public class ParticipantController {
             @ApiResponse(responseCode = "400", description = "해당 채널의 관리자가 아닙니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/{channelLink}/player/requests")
-    public ResponseEntity loadRequestPlayer(@RequestParam(value = "channelLink") String channelLink) {
+    public ResponseEntity loadRequestPlayer(@PathVariable("channelLink") String channelLink) {
 
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadRequestStatusPlayerList(channelLink);
 
@@ -156,7 +157,7 @@ public class ParticipantController {
             @ApiResponse(responseCode = "400", description = "해당 채널의 관리자가 아닙니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/{channelLink}/observers")
-    public ResponseEntity loadObserverPlayer(@RequestParam(value = "channelLink") String channelLink) {
+    public ResponseEntity loadObserverPlayer(@PathVariable("channelLink") String channelLink) {
 
         List<ResponseStatusPlayerDto> responsePlayers = participantService.loadObserverPlayerList(channelLink);
 
