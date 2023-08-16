@@ -162,17 +162,17 @@ class ParticipantServiceTest {
         UserFixture.setUpCustomAuth("서초임");
 
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("서초임");
 
-        participantService.participateMatch(responseDto);
+        participantService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
         Participant participant = participantRepository.
                 findParticipantByMemberIdAndChannel_ChannelLink(
                         getMemberId().getId(),
-                        responseDto.getChannelLink()).get();
+                        channel.getChannelLink()).get();
 
         //then
         assertThat(participant.getGameTier()).isEqualToIgnoringCase("unranked");
@@ -187,17 +187,17 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2100, null, 100);
         UserFixture.setUpCustomAuth("손성한");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("손성한");
 
-        participantService.participateMatch(responseDto);
+        participantService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
         Participant participant = participantRepository.
                 findParticipantByMemberIdAndChannel_ChannelLink(
                         getMemberId().getId(),
-                        responseDto.getChannelLink()).get();
+                        channel.getChannelLink()).get();
 
         //then
         assertThat(participant.getRole()).isEqualTo(Role.OBSERVER);
@@ -211,17 +211,17 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 3200, null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("채수채수밭");
 
-        participantService.participateMatch(responseDto);
+        participantService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
         Participant participant = participantRepository.
                 findParticipantByMemberIdAndChannel_ChannelLink(
                         getMemberId().getId(),
-                        responseDto.getChannelLink()).get();
+                        channel.getChannelLink()).get();
 
         //then
         assertThat(participant.getRole()).isEqualTo(Role.OBSERVER);
@@ -235,10 +235,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("서초임");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("participantGameId2");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantDuplicatedGameIdException.class);
 
     }
@@ -250,10 +250,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("참가된사람1");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("participantGameId2");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRoleException.class);
 
     }
@@ -265,10 +265,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("요청한사람");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("participantGameId1");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantAlreadyRequestedException.class);
 
     }
@@ -280,10 +280,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("거절된사람");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("participantGameId4");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantRejectedRequestedException.class);
 
     }
@@ -295,10 +295,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, false, 800, null, 100);
         UserFixture.setUpCustomAuth("손성한");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("손성한");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
 
     }
@@ -310,10 +310,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, false, null, 2400, 100);
         UserFixture.setUpCustomAuth("손성한");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("손성한");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
 
     }
@@ -326,10 +326,10 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(false, true, 800, null, 100);
         UserFixture.setUpCustomAuth("서초임");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("서초임");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidPlayCountException.class);
 
     }
@@ -341,11 +341,11 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("채수채수밭");
 
         //when
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
     }
 
@@ -732,10 +732,10 @@ class ParticipantServiceTest {
 
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         ParticipantDto responseDto = new ParticipantDto();
-        responseDto.setChannelLink(channel.getChannelLink());
+
         responseDto.setGameId("urlGuestGameId");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto))
+        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(UnauthorizedEmailException.class);
 
     }

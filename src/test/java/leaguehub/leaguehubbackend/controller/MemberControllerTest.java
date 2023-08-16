@@ -76,7 +76,7 @@ class MemberControllerTest {
         when(memberService.getProfile())
                 .thenReturn(mockProfileResponse);
 
-        mockMvc.perform(get("/api/profile"))
+        mockMvc.perform(get("/api/member/profile"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageUrl").value("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1Y"))
                 .andExpect(jsonPath("$.nickName").value("성우"));
@@ -91,7 +91,7 @@ class MemberControllerTest {
         when(memberService.getMypageProfile())
                 .thenReturn(mockMypageResponse);
 
-        mockMvc.perform(get("/api/mypage"))
+        mockMvc.perform(get("/api/member/mypage"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.profileImageUrl").value(mockMypageResponse.getProfileImageUrl()))
                 .andExpect(jsonPath("$.nickName").value(mockMypageResponse.getNickName()))
@@ -108,7 +108,7 @@ class MemberControllerTest {
                 any(HttpServletResponse.class)
         );
 
-        mockMvc.perform(post("/api/app/logout"))
+        mockMvc.perform(post("/api/member/logout"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Logout Success!"));
 
@@ -130,7 +130,7 @@ class MemberControllerTest {
         when(memberService.changeMemberParticipantNickname(nicknameRequest))
                 .thenReturn(mockProfileResponse);
 
-        mockMvc.perform(post("/api/change/nickname")
+        mockMvc.perform(post("/api/member/profile/nickname")
                         .contentType("application/json")
                         .content(new ObjectMapper().writeValueAsString(nicknameRequest)))
                 .andExpect(status().isOk())

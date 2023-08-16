@@ -120,7 +120,7 @@ class ParticipantControllerTest {
     @DisplayName("티어 조회 테스트 (참여 x) - 성공")
     void searchTierSuccessTest() throws Exception {
 
-        mockMvc.perform(get("/api/stat?gameid=서초임&gamecategory=0"))
+        mockMvc.perform(get("/api/participant/stat?gameid=서초임&gamecategory=0"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.tier").value("UNRANKED"))
                 .andExpect(jsonPath("$.playCount").value(0));
@@ -131,7 +131,7 @@ class ParticipantControllerTest {
     @DisplayName("티어 조회 테스트 (참여 x) - 실패")
     void searchTierFailTest() throws Exception {
 
-        mockMvc.perform(get("/api/stat?gameid=saovkovsk&gamecategory=0"))
+        mockMvc.perform(get("/api/participant/stat?gameid=saovkovsk&gamecategory=0"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
@@ -142,10 +142,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("썹맹구");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "썹맹구");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("썹맹구");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isOk());
@@ -159,10 +159,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, true, 800, null, 100);
         UserFixture.setUpCustomAuth("손성한");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isOk());
@@ -176,10 +176,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, 3200, null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isOk());
@@ -194,10 +194,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "participantGameId3");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("participantGameId3");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -212,10 +212,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, 800, null, 100);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "참가된사람1");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("참가된사람1");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -229,10 +229,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, 800, null, 100);
         UserFixture.setUpCustomAuth("요청한사람");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "요청한사람");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("요청한사람");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -246,10 +246,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, 800, null, 100);
         UserFixture.setUpCustomAuth("거절된사람");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "거절된사람");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("거절된사람");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -263,10 +263,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, false, 800, null, 20);
         UserFixture.setUpCustomAuth("손성한");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -280,10 +280,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, 800, null, 100);
         UserFixture.setUpCustomAuth("서초임");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "서초임");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("서초임");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -297,10 +297,10 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -315,10 +315,10 @@ class ParticipantControllerTest {
                 3200, 20);
         UserFixture.setUpCustomAuth("채수채수밭");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("채수채수밭");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isBadRequest());
@@ -332,7 +332,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 2400, null, 20);
         UserFixture.setUpCustomAuth("id");
 
-        mockMvc.perform(get("/api/profile/player?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/" + channel.getChannelLink() + "/players"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].nickname").value("participantNickname2"))
                 .andExpect(jsonPath("[0].gameId").value("participantGameId2"))
@@ -350,7 +350,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 2400, null, 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/" + channel.getChannelLink() + "/player/requests"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -362,7 +362,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 2400, null, 20);
         UserFixture.setUpCustomAuth("id");
 
-        mockMvc.perform(get("/api/profile/request?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/" + channel.getChannelLink() + "/player/requests"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].nickname").value("participantNickname1"))
                 .andExpect(jsonPath("[0].gameId").value("participantGameId1"));
@@ -380,7 +380,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
 
-        mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/player"))
                 .andExpect(status().isOk());
 
     }
@@ -394,7 +394,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
-        mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/player"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -408,7 +408,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
-        mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/observer"))
                 .andExpect(status().isOk());
 
     }
@@ -422,7 +422,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
-        mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/observer"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -437,7 +437,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
         dummy1.approveParticipantMatch();
 
-        mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/observer"))
                 .andExpect(status().isOk());
 
     }
@@ -452,7 +452,7 @@ class ParticipantControllerTest {
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
         dummy1.approveParticipantMatch();
 
-        mockMvc.perform(post("/api/player/reject/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/observer"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -466,7 +466,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
-        mockMvc.perform(post("/api/player/host/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/host"))
                 .andExpect(status().isOk());
 
     }
@@ -480,7 +480,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName", channel, "DummyGameId", "DummyNickname");
 
-        mockMvc.perform(post("/api/player/host/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/host"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -493,7 +493,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 2400, null, 20);
         UserFixture.setUpCustomAuth("id");
 
-        mockMvc.perform(get("/api/profile/observer?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/" + channel.getChannelLink() +"/observers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].nickname").value("관전자1"))
                 .andExpect(jsonPath("[1].nickname").value("관전자2"))
@@ -508,7 +508,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(false, false, 2400, null, 20);
         UserFixture.setUpCustomAuth("참가된사람1");
 
-        mockMvc.perform(get("/api/profile/observer?channelLink=" + channel.getChannelLink()))
+        mockMvc.perform(get("/api/" + channel.getChannelLink() +"/observers"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -530,7 +530,7 @@ class ParticipantControllerTest {
 
         Participant dummy1 = getParticipant("DummyName2", channel, "DummyGameId2", "DummyNickname2");
 
-        mockMvc.perform(post("/api/player/approve/" + channel.getChannelLink() + "/" + dummy1.getId()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/" + dummy1.getId() +"/player"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -542,7 +542,7 @@ class ParticipantControllerTest {
         UserFixture.setUpCustomAuth("참가할사람");
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
 
-        mockMvc.perform(post("/api/participant/" + channel.getChannelLink()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant/observer"))
                 .andExpect(status().isOk());
     }
 
@@ -554,7 +554,7 @@ class ParticipantControllerTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
 
         //then
-        mockMvc.perform(post("/api/participant/" + channel.getChannelLink()))
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant/observer"))
                 .andExpect(status().isBadRequest());
 
     }
@@ -568,10 +568,10 @@ class ParticipantControllerTest {
 
         Channel channel = createCustomChannel(false, false, 800, null, 100);
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto(channel.getChannelLink(), "손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/participant/match")
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant/observer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isUnauthorized());
