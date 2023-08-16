@@ -42,13 +42,14 @@ public class Match extends BaseTimeEntity {
         this.matchName = matchName;
         this.matchPasswd = matchPasswd;
     }
-    public static Match createMatch(Integer matchRound, Channel channel){
+
+    public static Match createMatch(Integer matchRound, Channel channel, String matchName){
         Match match = new Match();
         String uuid = UUID.randomUUID().toString();
         match.matchStatus = MatchStatus.READY;
         match.matchRound = matchRound;
         match.matchLink = uuid.substring(16);
-        match.matchName = GlobalConstant.NO_DATA.getData();
+        match.matchName = matchName;
         match.matchPasswd = GlobalConstant.NO_DATA.getData();
         match.channel = channel;
 

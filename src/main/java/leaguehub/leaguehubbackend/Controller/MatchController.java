@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchRankService;
+import leaguehub.leaguehubbackend.service.match.MatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MatchController {
 
     private final MatchRankService matchRankService;
+    private final MatchService matchService;
 
     @Operation(summary = "매치 결과 조회 및 저장")
     @ApiResponses(value = {
@@ -34,7 +38,7 @@ public class MatchController {
 
         matchRankService.setMatchRank(matchResponseDto);
 
-        return new ResponseEntity<>("매치 결과가 생성되었습니다.", HttpStatus.CREATED);
+        return new ResponseEntity<>("매치 결과가 생성되었습니다.", CREATED);
     }
 
     @Operation(summary = "저장된 매치 결과 출력")
@@ -48,6 +52,14 @@ public class MatchController {
 
         List<MatchRankResultDto> resultDto = matchRankService.getMatchDetail(matchCode);
 
-        return new ResponseEntity<>(resultDto, HttpStatus.OK);
+        return new ResponseEntity<>(resultDto, OK);
+    }
+
+    @PostMapping("/match/{channelLink}")
+    public ResponseEntity matchAssignmnet(@PathVariable("channelLink") String channelLink){
+
+        matchService.matchAssignment(channelLink);
+
+        return new ResponseEntity<>("create subMatch", OK);
     }
 }
