@@ -7,12 +7,16 @@ import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
+import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
+import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -32,6 +36,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     private final ParticipantRepository participantRepository;
+
+    private final JwtService jwtService;
 
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
@@ -119,6 +125,20 @@ public class MemberService {
 
         return getProfile();
     }
+
+    @Transactional
+    public LoginMemberResponse findOrSaveMember(KakaoUserDto kakaoUserDto) {
+        Member member = memberRepository.findMemberByPersonalId(String.valueOf(kakaoUserDto.getId()))
+                .orElseGet(() -> saveMember(kakaoUserDto).orElseThrow(GlobalServerErrorException::new));
+        return createLoginResponse(member);
+    }
+
+    public LoginMemberResponse createLoginResponse(Member member) {
+        LoginMemberResponse loginMemberResponse = jwtService.createTokens(String.valueOf(member.getPersonalId()));
+        loginMemberResponse.setVerifiedUser(member.getBaseRole() != BaseRole.GUEST);
+        return loginMemberResponse;
+    }
+
 
 }
 

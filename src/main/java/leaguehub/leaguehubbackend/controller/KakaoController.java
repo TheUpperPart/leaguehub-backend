@@ -10,14 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.entity.member.BaseRole;
-import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.kakao.KakaoService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -40,9 +36,6 @@ public class KakaoController {
     private final KakaoService kakaoService;
 
     private final MemberService memberService;
-
-    private final JwtService jwtService;
-
     @Operation(summary = "카카오 로그인/회원가입", description = "카카오 AccessCode를 사용하여 로그인/회원가입을 한다")
     @SecurityRequirements
     @ApiResponses(value = {
@@ -62,15 +55,6 @@ public class KakaoController {
 
         KakaoUserDto userDto = kakaoService.getKakaoUser(KakaoToken);
 
-        Member member = memberService.findMemberByPersonalId(String.valueOf(userDto.getId()))
-                .orElseGet(() -> memberService.saveMember(userDto).orElseThrow(GlobalServerErrorException::new));
-
-        LoginMemberResponse loginMemberResponse = jwtService.createTokens(String.valueOf(userDto.getId()));
-
-        loginMemberResponse.setVerifiedUser(member.getBaseRole() != BaseRole.GUEST);
-
-        return ResponseEntity.ok(loginMemberResponse);
+        return ResponseEntity.ok(memberService.findOrSaveMember(userDto));
     }
-
-
 }
