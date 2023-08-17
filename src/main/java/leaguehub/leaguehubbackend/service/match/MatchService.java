@@ -18,11 +18,13 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
@@ -86,22 +88,18 @@ public class MatchService {
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
 
-        List<Participant> playerList = participantRepository
-                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
-
-        if (playerList.size() < matchRound * 0.75) throw new MatchNotEnoughPlayerException();
+        List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
         assignSubMatches(findChannel, matchList, playerList);
     }
 
+
     public List<MatchInfoDto> loadMatchPlayerList(String channelLink, Integer matchRound) {
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
-        List<MatchInfoDto> matchInfoDtoList = new ArrayList<>();
 
-        for (Match match : matchList) {
-            MatchInfoDto matchInfoDto = createMatchInfoDto(match);
-            matchInfoDtoList.add(matchInfoDto);
-        }
+        List<MatchInfoDto> matchInfoDtoList = matchList.stream()
+                .map(this::createMatchInfoDto)
+                .collect(Collectors.toList());
 
         return matchInfoDtoList;
     }
@@ -146,6 +144,14 @@ public class MatchService {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }
+    }
+
+    private List<Participant> getParticipantList(String channelLink, Integer matchRound) {
+        List<Participant> playerList = participantRepository
+                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
+
+        if (playerList.size() < matchRound * 0.75) throw new MatchNotEnoughPlayerException();
+        return playerList;
     }
 
     private void assignSubMatches(Channel channel, List<Match> matchList, List<Participant> playerList) {
