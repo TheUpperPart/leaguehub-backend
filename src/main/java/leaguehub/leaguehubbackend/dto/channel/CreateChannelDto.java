@@ -30,7 +30,7 @@ public class CreateChannelDto {
     private String title;
 
     @NotNull
-    @Min(1)
+    @Min(8)
     @JsonProperty("maxPlayer")
     @Schema(description = "매치 최대 참가자 수", example = "8, 16, 32, 64")
     private Integer maxPlayer;
