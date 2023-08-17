@@ -6,9 +6,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
-import static java.util.UUID.*;
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.FetchType.LAZY;
+import static java.util.UUID.randomUUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,9 +49,14 @@ public class Channel extends BaseTimeEntity {
 
     private String channelImageUrl;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY, cascade = PERSIST,
+            orphanRemoval = true)
     @JoinColumn(name = "channel_rule_id")
     private ChannelRule channelRule;
+
+    @OneToMany(fetch = LAZY, cascade = REMOVE,
+            orphanRemoval = true, mappedBy = "channel")
+    private List<ChannelBoard> channelBoardList = new ArrayList<>();
 
 
     //-- 비즈니스 로직 --//
@@ -65,7 +74,7 @@ public class Channel extends BaseTimeEntity {
         channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
-        channel.channelRule = ChannelRule.createChannelRule(channel,tier
+        channel.channelRule = ChannelRule.createChannelRule(channel, tier
                 , tierMax
                 , tierMin
                 , playCount

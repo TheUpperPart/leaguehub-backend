@@ -3,7 +3,6 @@ package leaguehub.leaguehubbackend.entity.channel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +29,7 @@ public class ChannelRule extends BaseTimeEntity {
     private Boolean playCount;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 

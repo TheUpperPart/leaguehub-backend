@@ -26,7 +26,7 @@ public class ChannelBoard extends BaseTimeEntity {
     @Column(name = "channel_board_index", nullable = false)
     private int index;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
