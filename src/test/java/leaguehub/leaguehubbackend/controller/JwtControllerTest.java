@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,7 +57,7 @@ public class JwtControllerTest {
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
         Mockito.when(memberService.findMemberByRefreshToken("validToken")).thenReturn(Optional.of(member));
         Mockito.when(jwtService.createTokens(member.getPersonalId())).thenReturn(loginMemberResponse);
-        mockMvc.perform(get("/api/reissue/token")
+        mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer validToken")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -69,7 +69,7 @@ public class JwtControllerTest {
     public void whenTokenInvalid_thenReturnsNotValid() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("invalidToken"));
         Mockito.when(jwtService.isTokenValid("invalidToken")).thenReturn(false);
-        mockMvc.perform(get("/api/reissue/token")
+        mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer invalidToken")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
@@ -82,7 +82,7 @@ public class JwtControllerTest {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("validToken"));
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
         Mockito.when(memberService.findMemberByRefreshToken("validToken")).thenReturn(Optional.empty());
-        mockMvc.perform(get("/api/reissue/token")
+        mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer validToken")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
@@ -93,7 +93,7 @@ public class JwtControllerTest {
     @DisplayName("토큰이 존재하지 않을 때, AT-C-004코드가 반환되어야 함")
     public void whenNoToken_thenReturnsBadRequest() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.empty());
-        mockMvc.perform(get("/api/reissue/token")
+        mockMvc.perform(post("/api/member/token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.code").value("AT-C-004"));
