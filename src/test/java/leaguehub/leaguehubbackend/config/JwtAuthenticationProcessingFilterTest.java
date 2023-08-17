@@ -113,7 +113,7 @@ public class JwtAuthenticationProcessingFilterTest {
     @Test
     @DisplayName("filter에 등록된 url로 요청시 filter는 작동하지 않는다")
     public void whenUrlDoesNotNeedCheck_thenChainDoFilterCalled() throws ServletException, IOException {
-        when(request.getRequestURI()).thenReturn("/api/app/login/kakao");
+        when(request.getRequestURI()).thenReturn("/api/member/oauth/kakao");
 
         jwtAuthenticationProcessingFilter.doFilterInternal(request, response, filterChain);
 

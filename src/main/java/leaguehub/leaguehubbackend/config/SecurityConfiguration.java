@@ -27,13 +27,13 @@ public class SecurityConfiguration {
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = new JwtAuthenticationEntryPoint();
 
     private static final String[] WHITE_LIST_URLS = {
-            "/api/app/login/kakao",
-            "/api/reissue/token",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
-            "/api/send/verification/email",
-            "/confirm/**",
+            "/h2-console/**",
+            "/api/member/oauth/kakao",
+            "/api/member/token",
+            "/api/member/oauth/**",
             "/verifiedPage.html",
             "/invalidPage.html"
     };

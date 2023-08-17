@@ -79,7 +79,7 @@ public class EmailControllerTest {
         String validToken = "validToken";
         when(emailService.confirmUserEmail(validToken)).thenReturn(true);
 
-        mockMvc.perform(get("/member/auth/email?token=" + validToken))
+        mockMvc.perform(get("/api/member/oauth/email?token=" + validToken))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verifiedPage.html"));
     }
@@ -89,7 +89,7 @@ public class EmailControllerTest {
         String invalidToken = "invalidToken";
         when(emailService.confirmUserEmail(invalidToken)).thenReturn(false);
 
-        mockMvc.perform(get("/member/auth/email?token=" + invalidToken))
+        mockMvc.perform(get("/api/member/oauth/email?token=" + invalidToken))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/invalidPage.html"));
     }
