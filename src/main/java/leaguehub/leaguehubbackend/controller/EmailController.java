@@ -39,7 +39,7 @@ public class EmailController {
         return ResponseEntity.ok("Email Successfully Sent to " + email);
     }
 
-    @GetMapping("/member/auth/email")
+    @GetMapping("/member/oauth/email")
     public String confirmUserEmail(@RequestParam("token") String token) {
         if (emailService.confirmUserEmail(token)) {
             return "redirect:/verifiedPage.html";

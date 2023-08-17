@@ -64,7 +64,7 @@ public class EmailService {
     }
     private void sendConfirmationEmail(EmailAuth emailAuth, String uniqueToken) {
         try {
-            String link = "http://" + leagueHubAddress + "/api/member/auth/email?token=" + uniqueToken;
+            String link = "http://" + leagueHubAddress + "/api/member/oauth/email?token=" + uniqueToken;
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(emailAuth.getEmail());
             message.setSubject("회원가입 이메일 인증");

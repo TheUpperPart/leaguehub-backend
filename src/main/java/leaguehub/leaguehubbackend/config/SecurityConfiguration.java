@@ -33,6 +33,7 @@ public class SecurityConfiguration {
             "/h2-console/**",
             "/api/member/oauth/kakao",
             "/api/member/token",
+            "/api/member/oauth/**",
             "/verifiedPage.html",
             "/invalidPage.html"
     };
