@@ -5,6 +5,12 @@ import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.REMOVE;
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -20,9 +26,12 @@ public class MatchResult extends BaseTimeEntity {
     @Column(name = "match_code")
     private String matchCode;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "match_id")
     private Match match;
+
+    @OneToMany(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
+    private List<MatchRank> matchRankList = new ArrayList<>();
 
     public static MatchResult createMatchResult(String matchCode, Match match){
         MatchResult matchResult = new MatchResult();
