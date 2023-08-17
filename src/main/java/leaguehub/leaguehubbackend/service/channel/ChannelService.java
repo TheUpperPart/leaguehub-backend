@@ -104,7 +104,7 @@ public class ChannelService {
     @Transactional
     public void updateChannel(String channelLink, UpdateChannelDto updateChannelDto) {
         Member member = memberService.findCurrentMember();
-        Channel channel = validateChannel(channelLink);
+        Channel channel = getChannel(channelLink);
         Participant participant = getParticipant(channel.getId(), member.getId());
         checkRoleHost(participant.getRole());
 
@@ -114,7 +114,7 @@ public class ChannelService {
         Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
     }
 
-    public Channel validateChannel(String channelLink) {
+    public Channel getChannel(String channelLink) {
         Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
         return channel;

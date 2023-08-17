@@ -6,7 +6,6 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -57,7 +56,7 @@ public class ParticipantService {
 
 
     public int findParticipantPermission(String channelLink) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         if(userDetails == null) return OBSERVER.getNum();
         Member member = memberService.validateMember(userDetails.getUsername());
@@ -86,7 +85,7 @@ public class ParticipantService {
 
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         //중복 검사 추가
         duplicateParticipant(member, channelLink);
@@ -181,7 +180,7 @@ public class ParticipantService {
      * @param participantId
      */
     public void approveParticipantRequest(String channelLink, Long participantId) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         checkRoleHost(channelLink);
 
@@ -318,7 +317,7 @@ public class ParticipantService {
     }
 
     private void checkRealPlayerCount(String channelLink) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         if (channel.getRealPlayer() >= channel.getMaxPlayer())
             throw new ParticipantRealPlayerIsMaxException();
