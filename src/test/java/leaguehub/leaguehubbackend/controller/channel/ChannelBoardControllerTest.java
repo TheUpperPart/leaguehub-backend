@@ -300,7 +300,7 @@ class ChannelBoardControllerTest {
         String json = objectMapper.writeValueAsString(channelBoardLoadDtoList);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
-                                + channel.get().getChannelLink() + "/index")
+                                + channel.get().getChannelLink() + "/order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
@@ -325,7 +325,7 @@ class ChannelBoardControllerTest {
         participantRepository.save(Participant.participateChannel(test, channel.get()));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
-                                + channel.get().getChannelLink() + "/index")
+                                + channel.get().getChannelLink() + "/order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )

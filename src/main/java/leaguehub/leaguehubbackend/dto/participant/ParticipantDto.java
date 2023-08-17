@@ -8,9 +8,6 @@ import lombok.Data;
 @Data
 public class ParticipantDto {
 
-    @NotBlank
-    @Schema(description = "조회하는 매치 링크", example = "42aa1b11ab88")
-    private String channelLink;
 
     @NotBlank
     @Schema(description = "참가하려는 게임 닉네임", example = "칸영기")

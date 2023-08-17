@@ -80,6 +80,10 @@ public class ParticipantService {
      * @return Participant participant
      */
     public Participant participateChannel(String channelLink) {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+
+        checkEmail(userDetails);
+
         Member member = memberService.findCurrentMember();
 
         Channel channel = channelService.validateChannel(channelLink);
@@ -246,16 +250,16 @@ public class ParticipantService {
      *
      * @param responseDto
      */
-    public void participateMatch(ParticipantDto responseDto) {
-        Participant participant = getParticipant(responseDto.getChannelLink());
+    public void participateMatch(ParticipantDto responseDto, String channelLink) {
+        Participant participant = getParticipant(channelLink);
 
         checkParticipateMatch(participant);
 
         ChannelRule channelRule = channelRepository
-                .findByChannelLink(responseDto.getChannelLink()).get()
+                .findByChannelLink(channelLink).get()
                 .getChannelRule();
 
-        checkDuplicateNickname(responseDto.getGameId(), responseDto.getChannelLink());
+        checkDuplicateNickname(responseDto.getGameId(), channelLink);
 
         String userGameInfo = requestUserGameInfo(responseDto.getGameId());
 

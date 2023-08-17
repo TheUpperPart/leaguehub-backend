@@ -82,7 +82,7 @@ public class KakaoControllerTest {
         when(memberService.saveMember(kakaoUserDto)).thenReturn(Optional.of(member));
         when(jwtService.createTokens(String.valueOf(kakaoUserDto.getId()))).thenReturn(loginMemberResponse);
 
-        mockMvc.perform(post("/api/app/login/kakao")
+        mockMvc.perform(post("/api/member/oauth/kakao")
                         .header("Kakao-Code", "testCode")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

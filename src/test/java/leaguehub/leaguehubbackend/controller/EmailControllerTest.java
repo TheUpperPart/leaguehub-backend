@@ -65,7 +65,7 @@ public class EmailControllerTest {
         when(emailService.sendEmailWithConfirmation(emailDto.getEmail()))
                 .thenReturn(email);
 
-        mockMvc.perform(post("/api/member/verify/email")
+        mockMvc.perform(post("/api/member/auth/email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(emailDto)))
                 .andExpect(status().isOk())
@@ -79,7 +79,7 @@ public class EmailControllerTest {
         String validToken = "validToken";
         when(emailService.confirmUserEmail(validToken)).thenReturn(true);
 
-        mockMvc.perform(get("/confirm/Email?token=" + validToken))
+        mockMvc.perform(get("/member/auth/email?token=" + validToken))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verifiedPage.html"));
     }
@@ -89,7 +89,7 @@ public class EmailControllerTest {
         String invalidToken = "invalidToken";
         when(emailService.confirmUserEmail(invalidToken)).thenReturn(false);
 
-        mockMvc.perform(get("/confirm/Email?token=" + invalidToken))
+        mockMvc.perform(get("/member/auth/email?token=" + invalidToken))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/invalidPage.html"));
     }
