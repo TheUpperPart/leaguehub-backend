@@ -30,10 +30,9 @@ public class SecurityConfiguration {
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",
+            "/h2-console/**",
             "/api/member/oauth/kakao",
-            "/api/send/verification/email",
             "/api/member/token",
-            "/api/member/auth/**",
             "/verifiedPage.html",
             "/invalidPage.html"
     };

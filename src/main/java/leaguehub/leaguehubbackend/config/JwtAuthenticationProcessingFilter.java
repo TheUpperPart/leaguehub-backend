@@ -41,7 +41,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/h2-console/**",
             "/api/member/oauth/kakao",
             "/api/member/token",
-            "/api/member/auth/**",
             "/verifiedPage.html",
             "/invalidPage.html"
 
