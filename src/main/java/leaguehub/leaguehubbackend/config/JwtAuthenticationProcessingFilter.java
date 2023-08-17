@@ -39,9 +39,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/v3/api-docs/**",
             "/h2-console/**",
-            "/api/app/login/kakao",
-            "/api/reissue/token",
-            "/confirm/**",
+            "/api/member/oauth/kakao",
+            "/api/member/token",
+            "/api/member/auth/**",
             "/verifiedPage.html",
             "/invalidPage.html"
 
