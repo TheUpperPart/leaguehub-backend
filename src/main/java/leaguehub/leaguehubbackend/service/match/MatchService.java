@@ -1,81 +1,81 @@
 package leaguehub.leaguehubbackend.service.match;
 
+import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
-import leaguehub.leaguehubbackend.entity.match.MatchStatus;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
-import leaguehub.leaguehubbackend.service.channel.ChannelService;
-import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-
-import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
-import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
 @RequiredArgsConstructor
 public class MatchService {
 
+    private final MatchRepository matchRepository;
     private final ChannelRepository channelRepository;
     private final ParticipantRepository participantRepository;
-    private final MatchRepository matchRepository;
-    private final MatchPlayerRepository matchPlayerRepository;
-    private final ChannelService channelService;
-    private final MemberService memberService;
 
-    public void matchAssignment(String channelLink) {
-        Member member = memberService.findCurrentMember();
-        Channel findChannel = channelRepository.findByChannelLink(channelLink)
-                .orElseThrow(() -> new ChannelNotFoundException());
+    private static final int MIN_PLAYERS_FOR_SUB_MATCH = 8;
 
-        Participant participant = channelService.getParticipant(findChannel.getId(), member.getId());
-        channelService.checkRoleHost(participant.getRole());
+    /**
+     * 채널을 만들 때 빈 값인 매치를 만듦
+     * @param channel
+     * @param maxPlayers
+     */
+    public void createSubMatches(Channel channel, int maxPlayers) {
+        int currentPlayers = maxPlayers;
 
-        List<Participant> playerList = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
-
-
-        if (playerList.size() < findChannel.getMaxPlayer() * 0.75) throw new MatchNotEnoughPlayerException();
-
-
-        createSubMatch(findChannel, playerList);
+        while (currentPlayers >= MIN_PLAYERS_FOR_SUB_MATCH) {
+            currentPlayers = createSubMatchesForRound(channel, currentPlayers);
+        }
     }
 
-    private void createSubMatch(Channel findChannel, List<Participant> playerList) {
-        Collections.shuffle(playerList);
+    /**
+     * 해당 채널의 매치 라운드를 보여줌(64, 32, 16, 8)
+     * @param channelLink
+     * @return
+     */
+    public MatchRoundListDto getRoundList(String channelLink) {
+        Channel channel = channelRepository.findByChannelLink(channelLink)
+                .orElseThrow(() -> new ChannelNotFoundException());
 
-        int maxPlayer = findChannel.getMaxPlayer();
-        int tableCount = findChannel.getMaxPlayer() / 8;
-        int playerCount = findChannel.getRealPlayer() / tableCount;
-        int remainingPlayer = findChannel.getRealPlayer() % tableCount;
+        int maxPlayers = channel.getMaxPlayer();
+        List<Integer> roundList = calculateRoundList(maxPlayers);
 
-        int index = 0;
+        MatchRoundListDto roundListDto = new MatchRoundListDto();
+        roundListDto.setRoundList(roundList);
 
+        return roundListDto;
+    }
+
+
+    private int createSubMatchesForRound(Channel channel, int maxPlayers) {
+        int currentPlayers = maxPlayers;
+        int tableCount = currentPlayers / MIN_PLAYERS_FOR_SUB_MATCH;
 
         for (int tableIndex = 1; tableIndex <= tableCount; tableIndex++) {
-            Match match = Match.createMatch(maxPlayer, findChannel, "Group " + (char)(64 + tableIndex));
+            String groupName = "Group " + (char) (64 + tableIndex);
+            Match match = Match.createMatch(currentPlayers, channel, groupName);
             matchRepository.save(match);
-
-            for (int playerIndex = 0; playerIndex < playerCount; playerIndex++) {
-                MatchPlayer matchPlayer = MatchPlayer.createMatchPlayer(playerList.get(index), match);
-                matchPlayerRepository.save(matchPlayer);
-                index++;
-            }
-
-            if (remainingPlayer > 0) {
-                index++;
-                remainingPlayer--;
-            }
         }
+
+        return currentPlayers / 2;
+    }
+
+    private List<Integer> calculateRoundList(int maxPlayers) {
+        List<Integer> roundList = new ArrayList<>();
+
+        while (maxPlayers >= MIN_PLAYERS_FOR_SUB_MATCH) {
+            roundList.add(maxPlayers);
+            maxPlayers /= 2;
+        }
+
+        return roundList;
     }
 }

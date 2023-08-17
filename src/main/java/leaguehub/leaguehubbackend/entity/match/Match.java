@@ -31,6 +31,10 @@ public class Match extends BaseTimeEntity {
 
     private String matchPasswd;
 
+    private Integer roundMaxCount;
+
+    private Integer roundRealCount;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     private Channel channel;
@@ -51,6 +55,8 @@ public class Match extends BaseTimeEntity {
         match.matchLink = uuid.substring(16);
         match.matchName = matchName;
         match.matchPasswd = GlobalConstant.NO_DATA.getData();
+        match.roundMaxCount = 1;
+        match.roundRealCount = 0;
         match.channel = channel;
 
         return match;

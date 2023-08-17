@@ -16,6 +16,7 @@ import leaguehub.leaguehubbackend.exception.participant.exception.InvalidPartici
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.service.match.MatchService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class ChannelService {
     private final MemberService memberService;
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
+    private final MatchService matchService;
 
     @Transactional
     public ParticipantChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -63,6 +65,9 @@ public class ChannelService {
 
         participantRepository.save(participant);
         ParticipantChannelDto participantChannelDto = convertParticipantChannelDto(participant);
+
+        matchService.createSubMatches(channel, createChannelDto.getMaxPlayer());
+
         return participantChannelDto;
     }
 
