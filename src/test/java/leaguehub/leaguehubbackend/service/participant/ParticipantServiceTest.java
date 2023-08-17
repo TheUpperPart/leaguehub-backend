@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
@@ -32,8 +33,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,9 +47,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class ParticipantServiceTest {
-
-    @Autowired
-    MockMvc mockMvc;
 
     @Autowired
     MemberService memberService;
@@ -79,7 +80,7 @@ class ParticipantServiceTest {
     }
 
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin){
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
@@ -739,6 +740,41 @@ class ParticipantServiceTest {
                 .isInstanceOf(UnauthorizedEmailException.class);
 
     }
+
+    @Test
+    @DisplayName("채널 커스텀 정렬")
+    void channelCustomIndexOrder() {
+        Member findMember = memberRepository.save(UserFixture.createCustomeMember("test"));
+        UserFixture.setUpCustomAuth("test");
+
+        List<Channel> channels = IntStream.range(0, 3)
+                .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
+                .peek(channel -> {
+                    channelRepository.save(channel);
+                    participantService.participateChannel(channel.getChannelLink());
+                })
+                .collect(Collectors.toList());
+
+        List<ParticipantChannelDto> participantChannelDtos = IntStream.range(0, 3)
+                .mapToObj(i -> {
+                    ParticipantChannelDto dto = new ParticipantChannelDto();
+                    Channel channel = channels.get(i);
+                    dto.setChannelLink(channel.getChannelLink());
+                    dto.setImgSrc(channel.getChannelImageUrl());
+                    dto.setTitle(channel.getTitle());
+                    dto.setGameCategory(channel.getGameCategory().getNum());
+                    dto.setCustomChannelIndex(2 - i);  // Reversed index
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        participantService.updateCustomChannelIndex(participantChannelDtos);
+
+        List<Participant> all = participantRepository.findAllByMemberIdOrderByIndex(findMember.getId());
+        assertThat(all.get(0).getIndex()).isEqualTo(0);
+        assertThat(all.get(0).getChannel()).isEqualTo(channels.get(2));
+    }
+
 
 
 }
