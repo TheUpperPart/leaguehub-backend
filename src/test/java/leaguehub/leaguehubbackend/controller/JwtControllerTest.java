@@ -57,6 +57,7 @@ public class JwtControllerTest {
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
         Mockito.when(memberService.findMemberByRefreshToken("validToken")).thenReturn(Optional.of(member));
         Mockito.when(jwtService.createTokens(member.getPersonalId())).thenReturn(loginMemberResponse);
+
         mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer validToken")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -69,6 +70,7 @@ public class JwtControllerTest {
     public void whenTokenInvalid_thenReturnsNotValid() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("invalidToken"));
         Mockito.when(jwtService.isTokenValid("invalidToken")).thenReturn(false);
+
         mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer invalidToken")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -82,6 +84,7 @@ public class JwtControllerTest {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.of("validToken"));
         Mockito.when(jwtService.isTokenValid("validToken")).thenReturn(true);
         Mockito.when(memberService.findMemberByRefreshToken("validToken")).thenReturn(Optional.empty());
+
         mockMvc.perform(post("/api/member/token")
                         .header("Authorization-refresh", "Bearer validToken")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -93,6 +96,7 @@ public class JwtControllerTest {
     @DisplayName("토큰이 존재하지 않을 때, AT-C-004코드가 반환되어야 함")
     public void whenNoToken_thenReturnsBadRequest() throws Exception {
         Mockito.when(jwtService.extractRefreshToken(Mockito.any())).thenReturn(Optional.empty());
+
         mockMvc.perform(post("/api/member/token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
