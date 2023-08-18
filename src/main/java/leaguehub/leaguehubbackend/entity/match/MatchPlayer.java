@@ -33,6 +33,7 @@ public class MatchPlayer extends BaseTimeEntity {
         MatchPlayer matchPlayer = new MatchPlayer();
         matchPlayer.playerStatus = PlayerStatus.WAITING;
         matchPlayer.participant = participant;
+        matchPlayer.playerScore = 0;
         matchPlayer.match = match;
 
         return matchPlayer;

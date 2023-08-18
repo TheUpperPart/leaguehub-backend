@@ -101,8 +101,8 @@ class MatchServiceTest {
 
         matchService.createSubMatches(channel, channel.getMaxPlayer());
 
-        List<Match> findMatchRound16 = matchRepository.findAllByChannel_ChannelLinkAndMatchRound(channel.getChannelLink(), 16);
-        List<Match> findMatchRound8 = matchRepository.findAllByChannel_ChannelLinkAndMatchRound(channel.getChannelLink(), 8);
+        List<Match> findMatchRound16 = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channel.getChannelLink(), 16);
+        List<Match> findMatchRound8 = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channel.getChannelLink(), 8);
 
         assertThat(findMatchRound16.size()).isEqualTo(2);
         assertThat(findMatchRound8.size()).isEqualTo(1);

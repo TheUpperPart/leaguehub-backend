@@ -29,7 +29,7 @@ public class ChannelBoardService {
     public ChannelBoardLoadDto createChannelBoard(String channelLink, ChannelBoardDto request) {
 
         Member member = memberService.findCurrentMember();
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         Participant participant = channelService.getParticipant(channel.getId(), member.getId());
         channelService.checkRoleHost(participant.getRole());
 
@@ -52,7 +52,7 @@ public class ChannelBoardService {
      */
     @Transactional
     public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
 
@@ -65,7 +65,7 @@ public class ChannelBoardService {
 
     @Transactional
     public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
 
 
@@ -77,7 +77,7 @@ public class ChannelBoardService {
 
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         Participant participant = channelService.getParticipant(channel.getId(), member.getId());
         channelService.checkRoleHost(participant.getRole());
 
@@ -91,7 +91,7 @@ public class ChannelBoardService {
     public void deleteChannelBoard(String channelLink, Long boardId) {
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         Participant participant = channelService.getParticipant(channel.getId(), member.getId());
 
         channelService.checkRoleHost(participant.getRole());
@@ -110,7 +110,7 @@ public class ChannelBoardService {
     public void updateChannelBoardIndex(String channelLink, List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         Participant participant = channelService.getParticipant(channel.getId(), member.getId());
 
         channelService.checkRoleHost(participant.getRole());
