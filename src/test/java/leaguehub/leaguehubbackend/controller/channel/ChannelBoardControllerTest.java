@@ -333,4 +333,18 @@ class ChannelBoardControllerTest {
 
     }
 
+    @Test
+    @DisplayName("채널 보드 불러오기 테스트 - 화면 구성")
+    void loadChannelBoards() throws Exception {
+        CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
+        ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
+        Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/channel/"
+                                + channel.get().getChannelLink() + "/boards")
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(print());
+    }
+
+
 }
