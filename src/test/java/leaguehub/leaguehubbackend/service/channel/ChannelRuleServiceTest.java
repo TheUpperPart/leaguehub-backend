@@ -3,6 +3,7 @@ package leaguehub.leaguehubbackend.service.channel;
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -67,9 +68,10 @@ class ChannelRuleServiceTest {
     void updateChannelRuleTest() {
         ChannelRuleDto channelRuleDto = ChannelFixture.updateChannelRule();
         channelRuleService.updateChannelRule(channel.getChannelLink(), channelRuleDto);
-        assertThat(channel.getChannelRule().getTierMax()).isEqualTo(channelRuleDto.getTierMax());
-        assertThat(channel.getChannelRule().getTierMin()).isEqualTo(channelRuleDto.getTierMin());
-        assertThat(channel.getChannelRule().getLimitedPlayCount()).isEqualTo(channelRuleDto.getPlayCountMin());
+        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(channel.getChannelLink());
+        assertThat(channelRule.getTierMax()).isEqualTo(channelRuleDto.getTierMax());
+        assertThat(channelRule.getTierMin()).isEqualTo(channelRuleDto.getTierMin());
+        assertThat(channelRule.getLimitedPlayCount()).isEqualTo(channelRuleDto.getPlayCountMin());
     }
 
     @Test

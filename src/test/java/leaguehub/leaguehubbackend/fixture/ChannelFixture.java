@@ -98,11 +98,7 @@ public class ChannelFixture {
 
         return Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
-                channelDto.getTierMin(),
-                channelDto.getPlayCount(),
-                channelDto.getPlayCountMin());
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
     }
 
     public static UpdateChannelDto updateChannelDto() {

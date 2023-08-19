@@ -8,6 +8,7 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
@@ -31,9 +32,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,7 +65,7 @@ class ParticipantServiceTest {
     @Autowired
     ParticipantRepository participantRepository;
     @Autowired
-    private ChannelRuleRepository channelRuleRepository;
+    ChannelRuleRepository channelRuleRepository;
 
     Member getMemberId() throws Exception {
 
@@ -90,32 +89,36 @@ class ParticipantServiceTest {
         Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
         Member doneMember1 = memberRepository.save(UserFixture.createCustomeMember("참가된사람1"));
         Member doneMember2 = memberRepository.save(UserFixture.createCustomeMember("참가된사람2"));
+        Member observer1 = memberRepository.save(UserFixture.createCustomeMember("관전자1"));
+        Member observer2 = memberRepository.save(UserFixture.createCustomeMember("관전자2"));
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
-                channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
         participantRepository.save(Participant.participateChannel(ironMember, channel));
         participantRepository.save(Participant.participateChannel(platinumMember, channel));
         participantRepository.save(Participant.participateChannel(masterMember, channel));
+        participantRepository.save(Participant.participateChannel(observer1, channel));
+        participantRepository.save(Participant.participateChannel(observer2, channel));
 
         Participant alreadyParticipant = participantRepository.save(Participant.participateChannel(alreadyMember, channel));
         Participant rejectedParticipant = participantRepository.save(Participant.participateChannel(rejectedMember, channel));
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze", "participantNickname1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum", "participantNickname2");
-        doneParticipant2.updateParticipantStatus("participantGameId3", "iron", "participantNickname3");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -361,12 +364,13 @@ class ParticipantServiceTest {
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel,channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
