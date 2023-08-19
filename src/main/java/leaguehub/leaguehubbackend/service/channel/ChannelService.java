@@ -6,15 +6,16 @@ import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -40,6 +41,7 @@ public class ChannelService {
     private final ChannelBoardRepository channelBoardRepository;
     private final ParticipantRepository participantRepository;
     private final MatchService matchService;
+    private final ChannelRuleRepository channelRuleRepository;
 
     @Transactional
     public ParticipantChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -48,16 +50,19 @@ public class ChannelService {
 
         checkEmail(SecurityUtils.getAuthenticatedUser());
 
-        validateChannelRule(createChannelDto);
 
         Channel channel = Channel.createChannel(createChannelDto.getTitle(),
                 createChannelDto.getGameCategory(), createChannelDto.getMaxPlayer(),
-                createChannelDto.getMatchFormat(), createChannelDto.getChannelImageUrl(),
-                createChannelDto.getTier(), createChannelDto.getTierMax(),
+                createChannelDto.getMatchFormat(), createChannelDto.getChannelImageUrl());
+
+        channelRepository.save(channel);
+
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel,  createChannelDto.getTier(), createChannelDto.getTierMax(),
                 createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
-        channelRepository.save(channel);
+
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
 
         Participant participant = Participant.createHostChannel(member, channel);
@@ -130,28 +135,6 @@ public class ChannelService {
     public void checkRoleHost(Role role) {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
-        }
-    }
-
-    private void validateTier(Integer tierMax, Integer tierMin) {
-        if (tierMax == null && tierMin == null) {
-            throw new ChannelRequestException();
-        }
-    }
-
-    private void validatePlayCount(Integer playCountMin) {
-        if (playCountMin == null) {
-            throw new ChannelRequestException();
-        }
-    }
-
-    private void validateChannelRule(CreateChannelDto createChannelDto) {
-        if (createChannelDto.getTier()) {
-            validateTier(createChannelDto.getTierMax(), createChannelDto.getTierMin());
-        }
-
-        if (createChannelDto.getPlayCount()) {
-            validatePlayCount(createChannelDto.getPlayCountMin());
         }
     }
 
