@@ -6,12 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static jakarta.persistence.CascadeType.PERSIST;
-import static jakarta.persistence.CascadeType.REMOVE;
-import static jakarta.persistence.FetchType.LAZY;
 import static java.util.UUID.randomUUID;
 
 @Getter
@@ -49,21 +43,9 @@ public class Channel extends BaseTimeEntity {
 
     private String channelImageUrl;
 
-    @OneToOne(fetch = LAZY, cascade = PERSIST,
-            orphanRemoval = true)
-    @JoinColumn(name = "channel_rule_id")
-    private ChannelRule channelRule;
-
-    @OneToMany(fetch = LAZY, cascade = REMOVE,
-            orphanRemoval = true, mappedBy = "channel")
-    private List<ChannelBoard> channelBoardList = new ArrayList<>();
-
-
     //-- 비즈니스 로직 --//
     public static Channel createChannel(String title, int game, int maxPlayer,
-                                        int matchFormat, String channelImageUrl,
-                                        boolean tier, Integer tierMax, Integer tierMin,
-                                        boolean playCount, Integer playCountMin) {
+                                        int matchFormat, String channelImageUrl) {
         Channel channel = new Channel();
         String uuid = randomUUID().toString();
         channel.title = title;
@@ -74,11 +56,6 @@ public class Channel extends BaseTimeEntity {
         channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
-        channel.channelRule = ChannelRule.createChannelRule(channel, tier
-                , tierMax
-                , tierMin
-                , playCount
-                , playCountMin);
 
         return channel;
     }

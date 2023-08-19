@@ -8,11 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import static jakarta.persistence.CascadeType.REMOVE;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
@@ -43,9 +40,6 @@ public class Match extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
-
-    @OneToMany(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
-    List<MatchResult> matchResultList = new ArrayList<>();
 
     @Builder
     public Match(MatchStatus matchStatus, Integer matchRound, String matchName, String matchPasswd) {
