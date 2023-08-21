@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.fixture.MypageResponseFixture;
 import leaguehub.leaguehubbackend.fixture.ProfileFixture;
 import leaguehub.leaguehubbackend.service.member.MemberService;

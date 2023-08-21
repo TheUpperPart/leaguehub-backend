@@ -5,6 +5,7 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
@@ -58,10 +59,11 @@ class ChannelServiceTest {
         ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
 
         Optional<Channel> findChannel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
+        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(findChannel.get().getChannelLink());
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getMaxPlayer()).isEqualTo(createChannelDto.getMaxPlayer());
         assertThat(findChannel.get().getTitle()).isEqualTo(createChannelDto.getTitle());
-        assertThat(findChannel.get().getChannelRule().getTier()).isFalse();
+        assertThat(channelRule.getTier()).isFalse();
     }
 
     @Test

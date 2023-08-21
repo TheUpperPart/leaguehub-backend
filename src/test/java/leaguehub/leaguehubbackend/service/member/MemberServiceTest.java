@@ -7,7 +7,6 @@ import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
@@ -31,7 +30,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 

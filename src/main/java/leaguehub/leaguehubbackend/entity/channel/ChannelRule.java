@@ -3,7 +3,7 @@ package leaguehub.leaguehubbackend.entity.channel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +30,7 @@ public class ChannelRule extends BaseTimeEntity {
     private Boolean playCount;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
@@ -43,6 +43,7 @@ public class ChannelRule extends BaseTimeEntity {
         channelRule.tier = tier;
 
         if (tier) {
+            channelRule.validateTier(tierMax, tierMin);
             channelRule.tierMax = Optional.ofNullable(tierMax).orElse(Integer.MIN_VALUE);
             channelRule.tierMin = Optional.ofNullable(tierMin).orElse(Integer.MIN_VALUE);
         } else {
@@ -51,6 +52,7 @@ public class ChannelRule extends BaseTimeEntity {
         }
 
         if (playCount) {
+            channelRule.validatePlayCount(playCountMin);
             channelRule.limitedPlayCount = playCountMin;
         } else {
             channelRule.limitedPlayCount = Integer.MAX_VALUE;
@@ -60,13 +62,14 @@ public class ChannelRule extends BaseTimeEntity {
     }
 
     public void updateTierRule(boolean tier, Integer tierMax, Integer tierMin) {
+        validateTier(tierMax, tierMin);
         this.tier = tier;
-
         this.tierMax = Optional.ofNullable(tierMax).orElse(Integer.MIN_VALUE);
         this.tierMin = Optional.ofNullable(tierMin).orElse(Integer.MIN_VALUE);
     }
 
     public void updatePlayCountMin(boolean playCount, Integer playCountMin) {
+        validatePlayCount(playCountMin);
         this.playCount = playCount;
         this.limitedPlayCount = playCountMin;
     }
@@ -77,5 +80,17 @@ public class ChannelRule extends BaseTimeEntity {
 
     public void updatePlayCountMin(boolean playCount) {
         this.playCount = playCount;
+    }
+
+    private void validateTier(Integer tierMax, Integer tierMin) {
+        if (tierMax == null && tierMin == null) {
+            throw new ChannelRequestException();
+        }
+    }
+
+    private void validatePlayCount(Integer playCountMin) {
+        if (playCountMin == null) {
+            throw new ChannelRequestException();
+        }
     }
 }

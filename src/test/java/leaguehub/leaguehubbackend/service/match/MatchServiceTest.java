@@ -5,6 +5,7 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -12,6 +13,7 @@ import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -48,6 +50,9 @@ class MatchServiceTest {
     MatchRepository matchRepository;
 
     @Autowired
+    ChannelRuleRepository channelRuleRepository;
+
+    @Autowired
     MatchService matchService;
 
     Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
@@ -60,32 +65,36 @@ class MatchServiceTest {
         Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
         Member doneMember1 = memberRepository.save(UserFixture.createCustomeMember("참가된사람1"));
         Member doneMember2 = memberRepository.save(UserFixture.createCustomeMember("참가된사람2"));
+        Member observer1 = memberRepository.save(UserFixture.createCustomeMember("관전자1"));
+        Member observer2 = memberRepository.save(UserFixture.createCustomeMember("관전자2"));
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
-                channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
         participantRepository.save(Participant.participateChannel(ironMember, channel));
         participantRepository.save(Participant.participateChannel(platinumMember, channel));
         participantRepository.save(Participant.participateChannel(masterMember, channel));
+        participantRepository.save(Participant.participateChannel(observer1, channel));
+        participantRepository.save(Participant.participateChannel(observer2, channel));
 
         Participant alreadyParticipant = participantRepository.save(Participant.participateChannel(alreadyMember, channel));
         Participant rejectedParticipant = participantRepository.save(Participant.participateChannel(rejectedMember, channel));
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze", "participantNickname1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum", "participantNickname2");
-        doneParticipant2.updateParticipantStatus("participantGameId3", "iron", "participantNickname3");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 

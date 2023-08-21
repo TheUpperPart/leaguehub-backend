@@ -13,6 +13,7 @@ import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailExc
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -51,8 +52,7 @@ public class ParticipantService {
     private final ChannelService channelService;
     @Value("${riot-api-key-1}")
     private String riot_api_key;
-
-
+    private final ChannelRuleRepository channelRuleRepository;
 
 
     public int findParticipantPermission(String channelLink) {
@@ -254,9 +254,8 @@ public class ParticipantService {
 
         checkParticipateMatch(participant);
 
-        ChannelRule channelRule = channelRepository
-                .findByChannelLink(channelLink).get()
-                .getChannelRule();
+        ChannelRule channelRule = channelRuleRepository
+                .findChannelRuleByChannel_ChannelLink(channelLink);
 
         checkDuplicateNickname(responseDto.getGameId(), channelLink);
 

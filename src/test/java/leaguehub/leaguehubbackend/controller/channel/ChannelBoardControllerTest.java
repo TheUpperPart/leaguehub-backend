@@ -7,12 +7,14 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
@@ -60,6 +62,8 @@ class ChannelBoardControllerTest {
     ParticipantRepository participantRepository;
     @Autowired
     MockMvc mockMvc;
+    @Autowired
+    private ChannelRuleRepository channelRuleRepository;
 
     @BeforeEach
     void setUp() {
@@ -84,11 +88,12 @@ class ChannelBoardControllerTest {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));

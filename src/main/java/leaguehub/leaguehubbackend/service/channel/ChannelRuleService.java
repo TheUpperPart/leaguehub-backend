@@ -5,7 +5,6 @@ import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class ChannelRuleService {
         Optional.ofNullable(channelRuleDto.getTier())
                 .ifPresent(tier -> {
                     if (tier) {
-                        validateTier(channelRuleDto.getTierMax(), channelRuleDto.getTierMin());
                         channelRule.updateTierRule(true, channelRuleDto.getTierMax(), channelRuleDto.getTierMin());
                     } else {
                         channelRule.updateTierRule(false);
@@ -44,7 +42,6 @@ public class ChannelRuleService {
         Optional.ofNullable(channelRuleDto.getPlayCount())
                 .ifPresent(playCount -> {
                     if (playCount) {
-                        validatePlayCount(channelRuleDto.getPlayCountMin());
                         channelRule.updatePlayCountMin(true, channelRuleDto.getPlayCountMin());
                     } else {
                         channelRule.updatePlayCountMin(false);
@@ -66,16 +63,4 @@ public class ChannelRuleService {
                 .playCountMin(channelRule.getLimitedPlayCount()).build();
     }
 
-
-    private void validateTier(Integer tierMax, Integer tierMin) {
-        if (tierMax == null && tierMin == null) {
-            throw new ChannelRequestException();
-        }
-    }
-
-    private void validatePlayCount(Integer playCountMin) {
-        if (playCountMin == null) {
-            throw new ChannelRequestException();
-        }
-    }
 }

@@ -2,11 +2,13 @@ package leaguehub.leaguehubbackend.entity.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
@@ -32,6 +34,8 @@ class ParticipantTest {
     MemberRepository memberRepository;
     @Autowired
     ParticipantRepository participantRepository;
+    @Autowired
+    private ChannelRuleRepository channelRuleRepository;
 
 
     @Test
@@ -42,12 +46,15 @@ class ParticipantTest {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, 800, null, 100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel,
                 channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
 
 
