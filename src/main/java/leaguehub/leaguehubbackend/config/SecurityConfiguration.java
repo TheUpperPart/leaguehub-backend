@@ -35,7 +35,9 @@ public class SecurityConfiguration {
             "/api/member/token",
             "/api/member/oauth/**",
             "/verifiedPage.html",
-            "/invalidPage.html"
+            "/invalidPage.html",
+            "/ws/**",
+            "/app/**"
     };
 
     @Bean

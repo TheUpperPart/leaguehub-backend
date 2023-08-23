@@ -43,8 +43,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/api/member/token",
             "/api/member/oauth/**",
             "/verifiedPage.html",
-            "/invalidPage.html"
-
+            "/invalidPage.html",
+            "/ws/**",
+            "/app/**"
     );
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
