@@ -2,11 +2,13 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
@@ -30,10 +32,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,9 +46,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class ParticipantServiceTest {
-
-    @Autowired
-    MockMvc mockMvc;
 
     @Autowired
     MemberService memberService;
@@ -65,7 +65,7 @@ class ParticipantServiceTest {
     @Autowired
     ParticipantRepository participantRepository;
     @Autowired
-    private ChannelRuleRepository channelRuleRepository;
+    ChannelRuleRepository channelRuleRepository;
 
     Member getMemberId() throws Exception {
 
@@ -79,7 +79,7 @@ class ParticipantServiceTest {
     }
 
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin){
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
@@ -89,32 +89,36 @@ class ParticipantServiceTest {
         Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
         Member doneMember1 = memberRepository.save(UserFixture.createCustomeMember("참가된사람1"));
         Member doneMember2 = memberRepository.save(UserFixture.createCustomeMember("참가된사람2"));
+        Member observer1 = memberRepository.save(UserFixture.createCustomeMember("관전자1"));
+        Member observer2 = memberRepository.save(UserFixture.createCustomeMember("관전자2"));
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
-                channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
         participantRepository.save(Participant.participateChannel(ironMember, channel));
         participantRepository.save(Participant.participateChannel(platinumMember, channel));
         participantRepository.save(Participant.participateChannel(masterMember, channel));
+        participantRepository.save(Participant.participateChannel(observer1, channel));
+        participantRepository.save(Participant.participateChannel(observer2, channel));
 
         Participant alreadyParticipant = participantRepository.save(Participant.participateChannel(alreadyMember, channel));
         Participant rejectedParticipant = participantRepository.save(Participant.participateChannel(rejectedMember, channel));
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze", "participantNickname1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum", "participantNickname2");
-        doneParticipant2.updateParticipantStatus("participantGameId3", "iron", "participantNickname3");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -360,12 +364,13 @@ class ParticipantServiceTest {
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel,channelDto.getTier(), channelDto.getTierMax(),
                 channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
@@ -739,6 +744,41 @@ class ParticipantServiceTest {
                 .isInstanceOf(UnauthorizedEmailException.class);
 
     }
+
+    @Test
+    @DisplayName("채널 커스텀 정렬")
+    void channelCustomIndexOrder() {
+        Member findMember = memberRepository.save(UserFixture.createCustomeMember("test"));
+        UserFixture.setUpCustomAuth("test");
+
+        List<Channel> channels = IntStream.range(0, 3)
+                .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
+                .peek(channel -> {
+                    channelRepository.save(channel);
+                    participantService.participateChannel(channel.getChannelLink());
+                })
+                .collect(Collectors.toList());
+
+        List<ParticipantChannelDto> participantChannelDtos = IntStream.range(0, 3)
+                .mapToObj(i -> {
+                    ParticipantChannelDto dto = new ParticipantChannelDto();
+                    Channel channel = channels.get(i);
+                    dto.setChannelLink(channel.getChannelLink());
+                    dto.setImgSrc(channel.getChannelImageUrl());
+                    dto.setTitle(channel.getTitle());
+                    dto.setGameCategory(channel.getGameCategory().getNum());
+                    dto.setCustomChannelIndex(2 - i);  // Reversed index
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        participantService.updateCustomChannelIndex(participantChannelDtos);
+
+        List<Participant> all = participantRepository.findAllByMemberIdOrderByIndex(findMember.getId());
+        assertThat(all.get(0).getIndex()).isEqualTo(0);
+        assertThat(all.get(0).getChannel()).isEqualTo(channels.get(2));
+    }
+
 
 
 }

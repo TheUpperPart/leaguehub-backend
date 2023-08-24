@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.Optional;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -38,11 +40,11 @@ public class Participant extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private RequestStatus requestStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 

@@ -6,6 +6,8 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -21,11 +23,11 @@ public class MatchPlayer extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PlayerStatus playerStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "match_id")
     private Match match;
 
@@ -33,6 +35,7 @@ public class MatchPlayer extends BaseTimeEntity {
         MatchPlayer matchPlayer = new MatchPlayer();
         matchPlayer.playerStatus = PlayerStatus.WAITING;
         matchPlayer.participant = participant;
+        matchPlayer.playerScore = 0;
         matchPlayer.match = match;
 
         return matchPlayer;

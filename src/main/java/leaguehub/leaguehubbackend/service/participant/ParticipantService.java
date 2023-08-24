@@ -6,7 +6,6 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -14,6 +13,7 @@ import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailExc
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -52,12 +52,11 @@ public class ParticipantService {
     private final ChannelService channelService;
     @Value("${riot-api-key-1}")
     private String riot_api_key;
-
-
+    private final ChannelRuleRepository channelRuleRepository;
 
 
     public int findParticipantPermission(String channelLink) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         if(userDetails == null) return OBSERVER.getNum();
         Member member = memberService.validateMember(userDetails.getUsername());
@@ -86,7 +85,7 @@ public class ParticipantService {
 
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         //중복 검사 추가
         duplicateParticipant(member, channelLink);
@@ -181,7 +180,7 @@ public class ParticipantService {
      * @param participantId
      */
     public void approveParticipantRequest(String channelLink, Long participantId) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         checkRoleHost(channelLink);
 
@@ -255,9 +254,8 @@ public class ParticipantService {
 
         checkParticipateMatch(participant);
 
-        ChannelRule channelRule = channelRepository
-                .findByChannelLink(channelLink).get()
-                .getChannelRule();
+        ChannelRule channelRule = channelRuleRepository
+                .findChannelRuleByChannel_ChannelLink(channelLink);
 
         checkDuplicateNickname(responseDto.getGameId(), channelLink);
 
@@ -318,7 +316,7 @@ public class ParticipantService {
     }
 
     private void checkRealPlayerCount(String channelLink) {
-        Channel channel = channelService.validateChannel(channelLink);
+        Channel channel = channelService.getChannel(channelLink);
 
         if (channel.getRealPlayer() >= channel.getMaxPlayer())
             throw new ParticipantRealPlayerIsMaxException();

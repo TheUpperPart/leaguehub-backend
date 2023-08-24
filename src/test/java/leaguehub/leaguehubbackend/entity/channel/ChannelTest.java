@@ -8,6 +8,7 @@ import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
@@ -42,10 +43,12 @@ class ChannelTest {
     ParticipantRepository participantRepository;
 
     Member member;
+    @Autowired
+    private ChannelRuleRepository channelRuleRepository;
 
     @BeforeEach
     void setUp() {
-       member = memberRepository.save(UserFixture.createMember());
+        member = memberRepository.save(UserFixture.createMember());
     }
 
     @Test
@@ -53,8 +56,10 @@ class ChannelTest {
     public void 채널_생성_테스트() throws Exception {
         //given
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
-        Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),channelDto.getPlayCount(), channelDto.getPlayCountMin());
+        Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(), channelDto.getPlayCount(), channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        ChannelRule saveChannelRule = channelRuleRepository.save(channelRule);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
 
@@ -67,7 +72,7 @@ class ChannelTest {
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getRealPlayer()).isEqualTo(0);
         assertThat(findChannel.get().getGameCategory()).isEqualTo(GameCategory.getByNumber(channelDto.getGameCategory()));
-        assertThat(findChannel.get().getChannelRule().getLimitedPlayCount()).isEqualTo(Integer.MAX_VALUE);
+        assertThat(saveChannelRule.getTierMax()).isEqualTo(Integer.MIN_VALUE);
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
     }
@@ -76,9 +81,11 @@ class ChannelTest {
     @DisplayName("채널 생성 테스트 - 티어, 판수 제한 O")
     public void 채널_생성_테스트_제한() throws Exception {
         //given
-        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, 800, 400,100);
-        Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),channelDto.getPlayCount(), channelDto.getPlayCountMin());
+        CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(true, true, 800, 400, 100);
+        Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
         channelRepository.save(channel);
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(), channelDto.getPlayCount(), channelDto.getPlayCountMin());
+        ChannelRule saveChannelRule = channelRuleRepository.save(channelRule);
         List<ChannelBoard> channelBoardList = channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
 
@@ -91,36 +98,34 @@ class ChannelTest {
         assertThat(findChannel.get().getChannelStatus()).isEqualTo(ChannelStatus.PREPARING);
         assertThat(findChannel.get().getRealPlayer()).isEqualTo(0);
         assertThat(findChannel.get().getGameCategory()).isEqualTo(GameCategory.getByNumber(channelDto.getGameCategory()));
-        assertThat(findChannel.get().getChannelRule().getLimitedPlayCount()).isEqualTo(channelDto.getPlayCountMin());
+        assertThat(saveChannelRule.getLimitedPlayCount()).isEqualTo(channelDto.getPlayCountMin());
         assertThat(channelBoardList.size()).isEqualTo(3);
         assertThat(channelBoardList.get(0).getChannel()).isEqualTo(channel);
         assertThat(findChannel.get().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(findChannel.get().getChannelRule().getTierMax()).isEqualTo(800);
+        assertThat(saveChannelRule.getTierMax()).isEqualTo(800);
     }
 
     @Test
     public void 유효하지않는_채널_테스트_게임카테고리() throws Exception {
         CreateChannelDto channelDto = ChannelFixture.invalidatedCategoryData();
-        assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),channelDto.getPlayCount(), channelDto.getPlayCountMin())).isInstanceOf(ChannelRequestException.class);
+        assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(), channelDto.getMatchFormat(), channelDto.getChannelImageUrl())).isInstanceOf(ChannelRequestException.class);
     }
 
     @Test
     public void 유효하지않는_채널_테스트_토너먼트형식() throws Exception {
         CreateChannelDto channelDto = ChannelFixture.invalidatedTournamentData();
         assertThatThrownBy(() -> Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(),
-                channelDto.getTierMax(), channelDto.getTierMin(),channelDto.getPlayCount(),
-                channelDto.getPlayCountMin())).isInstanceOf(ChannelRequestException.class);
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl())).isInstanceOf(ChannelRequestException.class);
     }
 
     @Test
     public void update_test() {
         CreateChannelDto channelDto = ChannelFixture.createChannelDto();
         Channel channel = Channel.createChannel(channelDto.getTitle(), channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(), channelDto.getTier(),
-                channelDto.getTierMax(), channelDto.getTierMin(),
-                channelDto.getPlayCount(), channelDto.getPlayCountMin());
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
         channelRepository.save(channel);
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(), channelDto.getPlayCount(), channelDto.getPlayCountMin());
+        ChannelRule saveChannelRule = channelRuleRepository.save(channelRule);
         channel.updateMaxPlayer(64);
         channel.updateChannelImageUrl("test");
         channel.updateTitle("test123");

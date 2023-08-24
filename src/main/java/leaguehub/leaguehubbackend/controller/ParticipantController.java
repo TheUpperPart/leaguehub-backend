@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
 
-@Tag(name = "Participants", description = "참가자 관련 API")
+@Tag(name = "Participants-Controller", description = "참가자 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

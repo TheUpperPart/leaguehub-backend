@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -35,19 +37,19 @@ public class Match extends BaseTimeEntity {
 
     private Integer roundRealCount;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
     @Builder
-    public Match(MatchStatus matchStatus, Integer matchRound, String matchName, String matchPasswd){
+    public Match(MatchStatus matchStatus, Integer matchRound, String matchName, String matchPasswd) {
         this.matchStatus = matchStatus;
         this.matchRound = matchRound;
         this.matchName = matchName;
         this.matchPasswd = matchPasswd;
     }
 
-    public static Match createMatch(Integer matchRound, Channel channel, String matchName){
+    public static Match createMatch(Integer matchRound, Channel channel, String matchName) {
         Match match = new Match();
         String uuid = UUID.randomUUID().toString();
         match.matchStatus = MatchStatus.READY;

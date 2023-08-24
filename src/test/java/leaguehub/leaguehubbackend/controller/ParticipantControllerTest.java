@@ -3,9 +3,11 @@ package leaguehub.leaguehubbackend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
+import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -13,6 +15,7 @@ import leaguehub.leaguehubbackend.fixture.ParticipantFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -26,6 +29,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -59,11 +66,13 @@ class ParticipantControllerTest {
 
     @Autowired
     ParticipantRepository participantRepository;
+    @Autowired
+    ChannelRuleRepository channelRuleRepository;
 
     @Autowired
     ObjectMapper mapper;
 
-    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
+    Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin){
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
@@ -79,11 +88,12 @@ class ParticipantControllerTest {
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(tier, playCount, tierMax, tierMin, playCountMin);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
         participantRepository.save(Participant.participateChannel(unrankedMember, channel));
@@ -577,6 +587,41 @@ class ParticipantControllerTest {
                 .andExpect(status().isUnauthorized());
 
 
+    }
+
+    @Test
+    @DisplayName("채널 커스텀 인덱스 API 테스트")
+    void channelCustomIndexAPI() throws Exception {
+        Member findMember = memberRepository.save(UserFixture.createCustomeMember("test"));
+        UserFixture.setUpCustomAuth("test");
+
+        List<Channel> channels = IntStream.range(0, 3)
+                .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
+                .peek(channel -> {
+                    channelRepository.save(channel);
+                    participantService.participateChannel(channel.getChannelLink());
+                })
+                .collect(Collectors.toList());
+
+        List<ParticipantChannelDto> participantChannelDtos = IntStream.range(0, 3)
+                .mapToObj(i -> {
+                    ParticipantChannelDto dto = new ParticipantChannelDto();
+                    Channel channel = channels.get(i);
+                    dto.setChannelLink(channel.getChannelLink());
+                    dto.setImgSrc(channel.getChannelImageUrl());
+                    dto.setTitle(channel.getTitle());
+                    dto.setGameCategory(channel.getGameCategory().getNum());
+                    dto.setCustomChannelIndex(2 - i);  // Reversed index
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        String json = mapper.writeValueAsString(participantChannelDtos);
+
+        mockMvc.perform(post("/api/channels/order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
 

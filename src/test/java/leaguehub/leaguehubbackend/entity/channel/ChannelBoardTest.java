@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import org.junit.jupiter.api.Test;
@@ -33,17 +34,21 @@ class ChannelBoardTest {
     ChannelBoardRepository channelBoardRepository;
     @Autowired
     ParticipantRepository participantRepository;
+    @Autowired
+    private ChannelRuleRepository channelRuleRepository;
 
     public Channel createChannel() {
         Member member = memberRepository.save(UserFixture.createMember());
-        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, 800,0,100);
+        CreateChannelDto channelDto = createAllPropertiesCustomChannelDto(true, true, 800, 0, 100);
         Channel channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
-                channelDto.getMatchFormat(), channelDto.getChannelImageUrl(),
-                channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
+                channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
+
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
                 channelDto.getPlayCount(),
                 channelDto.getPlayCountMin());
         channelRepository.save(channel);
+        channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
         participantRepository.save(Participant.createHostChannel(member, channel));
 
