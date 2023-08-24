@@ -29,7 +29,6 @@ public class ChannelRule extends BaseTimeEntity {
 
     private Boolean playCount;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;

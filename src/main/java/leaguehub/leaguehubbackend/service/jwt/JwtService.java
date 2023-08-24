@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -73,6 +74,14 @@ public class JwtService {
         return Optional.ofNullable(request.getHeader("Authorization"))
                 .filter(accessToken -> accessToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
+    }
+    /**
+     * STOMP 헤더에서 AccessToken 추출
+     */
+    public Optional<String> extractAccessToken(StompHeaderAccessor accessor) {
+        return Optional.ofNullable(accessor.getFirstNativeHeader("Authorization"))
+                .filter(accessToken -> accessToken.startsWith(BEARER))
+                .map(accessToken -> accessToken.replace(BEARER, ""));
     }
     /**
      * AccessToken에서 PersonalId 추출
