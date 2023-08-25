@@ -6,6 +6,7 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
@@ -81,7 +82,7 @@ public class ParticipantService {
     public Participant participateChannel(String channelLink) {
 
         Member member = memberService.findCurrentMember();
-        checkEmail(memberService.getVerifiedEmail(member));
+        checkEmail(member.getBaseRole());
 
         Channel channel = channelService.getChannel(channelLink);
 
@@ -315,11 +316,10 @@ public class ParticipantService {
     /**
      * 이메일이 인증되었는지 확인
      *
-     * @param verifiedEmail
+     * @param baseRole
      */
-    public void checkEmail(String verifiedEmail) {
-        if (!verifiedEmail.equals(USER.convertBaseRole()))
-            throw new UnauthorizedEmailException();
+    public void checkEmail(BaseRole baseRole) {
+        if (baseRole != USER) throw new UnauthorizedEmailException();
     }
 
 
@@ -372,8 +372,7 @@ public class ParticipantService {
     public Participant getParticipant(String channelLink) {
 
         Member member = memberService.findCurrentMember();
-        String verifiedEmail = memberService.getVerifiedEmail(member);
-        checkEmail(verifiedEmail);
+        checkEmail(member.getBaseRole());
 
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
                 .orElseThrow(() -> new InvalidParticipantAuthException());

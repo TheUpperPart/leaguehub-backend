@@ -16,11 +16,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findAllByMemberIdOrderByIndex(Long memberId);
 
-    @Query("select p from Participant p join fetch p.channel")
-    Optional<Participant> findParticipantByMemberIdAndChannel_ChannelLink(Long memberId, String channelLink);
+    @Query("select p from Participant p join fetch p.channel where p.channel.channelLink = :channelLink and p.member.id = :memberId")
+    Optional<Participant> findParticipantByMemberIdAndChannel_ChannelLink(@Param("memberId") Long memberId, @Param("channelLink") String channelLink);
 
-    @Query("select p from Participant p join fetch p.channel")
-    Optional<Participant> findParticipantByIdAndChannel_ChannelLink(Long participantId, String channelLink);
+    @Query("select p from Participant p join fetch p.channel where p.channel.channelLink = :channelLink and p.id = :participantId")
+    Optional<Participant> findParticipantByIdAndChannel_ChannelLink(@Param("participantId") Long participantId, @Param("channelLink") String channelLink);
 
     List<Participant> findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(String channelLink, Role role, RequestStatus requestStatus);
 

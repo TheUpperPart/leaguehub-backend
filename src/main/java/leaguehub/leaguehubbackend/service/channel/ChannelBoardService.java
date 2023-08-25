@@ -53,6 +53,8 @@ public class ChannelBoardService {
     @Transactional
     public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
 
+        channelService.getChannel(channelLink);
+
         List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_ChannelLinkOrderByIndex(channelLink);
 
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
