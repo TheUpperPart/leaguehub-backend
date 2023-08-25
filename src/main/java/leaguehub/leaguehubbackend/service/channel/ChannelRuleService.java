@@ -23,12 +23,12 @@ public class ChannelRuleService {
 
     @Transactional
     public ChannelRuleDto updateChannelRule(String channelLink, ChannelRuleDto channelRuleDto) {
-        Channel channel = channelService.getChannel(channelLink);
         Member member = memberService.findCurrentMember();
-        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+        Channel channel = participant.getChannel();
         channelService.checkRoleHost(participant.getRole());
 
-        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(channelLink);
+        ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_Id(channel.getId());
 
         Optional.ofNullable(channelRuleDto.getTier())
                 .ifPresent(tier -> {
@@ -55,7 +55,6 @@ public class ChannelRuleService {
 
     @Transactional
     public ChannelRuleDto getChannelRule(String channelLink) {
-        channelService.getChannel(channelLink);
         ChannelRule channelRule = channelRuleRepository.findChannelRuleByChannel_ChannelLink(channelLink);
 
         return new ChannelRuleDto().builder().tier(channelRule.getTier()).tierMax(channelRule.getTierMax())

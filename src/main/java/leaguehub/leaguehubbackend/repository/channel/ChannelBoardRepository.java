@@ -11,9 +11,13 @@ import java.util.Optional;
 
 public interface ChannelBoardRepository extends JpaRepository<ChannelBoard, Long> {
 
-    List<ChannelBoard> findAllByChannel_IdOrderByIndex(Long channelId);
+    List<ChannelBoard> findAllByChannel_ChannelLinkOrderByIndex(String channelLink);
+
+    Optional<ChannelBoard> findChannelBoardsByIdAndChannel_ChannelLink(Long boardId, String channelLink);
 
     Optional<ChannelBoard> findChannelBoardsByIdAndChannel_Id(Long boardId, Long channelId);
+
+    List<ChannelBoard> findAllByChannel_IdOrderByIndex(Long channelId);
 
     List<ChannelBoard> findAllByChannelAndIndexGreaterThan(Channel channel, int deleteIndex);
 
