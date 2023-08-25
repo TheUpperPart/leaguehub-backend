@@ -96,8 +96,7 @@ public class ChannelService {
     @Transactional
     public ChannelDto findChannel(String channelLink) {
 
-        Channel findChannel = channelRepository.findByChannelLink(channelLink)
-                .orElseThrow(ChannelNotFoundException::new);
+        Channel findChannel = getChannel(channelLink);
 
         ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
                 .realPlayer(findChannel.getRealPlayer()).gameCategory(findChannel.getGameCategory())

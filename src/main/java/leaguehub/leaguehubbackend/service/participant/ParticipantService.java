@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
@@ -56,13 +57,12 @@ public class ParticipantService {
 
 
     public int findParticipantPermission(String channelLink) {
-        Channel channel = channelService.getChannel(channelLink);
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         if(userDetails == null) return OBSERVER.getNum();
         Member member = memberService.validateMember(userDetails.getUsername());
 
 
-        Optional<Participant> findParticipant = participantRepository.findParticipantByMemberIdAndChannel_Id(member.getId(), channel.getId());
+        Optional<Participant> findParticipant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
 
         return findParticipant.map(participant -> participant.getRole().getNum())
                 .orElse(OBSERVER.getNum());
@@ -79,11 +79,9 @@ public class ParticipantService {
      * @return Participant participant
      */
     public Participant participateChannel(String channelLink) {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-
-        checkEmail(userDetails);
 
         Member member = memberService.findCurrentMember();
+        checkEmail(memberService.getVerifiedEmail(member));
 
         Channel channel = channelService.getChannel(channelLink);
 
@@ -126,8 +124,9 @@ public class ParticipantService {
      * @return
      */
     public List<ResponseStatusPlayerDto> loadObserverPlayerList(String channelLink) {
+        Participant findParticipant = getParticipant(channelLink);
 
-        checkRoleHost(channelLink);
+        checkRoleHost(findParticipant.getRole());
 
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, NO_REQUEST);
 
@@ -143,8 +142,8 @@ public class ParticipantService {
      * @return
      */
     public List<ResponseStatusPlayerDto> loadRequestStatusPlayerList(String channelLink) {
-
-        checkRoleHost(channelLink);
+        Participant findParticipant = getParticipant(channelLink);
+        checkRoleHost(findParticipant.getRole());
 
         List<Participant> findParticipants =
                 participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc
@@ -180,11 +179,12 @@ public class ParticipantService {
      * @param participantId
      */
     public void approveParticipantRequest(String channelLink, Long participantId) {
-        Channel channel = channelService.getChannel(channelLink);
 
-        checkRoleHost(channelLink);
+        Participant participant = getParticipant(channelLink);
+        checkRoleHost(participant.getRole());
+        Channel channel = participant.getChannel();
 
-        checkRealPlayerCount(channelLink);
+        checkRealPlayerCount(channel);
 
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
@@ -204,12 +204,12 @@ public class ParticipantService {
      * @param participantId
      */
     public void rejectedParticipantRequest(String channelLink, Long participantId) {
+        Participant participant = getParticipant(channelLink);
+        checkRoleHost(participant.getRole());
 
-        checkRoleHost(channelLink);
+        Participant findParticipant = getFindParticipant(channelLink, participantId);
 
-        Participant participant = getFindParticipant(channelLink, participantId);
-
-        participant.rejectParticipantRequest();
+        findParticipant.rejectParticipantRequest();
     }
 
     /**
@@ -219,11 +219,12 @@ public class ParticipantService {
      * @param participantId
      */
     public void updateHostRole(String channelLink, Long participantId) {
+        Participant participant = getParticipant(channelLink);
+        checkRoleHost(participant.getRole());
 
-        checkRoleHost(channelLink);
-        Participant participant = getFindParticipant(channelLink, participantId);
+        Participant findParticipant = getFindParticipant(channelLink, participantId);
 
-        participant.updateHostRole();
+        findParticipant.updateHostRole();
     }
 
     /**
@@ -304,20 +305,8 @@ public class ParticipantService {
     }
 
 
-    /**
-     * 해당채널의 관리자가 맞는지 확인
-     *
-     * @param channelLink
-     */
-    public void checkRoleHost(String channelLink) {
-        Participant participant = getParticipant(channelLink);
 
-        channelService.checkRoleHost(participant.getRole());
-    }
-
-    private void checkRealPlayerCount(String channelLink) {
-        Channel channel = channelService.getChannel(channelLink);
-
+    private void checkRealPlayerCount(Channel channel) {
         if (channel.getRealPlayer() >= channel.getMaxPlayer())
             throw new ParticipantRealPlayerIsMaxException();
     }
@@ -326,10 +315,10 @@ public class ParticipantService {
     /**
      * 이메일이 인증되었는지 확인
      *
-     * @param userDetails
+     * @param verifiedEmail
      */
-    public void checkEmail(UserDetails userDetails) {
-        if (!userDetails.getAuthorities().toString().equals(USER.convertBaseRole()))
+    public void checkEmail(String verifiedEmail) {
+        if (!verifiedEmail.equals(USER.convertBaseRole()))
             throw new UnauthorizedEmailException();
     }
 
@@ -381,17 +370,10 @@ public class ParticipantService {
      * @return
      */
     public Participant getParticipant(String channelLink) {
-        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
 
-        checkEmail(userDetails);
-
-        if (userDetails == null) {
-            throw new ParticipantInvalidLoginException();
-        }
-
-        String personalId = userDetails.getUsername();
-
-        Member member = memberService.validateMember(personalId);
+        Member member = memberService.findCurrentMember();
+        String verifiedEmail = memberService.getVerifiedEmail(member);
+        checkEmail(verifiedEmail);
 
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
                 .orElseThrow(() -> new InvalidParticipantAuthException());
@@ -423,11 +405,12 @@ public class ParticipantService {
     public void checkDuplicateNickname(String gameId, String channelLink) {
         List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
 
-        for (Participant user : participantList) {
-            if (Objects.equals(user.getGameId(), gameId))
-                throw new ParticipantDuplicatedGameIdException();
-        }
+        boolean checkDuplicate = participantList.stream()
+                .anyMatch(participant -> participant.getGameId().equals(gameId));
 
+        if (checkDuplicate) {
+            throw new ParticipantDuplicatedGameIdException();
+        }
     }
 
     public void duplicateParticipant(Member member, String channelLink) {
@@ -562,8 +545,10 @@ public class ParticipantService {
         return userGameInfoDto;
     }
 
-
-
-
+    private void checkRoleHost(Role role) {
+        if (role != Role.HOST) {
+            throw new InvalidParticipantAuthException();
+        }
+    }
 
 }
