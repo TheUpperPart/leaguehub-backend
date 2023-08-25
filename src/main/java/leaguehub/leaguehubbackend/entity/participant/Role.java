@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.entity.participant;
 
 public enum Role {
-    HOST(0), MANAGER(1), PLAYER(2), OBSERVER(3);
+    HOST(0), PLAYER(1), OBSERVER(2);
 
     private final int num;
 
