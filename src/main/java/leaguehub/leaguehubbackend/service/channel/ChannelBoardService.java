@@ -29,8 +29,8 @@ public class ChannelBoardService {
     public ChannelBoardLoadDto createChannelBoard(String channelLink, ChannelBoardDto request) {
 
         Member member = memberService.findCurrentMember();
-        Channel channel = channelService.getChannel(channelLink);
-        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+        Channel channel = participant.getChannel();
         channelService.checkRoleHost(participant.getRole());
 
         Integer maxIndexByChannel = channelBoardRepository.findMaxIndexByChannel(channel);
@@ -52,9 +52,10 @@ public class ChannelBoardService {
      */
     @Transactional
     public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
-        Channel channel = channelService.getChannel(channelLink);
 
-        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_IdOrderByIndex(channel.getId());
+        channelService.getChannel(channelLink);
+
+        List<ChannelBoard> channelBoards = channelBoardRepository.findAllByChannel_ChannelLinkOrderByIndex(channelLink);
 
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoards.stream()
                 .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex()))
@@ -65,9 +66,7 @@ public class ChannelBoardService {
 
     @Transactional
     public ChannelBoardDto getChannelBoard(String channelLink, Long boardId) {
-        Channel channel = channelService.getChannel(channelLink);
-        ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
-
+        ChannelBoard channelBoard = validateChannelBoard(boardId, channelLink);
 
         return new ChannelBoardDto(channelBoard.getTitle(), channelBoard.getContent());
     }
@@ -77,8 +76,9 @@ public class ChannelBoardService {
 
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.getChannel(channelLink);
-        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+
+        Channel channel = participant.getChannel();
         channelService.checkRoleHost(participant.getRole());
 
         ChannelBoard channelBoard = validateChannelBoard(boardId, channel.getId());
@@ -91,8 +91,8 @@ public class ChannelBoardService {
     public void deleteChannelBoard(String channelLink, Long boardId) {
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.getChannel(channelLink);
-        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+        Channel channel = participant.getChannel();
 
         channelService.checkRoleHost(participant.getRole());
 
@@ -110,8 +110,9 @@ public class ChannelBoardService {
     public void updateChannelBoardIndex(String channelLink, List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
         Member member = memberService.findCurrentMember();
 
-        Channel channel = channelService.getChannel(channelLink);
-        Participant participant = channelService.getParticipant(channel.getId(), member.getId());
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+
+        Channel channel = participant.getChannel();
 
         channelService.checkRoleHost(participant.getRole());
 
@@ -123,6 +124,11 @@ public class ChannelBoardService {
                     .findFirst()
                     .ifPresent(channelBoard -> channelBoard.updateIndex(channelBoardLoadDto.getBoardIndex()));
         });
+    }
+
+    public ChannelBoard validateChannelBoard(Long channelBoardId, String channelLink) {
+        return channelBoardRepository.findChannelBoardsByIdAndChannel_ChannelLink(channelBoardId, channelLink)
+                .orElseThrow(() -> new ChannelBoardNotFoundException());
     }
 
     public ChannelBoard validateChannelBoard(Long channelBoardId, Long channelId) {

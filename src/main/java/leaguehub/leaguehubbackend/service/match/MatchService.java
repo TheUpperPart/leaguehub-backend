@@ -74,22 +74,21 @@ public class MatchService {
 
     /**
      * 경기 첫 배정
+     *
      * @param channelLink
      * @param matchRound
      */
     public void matchAssignment(String channelLink, Integer matchRound) {
-        Channel findChannel = channelRepository.findByChannelLink(channelLink)
-                .orElseThrow(() -> new ChannelNotFoundException());
-
         Member member = memberService.findCurrentMember();
-        Participant participant = getParticipant(findChannel.getId(), member.getId());
+        Participant participant = getParticipant(member.getId(), channelLink);
+        Channel channel = participant.getChannel();
         checkRoleHost(participant.getRole());
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
-        assignSubMatches(findChannel, matchList, playerList);
+        assignSubMatches(channel, matchList, playerList);
     }
 
 
@@ -133,8 +132,8 @@ public class MatchService {
         return currentPlayers / 2;
     }
 
-    private Participant getParticipant(Long channelId, Long memberId) {
-        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
+    private Participant getParticipant(Long memberId, String channelLink) {
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(memberId, channelLink)
                 .orElseThrow(() -> new InvalidParticipantAuthException());
         return participant;
     }
@@ -193,17 +192,18 @@ public class MatchService {
     }
 
     private List<MatchPlayerInfo> createMatchPlayerInfoList(List<MatchPlayer> playerList) {
-        List<MatchPlayerInfo> matchPlayerInfoList = new ArrayList<>();
-
-        for (MatchPlayer matchPlayer : playerList) {
-            MatchPlayerInfo matchPlayerInfo = new MatchPlayerInfo();
-            matchPlayerInfo.setNickName(matchPlayer.getParticipant().getNickname());
-            matchPlayerInfo.setGameTier(matchPlayer.getParticipant().getGameTier());
-            matchPlayerInfo.setPlayerStatus(matchPlayer.getPlayerStatus());
-            matchPlayerInfo.setScore(matchPlayer.getPlayerScore());
-            matchPlayerInfoList.add(matchPlayerInfo);
-        }
+        List<MatchPlayerInfo> matchPlayerInfoList = playerList.stream()
+                .map(matchPlayer -> {
+                    MatchPlayerInfo matchPlayerInfo = new MatchPlayerInfo();
+                    matchPlayerInfo.setNickName(matchPlayer.getParticipant().getNickname());
+                    matchPlayerInfo.setGameTier(matchPlayer.getParticipant().getGameTier());
+                    matchPlayerInfo.setPlayerStatus(matchPlayer.getPlayerStatus());
+                    matchPlayerInfo.setScore(matchPlayer.getPlayerScore());
+                    return matchPlayerInfo;
+                })
+                .collect(Collectors.toList());
 
         return matchPlayerInfoList;
+
     }
 }

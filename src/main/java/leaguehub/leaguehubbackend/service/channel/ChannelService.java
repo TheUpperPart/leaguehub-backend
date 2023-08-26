@@ -57,7 +57,7 @@ public class ChannelService {
 
         channelRepository.save(channel);
 
-        ChannelRule channelRule = ChannelRule.createChannelRule(channel,  createChannelDto.getTier(), createChannelDto.getTierMax(),
+        ChannelRule channelRule = ChannelRule.createChannelRule(channel, createChannelDto.getTier(), createChannelDto.getTierMax(),
                 createChannelDto.getTierMin(),
                 createChannelDto.getPlayCount(),
                 createChannelDto.getPlayCountMin());
@@ -96,8 +96,7 @@ public class ChannelService {
     @Transactional
     public ChannelDto findChannel(String channelLink) {
 
-        Channel findChannel = channelRepository.findByChannelLink(channelLink)
-                .orElseThrow(ChannelNotFoundException::new);
+        Channel findChannel = getChannel(channelLink);
 
         ChannelDto channelDto = ChannelDto.builder().title(findChannel.getTitle())
                 .realPlayer(findChannel.getRealPlayer()).gameCategory(findChannel.getGameCategory())
@@ -109,8 +108,8 @@ public class ChannelService {
     @Transactional
     public void updateChannel(String channelLink, UpdateChannelDto updateChannelDto) {
         Member member = memberService.findCurrentMember();
-        Channel channel = getChannel(channelLink);
-        Participant participant = getParticipant(channel.getId(), member.getId());
+        Participant participant = getParticipant(member.getId(), channelLink);
+        Channel channel = participant.getChannel();
         checkRoleHost(participant.getRole());
 
 
@@ -119,6 +118,7 @@ public class ChannelService {
         Optional.ofNullable(updateChannelDto.getChannelImageUrl()).ifPresent(channel::updateChannelImageUrl);
     }
 
+
     public Channel getChannel(String channelLink) {
         Channel channel = channelRepository.findByChannelLink(channelLink)
                 .orElseThrow(ChannelNotFoundException::new);
@@ -126,10 +126,10 @@ public class ChannelService {
     }
 
 
-    public Participant getParticipant(Long channelId, Long memberId) {
-        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_Id(memberId, channelId)
+    public Participant getParticipant(Long memberId, String channelLink) {
+        return participantRepository
+                .findParticipantByMemberIdAndChannel_ChannelLink(memberId, channelLink)
                 .orElseThrow(() -> new InvalidParticipantAuthException());
-        return participant;
     }
 
     public void checkRoleHost(Role role) {
