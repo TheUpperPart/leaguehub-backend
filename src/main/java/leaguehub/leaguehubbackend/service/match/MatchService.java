@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
+import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
@@ -69,7 +70,10 @@ public class MatchService {
         List<Integer> roundList = calculateRoundList(maxPlayers);
 
         MatchRoundListDto roundListDto = new MatchRoundListDto();
+        roundListDto.setLiveRound(0);
         roundListDto.setRoundList(roundList);
+
+        findLiveRound(channelLink, roundList, roundListDto);
 
         return roundListDto;
     }
@@ -127,6 +131,17 @@ public class MatchService {
         }
 
         return roundList;
+    }
+
+    private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
+        roundList.forEach(round -> {
+                    List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, round);
+                    matchList.stream()
+                            .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
+                            .findFirst()
+                            .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
+                }
+        );
     }
 
     private int createSubMatchesForRound(Channel channel, int maxPlayers) {

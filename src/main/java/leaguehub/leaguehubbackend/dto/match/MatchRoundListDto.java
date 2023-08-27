@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class MatchRoundListDto {
 
+    private Integer liveRound;
 
-    List<Integer> roundList;
+    private List<Integer> roundList;
 }
