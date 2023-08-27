@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
+import leaguehub.leaguehubbackend.dto.match.MatchRoundInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
@@ -92,14 +94,22 @@ public class MatchService {
     }
 
 
-    public List<MatchInfoDto> loadMatchPlayerList(String channelLink, Integer matchRound) {
+    public MatchRoundInfoDto loadMatchPlayerList(String channelLink, Integer matchRound) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
 
         List<MatchInfoDto> matchInfoDtoList = matchList.stream()
                 .map(this::createMatchInfoDto)
                 .collect(Collectors.toList());
 
-        return matchInfoDtoList;
+        MatchRoundInfoDto matchRoundInfoDto = new MatchRoundInfoDto();
+
+        findMyRoundName(participant, matchList, matchRoundInfoDto);
+
+        matchRoundInfoDto.setMatchInfoDtoList(matchInfoDtoList);
+        return matchRoundInfoDto;
     }
 
     private Channel getChannel(String channelLink) {
@@ -195,7 +205,7 @@ public class MatchService {
         List<MatchPlayerInfo> matchPlayerInfoList = playerList.stream()
                 .map(matchPlayer -> {
                     MatchPlayerInfo matchPlayerInfo = new MatchPlayerInfo();
-                    matchPlayerInfo.setNickName(matchPlayer.getParticipant().getNickname());
+                    matchPlayerInfo.setGameId(matchPlayer.getParticipant().getGameId());
                     matchPlayerInfo.setGameTier(matchPlayer.getParticipant().getGameTier());
                     matchPlayerInfo.setPlayerStatus(matchPlayer.getPlayerStatus());
                     matchPlayerInfo.setScore(matchPlayer.getPlayerScore());
@@ -205,5 +215,19 @@ public class MatchService {
 
         return matchPlayerInfoList;
 
+    }
+
+    private void findMyRoundName(Participant participant, List<Match> matchList, MatchRoundInfoDto matchRoundInfoDto) {
+        matchRoundInfoDto.setMyGameId(NO_DATA.getData());
+
+        if (!participant.getGameId().equalsIgnoreCase(NO_DATA.getData())) {
+            matchList.forEach(match -> {
+                List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+                playerList.stream()
+                        .filter(player -> participant.getGameId().equalsIgnoreCase(player.getParticipant().getGameId()))
+                        .findFirst()
+                        .ifPresent(player -> matchRoundInfoDto.setMyGameId(participant.getGameId()));
+            });
+        }
     }
 }
