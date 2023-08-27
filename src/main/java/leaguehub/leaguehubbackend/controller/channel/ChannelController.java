@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.controller.channel;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -91,5 +92,22 @@ public class ChannelController {
         channelService.updateChannel(channelLink, updateChannelDto);
 
         return new ResponseEntity("Channel successfully updated", OK);
+    }
+
+    @Operation(summary = "채널 상태 업데이트  - 준비중(PREPARING, 0), 진행중(PROCEEDING, 1), 끝남(FINISH, 2)")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "status", description = "채널 진행 상태 변경 쿼리 파라미터", example = "준비중(0), 진행중(1), 끝남(2)")
+    }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PutMapping("/channel/{channelLink}")
+    public ResponseEntity updateChannelStatus(@PathVariable("channelLink") String channelLink,
+                                              @RequestParam("status") Integer status) {
+        channelService.updateChannelStatus(channelLink, status);
+        return new ResponseEntity("Channel Status Successfully updated", OK);
     }
 }
