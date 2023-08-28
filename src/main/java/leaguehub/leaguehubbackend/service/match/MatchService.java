@@ -23,9 +23,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
@@ -51,9 +53,11 @@ public class MatchService {
      */
     public void createSubMatches(Channel channel, int maxPlayers) {
         int currentPlayers = maxPlayers;
+        int matchRoundIndex = 1;
 
         while (currentPlayers >= MIN_PLAYERS_FOR_SUB_MATCH) {
-            currentPlayers = createSubMatchesForRound(channel, currentPlayers);
+            currentPlayers = createSubMatchesForRound(channel, currentPlayers, matchRoundIndex);
+            matchRoundIndex++;
         }
     }
 
@@ -61,7 +65,7 @@ public class MatchService {
      * 해당 채널의 매치 라운드를 보여줌(64, 32, 16, 8)
      *
      * @param channelLink
-     * @return
+     * @return 2 4 8 16 32 64
      */
     public MatchRoundListDto getRoundList(String channelLink) {
         Channel findChannel = getChannel(channelLink);
@@ -123,14 +127,17 @@ public class MatchService {
     }
 
     private List<Integer> calculateRoundList(int maxPlayers) {
-        List<Integer> roundList = new ArrayList<>();
+        List<Integer> defaultroundList = Arrays.asList(0, 8, 16, 32, 64, 128, 256);
 
-        while (maxPlayers >= MIN_PLAYERS_FOR_SUB_MATCH) {
-            roundList.add(maxPlayers);
-            maxPlayers /= 2;
+        int roundIndex = defaultroundList.indexOf(maxPlayers);
+
+        if (roundIndex == -1) {
+            throw new ChannelNotFoundException();// 에러 처리 시 빈 리스트 반환
         }
 
-        return roundList;
+        return IntStream.rangeClosed(1, roundIndex)
+                .boxed()
+                .collect(Collectors.toList());
     }
 
     private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
@@ -144,13 +151,13 @@ public class MatchService {
         );
     }
 
-    private int createSubMatchesForRound(Channel channel, int maxPlayers) {
+    private int createSubMatchesForRound(Channel channel, int maxPlayers, int matchRoundIndex) {
         int currentPlayers = maxPlayers;
         int tableCount = currentPlayers / MIN_PLAYERS_FOR_SUB_MATCH;
 
         for (int tableIndex = 1; tableIndex <= tableCount; tableIndex++) {
             String groupName = "Group " + (char) (64 + tableIndex);
-            Match match = Match.createMatch(currentPlayers, channel, groupName);
+            Match match = Match.createMatch(matchRoundIndex, channel, groupName);
             matchRepository.save(match);
         }
 

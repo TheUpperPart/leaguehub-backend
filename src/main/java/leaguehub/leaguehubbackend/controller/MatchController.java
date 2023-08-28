@@ -72,7 +72,7 @@ public class MatchController {
     @Operation(summary = "해당 채널의 경기 첫 배정")
     @Parameters(value = {
             @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "matchRound", description = "배정 싶은 매치의 라운드(64강, 32강)", example = "64, 32, 16, 8")
+            @Parameter(name = "matchRound", description = "배정 싶은 매치의 라운드(1, 2 라운드)", example = "1, 2, 3, 4")
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "참가자들이 첫 매치에 배정되었습니다."),
@@ -86,10 +86,10 @@ public class MatchController {
         return new ResponseEntity<>("참가자들이 첫 매치에 배정되었습니다.", HttpStatus.OK);
     }
 
-    @Operation(summary = "해당 채널의 (32, 16, 8)강에 대한 매치 조회")
+    @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 매치 조회")
     @Parameters(value = {
             @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "matchRound", description = "조회하고 싶은 매치의 라운드(64강, 32강)", example = "64, 32, 16, 8")
+            @Parameter(name = "matchRound", description = "조회하고 싶은 매치의 라운드(1, 2, 3)", example = "1, 2, 3, 4")
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "매치가 조회되었습니다. - 배열로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchInfoDto.class))),
