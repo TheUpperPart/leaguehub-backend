@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
@@ -154,4 +155,11 @@ public class ChannelService {
         );
     }
 
+    public void updateChannelStatus(String channelLink, Integer status) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+        checkRoleHost(participant.getRole());
+
+        participant.getChannel().updateChannelStatus(ChannelStatus.convertStatus(status));
+    }
 }

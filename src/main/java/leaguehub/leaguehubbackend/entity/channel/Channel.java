@@ -94,4 +94,7 @@ public class Channel extends BaseTimeEntity {
         this.channelImageUrl = channelImageUrl;
     }
 
+    public void updateChannelStatus(ChannelStatus channelStatus) {
+        this.channelStatus = channelStatus;
+    }
 }
