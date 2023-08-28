@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class MatchPlayerInfo {
 
-    @Schema(description = "플레이어의 채널 닉네임", example = "채널안의 닉네임")
-    private String nickName;
+    @Schema(description = "플레이어의 게임 닉네임", example = "돈절래")
+    private String gameId;
 
     @Schema(description = "플레이어의 게임 티어", example = "Diamond II")
     private String gameTier;

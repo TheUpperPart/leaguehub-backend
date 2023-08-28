@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
-import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
+import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchRankService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
@@ -101,7 +98,7 @@ public class MatchController {
     @GetMapping("/match/{channelLink}/{matchRound}")
     public ResponseEntity loadMatchInfo(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound){
 
-        List<MatchInfoDto> matchInfoDtoList = matchService.loadMatchPlayerList(channelLink, matchRound);
+        MatchRoundInfoDto matchInfoDtoList = matchService.loadMatchPlayerList(channelLink, matchRound);
 
         return new ResponseEntity<>(matchInfoDtoList, HttpStatus.OK);
     }
