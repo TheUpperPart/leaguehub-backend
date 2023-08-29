@@ -104,4 +104,12 @@ public class MatchController {
     }
 
 
+
+    public ResponseEntity updateMatchPlayerPlacement(@RequestBody MatchResultUpdateDto matchResultUpdateDto) {
+        matchRankService.updateMatchPlayerPlacement(matchResultUpdateDto);
+
+        return new ResponseEntity<>("등수가 성공적으로 업데이트 되었습니다.", HttpStatus.OK);
+    }
+
+
 }

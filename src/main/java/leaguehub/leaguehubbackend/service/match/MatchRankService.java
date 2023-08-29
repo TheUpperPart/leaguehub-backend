@@ -2,13 +2,24 @@ package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
+import leaguehub.leaguehubbackend.dto.match.MatchResultUpdateDto;
+import leaguehub.leaguehubbackend.entity.match.Match;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchRank;
 import leaguehub.leaguehubbackend.entity.match.MatchResult;
+import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
+import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
+import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchResultRepository;
+import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
@@ -17,6 +28,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -33,10 +45,13 @@ public class MatchRankService {
     private final MatchResultService matchResultService;
     private final MatchRankRepository matchRankRepository;
     private final MatchResultRepository matchResultRepository;
+    private final MemberService memberService;
     @Value("${riot-api-key-1}")
     private String riot_api_key_1;
     @Value("${riot-api-key-2}")
     private String riot_api_key_2;
+    private final MatchRepository matchRepository;
+
 
     /**
      * @param name 게임 닉네임
@@ -183,5 +198,50 @@ public class MatchRankService {
             dtoList.add(dto);
         }
         return dtoList;
+    }
+
+    @Transactional
+    public void updateMatchPlayerPlacement(MatchResultUpdateDto matchResultUpdateDto) {
+        Member member = memberService.findCurrentMember();
+
+        Match match = getMatch(matchResultUpdateDto.getMatchId());
+
+        MatchPlayer findMatchPlayer = getMatchPlayer(matchResultUpdateDto, match);
+
+        checkAuthMatchPlayerUpdate(member, findMatchPlayer);
+
+        MatchRank findMatchRank = getMatchRank(match, findMatchPlayer);
+
+        findMatchRank.updateMatchRank(matchResultUpdateDto.getPlacement());
+    }
+
+    private void checkAuthMatchPlayerUpdate(Member member, MatchPlayer findMatchPlayer) {
+        if(findMatchPlayer.getParticipant().getMember().getId() != member.getId()) {
+            if(findMatchPlayer.getParticipant().getRole() != Role.HOST) {
+                throw new InvalidParticipantAuthException();
+            }
+        }
+    }
+
+    private MatchRank getMatchRank(Match match, MatchPlayer findMatchPlayer) {
+        MatchRank findMatchRank = match.getMatchRankList().stream().filter(matchRank ->
+                        (matchRank.getMatch().getId() == match.getId())
+                                && (matchRank.getMatchPlayer().getId() == findMatchPlayer.getId()))
+                .findFirst()
+                .orElseThrow(() -> new MatchResultIdNotFoundException());
+        return findMatchRank;
+    }
+
+    private MatchPlayer getMatchPlayer(MatchResultUpdateDto matchResultUpdateDto, Match match) {
+        MatchPlayer findMatchPlayer = match.getMatchPlayerList().stream()
+                .filter(matchPlayer -> matchPlayer.getId() == matchResultUpdateDto.getMatchPlayerId())
+                .findFirst()
+                .orElseThrow(() -> new MatchPlayerNotFoundException());
+        return findMatchPlayer;
+    }
+
+    private Match getMatch(Long matchId) {
+        return matchRepository.findMatchAndMatchPlayerAndMatchRank(matchId)
+                .orElseThrow(() -> new MatchNotFoundException());
     }
 }
