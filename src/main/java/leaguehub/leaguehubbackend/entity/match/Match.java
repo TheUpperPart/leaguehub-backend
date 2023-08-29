@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -40,6 +42,12 @@ public class Match extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
+
+    @OneToMany(fetch = LAZY, mappedBy = "match")
+    List<MatchPlayer> matchPlayerList = new ArrayList<>();
+
+    @OneToMany(fetch = LAZY, mappedBy = "match")
+    List<MatchRank> matchRankList = new ArrayList<>();
 
     @Builder
     public Match(MatchStatus matchStatus, Integer matchRound, String matchName, String matchPasswd) {
