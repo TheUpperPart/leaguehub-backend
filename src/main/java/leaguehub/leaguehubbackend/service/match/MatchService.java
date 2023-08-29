@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.ParticipantStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
+import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
@@ -87,14 +89,13 @@ public class MatchService {
     public void matchAssignment(String channelLink, Integer matchRound) {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
-        Channel channel = participant.getChannel();
         checkRoleHost(participant.getRole());
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
-        assignSubMatches(channel, matchList, playerList);
+        assignSubMatches(matchList, playerList);
     }
 
 
@@ -171,16 +172,16 @@ public class MatchService {
 
     private List<Participant> getParticipantList(String channelLink, Integer matchRound) {
         List<Participant> playerList = participantRepository
-                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
+                .findAllByChannel_ChannelLinkAndRoleAndParticipantStatus(channelLink, PLAYER, PROGRESS);
 
         if (playerList.size() < matchRound * 0.75) throw new MatchNotEnoughPlayerException();
         return playerList;
     }
 
-    private void assignSubMatches(Channel channel, List<Match> matchList, List<Participant> playerList) {
+    private void assignSubMatches(List<Match> matchList, List<Participant> playerList) {
         Collections.shuffle(playerList);
 
-        int totalPlayers = channel.getRealPlayer();
+        int totalPlayers = playerList.size();
         int matchCount = matchList.size();
         int playersPerMatch = totalPlayers / matchCount;
         int remainingPlayers = totalPlayers % matchCount;
