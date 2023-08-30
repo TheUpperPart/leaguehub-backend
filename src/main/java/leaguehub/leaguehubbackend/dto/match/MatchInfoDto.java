@@ -12,8 +12,8 @@ public class MatchInfoDto {
     @Schema(description = "매치 이름", example = "Group A")
     private String matchName;
 
-    @Schema(description = "해당 매치의 상세보기 or 체크인하기 위한 매치 링크", example = "adpdpa123")
-    private String matchLink;
+    @Schema(description = "해당 매치의 상세보기 or 체크인하기 위한 매치 링크", example = "1")
+    private Long matchId;
 
     @Schema(description = "매치 상태", example = "대기 | 경기 중 | 경기 종료")
     private MatchStatus matchStatus;

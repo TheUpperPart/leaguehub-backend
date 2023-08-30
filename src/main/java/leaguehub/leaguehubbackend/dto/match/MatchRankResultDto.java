@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class MatchRankResultDto {
 
-    private String name;
+    private String gameId;
 
-    private String placement;
+    private Integer placement;
 
 }

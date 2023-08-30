@@ -1,6 +1,5 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;

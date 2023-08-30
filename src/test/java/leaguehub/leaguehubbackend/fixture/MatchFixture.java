@@ -6,18 +6,18 @@ public class MatchFixture {
 
 
 
-    public static MatchResponseDto createMatchResponseDto(String matchLink){
+    public static MatchResponseDto createMatchResponseDto(Long matchId){
         MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchLink(matchLink);
-        matchResponseDto.setNickName("서초임");
+        matchResponseDto.setMatchId(matchId);
+        matchResponseDto.setGameId("서초임");
 
         return matchResponseDto;
     }
 
-    public static MatchResponseDto createFailResponseDto(String matchLink){
+    public static MatchResponseDto createFailResponseDto(Long matchId){
         MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchLink(matchLink);
-        matchResponseDto.setNickName("savokscmo");
+        matchResponseDto.setMatchId(matchId);
+        matchResponseDto.setGameId("savokscmo");
 
         return matchResponseDto;
     }
