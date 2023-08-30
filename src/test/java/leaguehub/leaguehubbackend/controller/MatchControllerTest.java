@@ -8,7 +8,7 @@ import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
-import leaguehub.leaguehubbackend.service.match.MatchRankService;
+import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class MatchControllerTest {
     MatchRepository matchRepository;
 
     @Autowired
-    MatchRankService matchRankService;
+    MatchPlayerService matchPlayerService;
 
     @Autowired
     ObjectMapper mapper;
@@ -53,8 +53,8 @@ public class MatchControllerTest {
         matchRepository.save(match);
 
         MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchLink(match.getMatchLink());
-        matchResponseDto.setNickName("서초임");
+        matchResponseDto.setMatchId(match.getId());
+        matchResponseDto.setGameId("서초임");
         String dtoToJson = mapper.writeValueAsString(matchResponseDto);
         //when
         mockMvc.perform(post("/api/match/matchResult")
@@ -74,8 +74,8 @@ public class MatchControllerTest {
         matchRepository.save(match);
 
         MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchLink(match.getMatchLink());
-        matchResponseDto.setNickName("savokscmo");
+        matchResponseDto.setMatchId(match.getId());
+        matchResponseDto.setGameId("savokscmo");
         String dtoToJson = mapper.writeValueAsString(matchResponseDto);
         //when
         mockMvc.perform(post("/api/match/matchResult")
