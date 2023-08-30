@@ -10,7 +10,6 @@ import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.ParticipantStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
@@ -23,7 +22,6 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
-import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
-import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
+import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.PROGRESS;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
@@ -211,7 +208,7 @@ public class MatchService {
     private MatchInfoDto createMatchInfoDto(Match match) {
         MatchInfoDto matchInfoDto = new MatchInfoDto();
         matchInfoDto.setMatchName(match.getMatchName());
-        matchInfoDto.setMatchLink(match.getMatchLink());
+        matchInfoDto.setMatchId(match.getId());
         matchInfoDto.setMatchStatus(match.getMatchStatus());
         matchInfoDto.setMatchRound(match.getMatchRound());
         matchInfoDto.setMatchRoundCount(match.getRoundRealCount());

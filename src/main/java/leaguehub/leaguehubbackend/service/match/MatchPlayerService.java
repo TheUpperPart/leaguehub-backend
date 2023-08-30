@@ -2,13 +2,9 @@ package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
-import leaguehub.leaguehubbackend.entity.match.MatchRank;
-import leaguehub.leaguehubbackend.entity.match.MatchResult;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
-import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
@@ -17,6 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -26,19 +23,19 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class MatchRankService {
+@Transactional
+public class MatchPlayerService {
 
     private final WebClient webClient;
     private final JSONParser jsonParser;
-    private final MatchResultService matchResultService;
-    private final MatchRankRepository matchRankRepository;
-    private final MatchResultRepository matchResultRepository;
     @Value("${riot-api-key-1}")
     private String riot_api_key_1;
     @Value("${riot-api-key-2}")
     private String riot_api_key_2;
 
     /**
+     * 소환사의 라이엇 puuid를 얻는 메서드
+     *
      * @param name 게임 닉네임
      * @return puuid
      */
@@ -60,7 +57,7 @@ public class MatchRankService {
     }
 
     /**
-     * puuid로 매치 id 검색
+     * 게임 Id로 얻은 puuid로 라이엇 서버에 고유 매치 Id 검색
      *
      * @param puuid
      * @return
@@ -103,13 +100,13 @@ public class MatchRankService {
 
 
     @SneakyThrows
-    public List<MatchRankResultDto> setPlacement(JSONArray participantList, MatchResult matchResult) {
+    public List<MatchRankResultDto> setPlacement(JSONArray participantList) {
         List<MatchRankResultDto> dtoList = new ArrayList<>();
 
 
         for (int i = 0; i < 8; i++) {
             JSONObject participants = (JSONObject) jsonParser.parse(participantList.get(i).toString());
-            String placement = participants.get("placement").toString();
+            Integer placement = Integer.parseInt(participants.get("placement").toString());
             String parti1puuid = participants.get("puuid").toString();
 
 
@@ -120,15 +117,11 @@ public class MatchRankService {
                     .bodyToMono(JSONObject.class)
                     .block().get("name").toString();
 
-            MatchRankResultDto dto = new MatchRankResultDto();
-            dto.setName(summonerName);
-            dto.setPlacement(placement);
+            MatchRankResultDto matchRankResultDto = new MatchRankResultDto();
+            matchRankResultDto.setGameId(summonerName);
+            matchRankResultDto.setPlacement(placement);
 
-            dtoList.add(dto);
-
-            MatchRank matchRank = MatchRank.createMatchRank(summonerName, placement, matchResult);
-            matchRankRepository.save(matchRank);
-
+            dtoList.add(matchRankResultDto);
 
         }
         return dtoList;
@@ -143,45 +136,18 @@ public class MatchRankService {
      */
     @SneakyThrows
     public List<MatchRankResultDto> setMatchRank(MatchResponseDto matchResponseDto) {
-        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
+        String puuid = getSummonerPuuid(matchResponseDto.getGameId());
         String matchId = getMatch(puuid);
 
         JSONObject matchDetailJSON = responseMatchDetail(matchId);
-        //uuid를 이용하여 찾는다 dto에 uuid와 matchId만 필요함
-        MatchResult matchResult = matchResultService.saveMatchResult(
-                matchResponseDto.getMatchLink(),
-                matchId);
 
 
         JSONObject info = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
         JSONArray participantList = (JSONArray) jsonParser.parse(info.get("participants").toString());
 
-        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList, matchResult);
+        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList);
 
 
         return matchRankResultDtoList;
-    }
-
-    /**
-     * 해당 경기 순위 반환
-     *
-     * @param matchCode
-     * @return MatchRankResultDto
-     */
-    public List<MatchRankResultDto> getMatchDetail(String matchCode) {
-
-        List<MatchRankResultDto> dtoList = new ArrayList<>();
-
-        Long id = matchResultRepository.findByMatchCode(matchCode).getId();
-
-        List<MatchRank> list = matchRankRepository.findByMatchResult_Id(id);
-
-        for (MatchRank matchRank : list) {
-            MatchRankResultDto dto = new MatchRankResultDto();
-            dto.setName(matchRank.getParticipant());
-            dto.setPlacement(matchRank.getPlacement());
-            dtoList.add(dto);
-        }
-        return dtoList;
     }
 }

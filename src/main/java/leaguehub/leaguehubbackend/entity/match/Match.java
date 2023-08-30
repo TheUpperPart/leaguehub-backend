@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
@@ -26,8 +24,6 @@ public class Match extends BaseTimeEntity {
     private MatchStatus matchStatus;
 
     private Integer matchRound;
-
-    private String matchLink;
 
     private String matchName;
 
@@ -51,10 +47,8 @@ public class Match extends BaseTimeEntity {
 
     public static Match createMatch(Integer matchRound, Channel channel, String matchName) {
         Match match = new Match();
-        String uuid = UUID.randomUUID().toString();
         match.matchStatus = MatchStatus.READY;
         match.matchRound = matchRound;
-        match.matchLink = uuid.substring(16);
         match.matchName = matchName;
         match.matchPasswd = GlobalConstant.NO_DATA.getData();
         match.roundMaxCount = 1;
