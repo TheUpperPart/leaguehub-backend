@@ -1,5 +1,5 @@
 package leaguehub.leaguehubbackend.entity.participant;
 
 public enum ParticipantStatus {
-    PROGRESS, DROPOUT
+    PROGRESS, DROPOUT, DISQUALIFICATION
 }

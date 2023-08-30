@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.repository.particiapnt;
 
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.entity.participant.ParticipantStatus;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,5 +35,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Integer> findMaxIndexByParticipant(@Param("memberId") Long memberId);
 
     List<Participant> findAllByMemberIdAndAndIndexGreaterThan(Long memberId, int deleteIndex);
+
+    List<Participant> findAllByChannel_ChannelLinkAndRoleAndParticipantStatus(String channelLink, Role role,ParticipantStatus participantStatus);
 
 }
