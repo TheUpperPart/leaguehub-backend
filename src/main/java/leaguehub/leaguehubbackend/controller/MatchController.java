@@ -68,7 +68,6 @@ public class MatchController {
     @PostMapping("/match/{channelLink}/{matchRound}")
     public ResponseEntity assignmentMatches(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound){
 
-        matchService.updateMatchPlayerStatus(channelLink, matchRound);
         matchService.matchAssignment(channelLink, matchRound);
 
         return new ResponseEntity<>("참가자들이 첫 매치에 배정되었습니다.", HttpStatus.OK);

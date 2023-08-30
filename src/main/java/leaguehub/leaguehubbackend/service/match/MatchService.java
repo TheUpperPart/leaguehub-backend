@@ -90,9 +90,12 @@ public class MatchService {
      * @param matchRound
      */
     public void matchAssignment(String channelLink, Integer matchRound) {
-        checkHost(channelLink);
+        Participant participant = checkHost(channelLink);
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+
+        if(!participant.getChannel().getMaxPlayer().equals(matchRound))
+            checkUpdateScore(matchList);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
@@ -118,13 +121,6 @@ public class MatchService {
         return matchRoundInfoDto;
     }
 
-    public void updateMatchPlayerStatus(String channelLink, Integer matchRound){
-        checkHost(channelLink);
-
-        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
-
-        checkUpdateScore(matchList);
-    }
 
     private Channel getChannel(String channelLink) {
         Channel findChannel = channelRepository.findByChannelLink(channelLink)
@@ -259,10 +255,12 @@ public class MatchService {
         }
     }
 
-    private void checkHost(String channelLink) {
+    private Participant checkHost(String channelLink) {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
         checkRoleHost(participant.getRole());
+
+        return participant;
     }
 
     private void checkUpdateScore(List<Match> matchList) {
