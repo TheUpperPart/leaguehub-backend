@@ -17,9 +17,7 @@ public class MatchRank extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String participant;
-
-    private String placement;
+    private Integer placement;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "match_result_id")
@@ -33,16 +31,15 @@ public class MatchRank extends BaseTimeEntity {
     @JoinColumn(name = "match")
     private Match match;
 
-    public static MatchRank createMatchRank(String participant, String placement, MatchResult matchResult){
+    public static MatchRank createMatchRank(MatchPlayer matchPlayer, Integer placement){
         MatchRank matchRank = new MatchRank();
-        matchRank.participant = participant;
+        matchRank.matchPlayer = matchPlayer;
         matchRank.placement = placement;
-        matchRank.matchResult = matchResult;
 
         return matchRank;
     }
 
     public void updateMatchRank(Integer placement) {
-        this.placement = placement + "등";
+        this.placement = placement;
     }
 }

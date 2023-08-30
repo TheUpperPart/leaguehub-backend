@@ -1,12 +1,10 @@
 package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
-import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
 import leaguehub.leaguehubbackend.dto.match.MatchResultUpdateDto;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchRank;
-import leaguehub.leaguehubbackend.entity.match.MatchResult;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
@@ -35,6 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +50,7 @@ public class MatchRankService {
     @Value("${riot-api-key-2}")
     private String riot_api_key_2;
     private final MatchRepository matchRepository;
+    private final MatchPlayerRepository matchPlayerRepository;
 
 
     /**
@@ -80,7 +80,7 @@ public class MatchRankService {
      * @param puuid
      * @return
      */
-    public String getMatch(String puuid) {
+    public String getMatchRank(String puuid) {
         long endTime = System.currentTimeMillis() / 1000;
         long statTime = 0;
 
@@ -118,13 +118,13 @@ public class MatchRankService {
 
 
     @SneakyThrows
-    public List<MatchRankResultDto> setPlacement(JSONArray participantList, MatchResult matchResult) {
+    public List<MatchRankResultDto> setPlacement(JSONArray participantList) {
         List<MatchRankResultDto> dtoList = new ArrayList<>();
 
 
         for (int i = 0; i < 8; i++) {
             JSONObject participants = (JSONObject) jsonParser.parse(participantList.get(i).toString());
-            String placement = participants.get("placement").toString();
+            Integer placement = (Integer) participants.get("placement");
             String parti1puuid = participants.get("puuid").toString();
 
 
@@ -136,15 +136,10 @@ public class MatchRankService {
                     .block().get("name").toString();
 
             MatchRankResultDto dto = new MatchRankResultDto();
-            dto.setName(summonerName);
+            dto.setGameId(summonerName);
             dto.setPlacement(placement);
 
             dtoList.add(dto);
-
-            MatchRank matchRank = MatchRank.createMatchRank(summonerName, placement, matchResult);
-            matchRankRepository.save(matchRank);
-
-
         }
         return dtoList;
     }
@@ -152,53 +147,23 @@ public class MatchRankService {
 
     /**
      * 최근 매치 id로 경기 세부사항 추출
-     *
-     * @param matchResponseDto
-     * @return matchRankResultDto
      */
     @SneakyThrows
-    public List<MatchRankResultDto> setMatchRank(MatchResponseDto matchResponseDto) {
-        String puuid = getSummonerPuuid(matchResponseDto.getNickName());
-        String matchId = getMatch(puuid);
+    public List<MatchRankResultDto> setMatchRank(String gameId) {
+        String puuid = getSummonerPuuid(gameId);
+        String matchLink = getMatchRank(puuid);
 
-        JSONObject matchDetailJSON = responseMatchDetail(matchId);
-        //uuid를 이용하여 찾는다 dto에 uuid와 matchId만 필요함
-        MatchResult matchResult = matchResultService.saveMatchResult(
-                matchResponseDto.getMatchLink(),
-                matchId);
-
+        JSONObject matchDetailJSON = responseMatchDetail(matchLink);
 
         JSONObject info = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
         JSONArray participantList = (JSONArray) jsonParser.parse(info.get("participants").toString());
 
-        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList, matchResult);
+        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList);
 
 
         return matchRankResultDtoList;
     }
 
-    /**
-     * 해당 경기 순위 반환
-     *
-     * @param matchCode
-     * @return MatchRankResultDto
-     */
-    public List<MatchRankResultDto> getMatchDetail(String matchCode) {
-
-        List<MatchRankResultDto> dtoList = new ArrayList<>();
-
-        Long id = matchResultRepository.findByMatchCode(matchCode).getId();
-
-        List<MatchRank> list = matchRankRepository.findByMatchResult_Id(id);
-
-        for (MatchRank matchRank : list) {
-            MatchRankResultDto dto = new MatchRankResultDto();
-            dto.setName(matchRank.getParticipant());
-            dto.setPlacement(matchRank.getPlacement());
-            dtoList.add(dto);
-        }
-        return dtoList;
-    }
 
     @Transactional
     public void updateMatchPlayerPlacement(MatchResultUpdateDto matchResultUpdateDto) {
@@ -206,22 +171,60 @@ public class MatchRankService {
 
         Match match = getMatch(matchResultUpdateDto.getMatchId());
 
-        MatchPlayer findMatchPlayer = getMatchPlayer(matchResultUpdateDto, match);
+        MatchPlayer findMatchPlayer = getMatchPlayer(matchResultUpdateDto.getMatchPlayerId(), match);
 
         checkAuthMatchPlayerUpdate(member, findMatchPlayer);
 
         MatchRank findMatchRank = getMatchRank(match, findMatchPlayer);
 
         findMatchRank.updateMatchRank(matchResultUpdateDto.getPlacement());
+
+        updatePlacementFromRiotAPI(matchResultUpdateDto, match, findMatchPlayer);
     }
 
+    private void updatePlacementFromRiotAPI(MatchResultUpdateDto matchResultUpdateDto, Match match, MatchPlayer findMatchPlayer) {
+        List<MatchPlayer> matchPlayerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+
+        if (matchResultUpdateDto.getPlacement() == 1) {
+            List<MatchRankResultDto> matchRankResultList = setMatchRank(findMatchPlayer.getParticipant().getGameId());
+            matchPlayerList.forEach(matchPlayer -> {
+                updatePlacement(match, matchRankResultList, matchPlayer);
+            });
+        }
+    }
+
+    /**
+     * 라이엇 API로 가져온 등수 정보에 따라 등수를 재업데이트
+     * @param match
+     * @param matchRankResultList
+     * @param matchPlayer
+     */
+    private void updatePlacement(Match match, List<MatchRankResultDto> matchRankResultList, MatchPlayer matchPlayer) {
+        matchRankResultList.stream()
+                .filter(dto -> dto.getGameId().equals(matchPlayer.getParticipant().getGameId()))
+                .findFirst()
+                .ifPresent(dto -> {
+                    match.getMatchRankList().stream()
+                            .filter(matchRank -> matchRank.getMatchPlayer().getId().equals(matchPlayer.getId()))
+                            .findFirst()
+                            .ifPresent(updateMatchRank -> updateMatchRank.updateMatchRank(dto.getPlacement()));
+                });
+    }
+
+
+    /**
+     * 플레이어 점수를 업데이트 할 때 권한 체크, (본인 or 관리자만)
+     * @param member
+     * @param findMatchPlayer
+     */
     private void checkAuthMatchPlayerUpdate(Member member, MatchPlayer findMatchPlayer) {
-        if(findMatchPlayer.getParticipant().getMember().getId() != member.getId()) {
-            if(findMatchPlayer.getParticipant().getRole() != Role.HOST) {
+        if (findMatchPlayer.getParticipant().getMember().getId() != member.getId()) {
+            if (findMatchPlayer.getParticipant().getRole() != Role.HOST) {
                 throw new InvalidParticipantAuthException();
             }
         }
     }
+
 
     private MatchRank getMatchRank(Match match, MatchPlayer findMatchPlayer) {
         MatchRank findMatchRank = match.getMatchRankList().stream().filter(matchRank ->
@@ -232,9 +235,9 @@ public class MatchRankService {
         return findMatchRank;
     }
 
-    private MatchPlayer getMatchPlayer(MatchResultUpdateDto matchResultUpdateDto, Match match) {
+    private MatchPlayer getMatchPlayer(Long matchPlayerId, Match match) {
         MatchPlayer findMatchPlayer = match.getMatchPlayerList().stream()
-                .filter(matchPlayer -> matchPlayer.getId() == matchResultUpdateDto.getMatchPlayerId())
+                .filter(matchPlayer -> matchPlayer.getId() == matchPlayerId)
                 .findFirst()
                 .orElseThrow(() -> new MatchPlayerNotFoundException());
         return findMatchPlayer;
