@@ -23,7 +23,6 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +31,6 @@ import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
-import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.DONE;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
@@ -91,9 +89,7 @@ public class MatchService {
      * @param matchRound
      */
     public void matchAssignment(String channelLink, Integer matchRound) {
-        Member member = memberService.findCurrentMember();
-        Participant participant = getParticipant(member.getId(), channelLink);
-        checkRoleHost(participant.getRole());
+        checkHost(channelLink);
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
 
@@ -119,6 +115,14 @@ public class MatchService {
 
         matchRoundInfoDto.setMatchInfoDtoList(matchInfoDtoList);
         return matchRoundInfoDto;
+    }
+
+    public void updateMatchPlayerStatus(String channelLink, Integer matchRound){
+        checkHost(channelLink);
+
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+
+        checkUpdateScore(matchList);
     }
 
     private Channel getChannel(String channelLink) {
@@ -217,7 +221,7 @@ public class MatchService {
         matchInfoDto.setMatchRoundCount(match.getRoundRealCount());
         matchInfoDto.setMatchRoundMaxCount(match.getRoundMaxCount());
 
-        List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+        List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
         List<MatchPlayerInfo> matchPlayerInfoList = createMatchPlayerInfoList(playerList);
         matchInfoDto.setMatchPlayerInfoList(matchPlayerInfoList);
 
@@ -245,12 +249,41 @@ public class MatchService {
 
         if (!participant.getGameId().equalsIgnoreCase(NO_DATA.getData())) {
             matchList.forEach(match -> {
-                List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+                List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
                 playerList.stream()
                         .filter(player -> participant.getGameId().equalsIgnoreCase(player.getParticipant().getGameId()))
                         .findFirst()
                         .ifPresent(player -> matchRoundInfoDto.setMyGameId(participant.getGameId()));
             });
+        }
+    }
+
+    private void checkHost(String channelLink) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+        checkRoleHost(participant.getRole());
+    }
+
+    private void checkUpdateScore(List<Match> matchList) {
+        for (Match currentMatch : matchList) {
+            List<MatchPlayer> matchplayerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(currentMatch.getId());
+
+            int progressCount = 0;
+
+            for (MatchPlayer matchPlayer : matchplayerList) {
+                if (progressCount >= 5) {
+                    if (!matchPlayer.getParticipant().getParticipantStatus().equals(DISQUALIFICATION)) {
+                        matchPlayer.getParticipant().dropoutParticipantStatus();
+                    }
+                    continue;
+                }
+
+                if (matchPlayer.getParticipant().getParticipantStatus().equals(PROGRESS)) {
+                    progressCount++;
+                } else {
+                    matchPlayer.getParticipant().dropoutParticipantStatus();
+                }
+            }
         }
     }
 }
