@@ -21,9 +21,11 @@ import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,6 +35,7 @@ import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.PR
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MatchService {
 
@@ -237,6 +240,12 @@ public class MatchService {
 
     }
 
+    public MatchInfoDto getMatchInfo(Long matchId) {
+        List<MatchPlayer> matchPlayers = matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId);
+
+        return convertMatchInfoDto(matchPlayers.get(0).getMatch(), matchPlayers);
+    }
+
     private void findMyRoundName(Participant participant, List<Match> matchList, MatchRoundInfoDto matchRoundInfoDto) {
         matchRoundInfoDto.setMyGameId(NO_DATA.getData());
 
@@ -249,5 +258,28 @@ public class MatchService {
                         .ifPresent(player -> matchRoundInfoDto.setMyGameId(participant.getGameId()));
             });
         }
+    }
+
+    public MatchInfoDto convertMatchInfoDto(Match match, List<MatchPlayer> matchPlayers) {
+        return MatchInfoDto.builder().matchId(match.getId())
+                .matchName(match.getMatchName())
+                .matchStatus(match.getMatchStatus())
+                .matchRound(match.getMatchRound())
+                .matchRoundCount(match.getRoundRealCount())
+                .matchPlayerInfoList(convertMatchPlayerInfoList(matchPlayers))
+                .build();
+    }
+
+
+    public List<MatchPlayerInfo> convertMatchPlayerInfoList(List<MatchPlayer> matchPlayers) {
+        return matchPlayers.stream()
+                .map(matchPlayer -> new MatchPlayerInfo(
+                        matchPlayer.getParticipant().getGameId(),
+                        matchPlayer.getParticipant().getGameTier(),
+                        matchPlayer.getPlayerStatus(),
+                        matchPlayer.getPlayerScore()
+                ))
+                .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
+                .collect(Collectors.toList());
     }
 }

@@ -40,4 +40,8 @@ public class MatchPlayer extends BaseTimeEntity {
 
         return matchPlayer;
     }
+
+    public void updateMatchPlayerScore(Integer placement) {
+        this.playerScore += 9 - placement;
+    }
 }

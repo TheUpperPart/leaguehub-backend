@@ -23,6 +23,14 @@ public class MatchSet {
 
     private Boolean updateScore;
 
-    private Integer matchSet;
+    private Integer setCount;
+
+    public void updateRiotMatchUuid(String riotMatchUuid) {
+        this.riotMatchUuid = riotMatchUuid;
+    }
+
+    public void updateScore(boolean updateScore) {
+        this.updateScore = updateScore;
+    }
 
 }
