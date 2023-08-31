@@ -269,7 +269,6 @@ public class MatchService {
         }
     }
 
-
     public MatchInfoDto convertMatchInfoDto(Match match, List<MatchPlayer> matchPlayers) {
         return MatchInfoDto.builder().matchId(match.getId())
                 .matchName(match.getMatchName())

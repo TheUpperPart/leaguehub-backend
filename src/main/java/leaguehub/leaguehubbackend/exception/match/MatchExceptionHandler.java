@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.exception.match;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
@@ -45,6 +46,19 @@ public class MatchExceptionHandler {
     @ExceptionHandler(MatchNotEnoughPlayerException.class)
     public ResponseEntity<ExceptionResponse> matchNotEnoughPlayerException(
             MatchNotEnoughPlayerException e
+    ) {
+        ExceptionCode exceptionCode = e.getExceptionCode();
+        log.error("{}", exceptionCode.getMessage());
+
+        return new ResponseEntity<>(
+                new ExceptionResponse(exceptionCode),
+                exceptionCode.getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler(MatchAlreadyUpdateException.class)
+    public ResponseEntity<ExceptionResponse> matchAlreadyUpdateException(
+            MatchAlreadyUpdateException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());

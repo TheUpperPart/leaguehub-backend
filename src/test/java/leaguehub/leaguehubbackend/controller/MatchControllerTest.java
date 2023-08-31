@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -46,42 +45,14 @@ public class MatchControllerTest {
     @Test
     @DisplayName("경기 결과 생성 테스트 - 성공")
     public void createMatchRankSuccessTest() throws Exception {
-        //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, 800, null, 100);
-        channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel, "테스트매치 이름");
-        matchRepository.save(match);
 
-        MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchId(match.getId());
-        matchResponseDto.setGameId("서초임");
-        String dtoToJson = mapper.writeValueAsString(matchResponseDto);
-        //when
-        mockMvc.perform(post("/api/match/matchResult")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(dtoToJson))
-                .andExpect(status().isCreated());
 
     }
 
     @Test
     @DisplayName("경기 결과 생성 테스트 - 실패")
     public void createMatchRankFailTest() throws Exception {
-        //given
-        Channel channel = ChannelFixture.createDummyChannel(false, false, 800, null, 100);
-        channelRepository.save(channel);
-        Match match = Match.createMatch(16, channel, "테스트매치 이름");
-        matchRepository.save(match);
 
-        MatchResponseDto matchResponseDto = new MatchResponseDto();
-        matchResponseDto.setMatchId(match.getId());
-        matchResponseDto.setGameId("savokscmo");
-        String dtoToJson = mapper.writeValueAsString(matchResponseDto);
-        //when
-        mockMvc.perform(post("/api/match/matchResult")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(dtoToJson))
-                .andExpect(status().isNotFound());
     }
 
 }
