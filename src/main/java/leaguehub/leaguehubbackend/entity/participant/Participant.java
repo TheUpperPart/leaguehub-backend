@@ -119,6 +119,12 @@ public class Participant extends BaseTimeEntity {
         return this;
     }
 
+    public Participant dropoutParticipantStatus(){
+        this.participantStatus = ParticipantStatus.DROPOUT;
+
+        return this;
+    }
+
     public void newCustomChannelIndex(Optional<Integer> index) {
         this.index = index.map(i -> i + 1).orElseGet(() -> 0);
     }
