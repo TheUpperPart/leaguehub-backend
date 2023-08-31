@@ -2,9 +2,12 @@ package leaguehub.leaguehubbackend.dto.match;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class MatchPlayerInfo {
 
     @Schema(description = "플레이어의 게임 닉네임", example = "돈절래")
@@ -17,5 +20,14 @@ public class MatchPlayerInfo {
     private PlayerStatus playerStatus;
 
     @Schema(description = "참가자 점수", example = "8(점), 5(점), ...")
-    private Integer Score;
+    private Integer score;
+
+
+    @Builder
+    public MatchPlayerInfo(String gameId, String gameTier, PlayerStatus playerStatus, Integer score) {
+        this.gameId = gameId;
+        this.gameTier = gameTier;
+        this.playerStatus = playerStatus;
+        this.score = score;
+    }
 }
