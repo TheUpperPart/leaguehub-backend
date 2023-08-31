@@ -101,6 +101,12 @@ public class Participant extends BaseTimeEntity {
         return this;
     }
 
+    public Participant disqualificationParticipant(){
+        this.participantStatus = ParticipantStatus.DISQUALIFICATION;
+
+        return this;
+    }
+
 
     public Participant updateParticipantStatus(String gameId, String gameTier, String nickname) {
         this.gameId = gameId;
