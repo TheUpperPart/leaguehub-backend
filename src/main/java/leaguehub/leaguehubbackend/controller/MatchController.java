@@ -18,7 +18,11 @@ import leaguehub.leaguehubbackend.service.match.MatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @Tag(name = "Match-Controller", description = "대회 경기자 관련 API")
 @RestController
@@ -53,7 +57,7 @@ public class MatchController {
 
         MatchRoundListDto roundList = matchService.getRoundList(channelLink);
 
-        return new ResponseEntity<>(roundList, HttpStatus.OK);
+        return new ResponseEntity<>(roundList, OK);
     }
 
     @Operation(summary = "해당 채널의 라운드 경기 배정")
@@ -70,7 +74,7 @@ public class MatchController {
 
         matchService.matchAssignment(channelLink, matchRound);
 
-        return new ResponseEntity<>("참가자들이 첫 매치에 배정되었습니다.", HttpStatus.OK);
+        return new ResponseEntity<>("참가자들이 첫 매치에 배정되었습니다.", OK);
     }
 
     @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 매치 조회")
@@ -87,7 +91,22 @@ public class MatchController {
 
         MatchRoundInfoDto matchInfoDtoList = matchService.loadMatchPlayerList(channelLink, matchRound);
 
-        return new ResponseEntity<>(matchInfoDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(matchInfoDtoList, OK);
+    }
+
+    @Operation(summary = "대회에 참여된 플레이어면 좌측 중간에 표시")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "매치가 조회되었습니다. - 배열로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchInfoDto.class))),
+            @ApiResponse(responseCode = "403", description = "플레이어가 아니면 0 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @MessageMapping("/match/{channelLink}")
+    @SendTo("/match/round")
+    public ResponseEntity getRoundLive(@PathVariable("channelLink") String channelLink){
+
+        int myMatchRound = matchService.getMyMatchRound(channelLink);
+
+        return new ResponseEntity<>(myMatchRound, OK);
     }
 
 

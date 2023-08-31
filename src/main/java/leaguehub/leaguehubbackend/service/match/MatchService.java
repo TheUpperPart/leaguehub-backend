@@ -94,7 +94,7 @@ public class MatchService {
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
 
-        if(!participant.getChannel().getMaxPlayer().equals(matchRound))
+        if (!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
@@ -121,6 +121,26 @@ public class MatchService {
         return matchRoundInfoDto;
     }
 
+    public Integer getMyMatchRound(String channelLink) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+
+        MatchRoundListDto roundListDto = new MatchRoundListDto();
+        roundListDto.setLiveRound(0);
+
+        if (participant.getRole().equals(PLAYER)
+                && participant.getParticipantStatus().equals(PROGRESS)) {
+            int maxPlayers = participant.getChannel().getMaxPlayer();
+            List<Integer> roundList = calculateRoundList(maxPlayers);
+            roundListDto.setRoundList(roundList);
+
+            findLiveRound(channelLink, roundList, roundListDto);
+        }
+
+        return roundListDto.getLiveRound();
+
+    }
+
 
     private Channel getChannel(String channelLink) {
         Channel findChannel = channelRepository.findByChannelLink(channelLink)
@@ -144,8 +164,8 @@ public class MatchService {
 
     private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
         roundList.forEach(round -> {
-            List<Match> matchList = findMatchList(channelLink, round);
-            matchList.stream()
+                    List<Match> matchList = findMatchList(channelLink, round);
+                    matchList.stream()
                             .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                             .findFirst()
                             .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
