@@ -2,11 +2,14 @@ package leaguehub.leaguehubbackend.dto.match;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class MatchInfoDto {
 
     @Schema(description = "매치 이름", example = "Group A")
@@ -29,4 +32,15 @@ public class MatchInfoDto {
 
     @Schema(description = "매치에 속해있는 플레이어의 정보", example = "배열로 반환")
     private List<MatchPlayerInfo> matchPlayerInfoList;
+
+    @Builder
+    public MatchInfoDto(String matchName, Long matchId, MatchStatus matchStatus, Integer matchRound, Integer matchRoundCount, Integer matchRoundMaxCount, List<MatchPlayerInfo> matchPlayerInfoList) {
+        this.matchName = matchName;
+        this.matchId = matchId;
+        this.matchStatus = matchStatus;
+        this.matchRound = matchRound;
+        this.matchRoundCount = matchRoundCount;
+        this.matchRoundMaxCount = matchRoundMaxCount;
+        this.matchPlayerInfoList = matchPlayerInfoList;
+    }
 }
