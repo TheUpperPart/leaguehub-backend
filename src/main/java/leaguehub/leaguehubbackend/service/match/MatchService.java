@@ -92,7 +92,7 @@ public class MatchService {
     public void matchAssignment(String channelLink, Integer matchRound) {
         Participant participant = checkHost(channelLink);
 
-        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        List<Match> matchList = findMatchList(channelLink, matchRound);
 
         if(!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
@@ -107,7 +107,7 @@ public class MatchService {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
 
-        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        List<Match> matchList = findMatchList(channelLink, matchRound);
 
         List<MatchInfoDto> matchInfoDtoList = matchList.stream()
                 .map(this::createMatchInfoDto)
@@ -144,8 +144,8 @@ public class MatchService {
 
     private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
         roundList.forEach(round -> {
-                    List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, round);
-                    matchList.stream()
+            List<Match> matchList = findMatchList(channelLink, round);
+            matchList.stream()
                             .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                             .findFirst()
                             .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
@@ -176,6 +176,11 @@ public class MatchService {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }
+    }
+
+    private List<Match> findMatchList(String channelLink, Integer matchRound) {
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        return matchList;
     }
 
     private List<Participant> getParticipantList(String channelLink, Integer matchRound) {
