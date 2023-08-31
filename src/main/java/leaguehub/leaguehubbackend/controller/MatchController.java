@@ -56,7 +56,7 @@ public class MatchController {
         return new ResponseEntity<>(roundList, HttpStatus.OK);
     }
 
-    @Operation(summary = "해당 채널의 경기 첫 배정")
+    @Operation(summary = "해당 채널의 라운드 경기 배정")
     @Parameters(value = {
             @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
             @Parameter(name = "matchRound", description = "배정 싶은 매치의 라운드(1, 2 라운드)", example = "1, 2, 3, 4")

@@ -29,7 +29,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
-import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.PROGRESS;
+
+import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
+
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
@@ -88,11 +90,12 @@ public class MatchService {
      * @param matchRound
      */
     public void matchAssignment(String channelLink, Integer matchRound) {
-        Member member = memberService.findCurrentMember();
-        Participant participant = getParticipant(member.getId(), channelLink);
-        checkRoleHost(participant.getRole());
+        Participant participant = checkHost(channelLink);
 
-        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        List<Match> matchList = findMatchList(channelLink, matchRound);
+
+        if(!participant.getChannel().getMaxPlayer().equals(matchRound))
+            checkUpdateScore(matchList);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
@@ -104,7 +107,7 @@ public class MatchService {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
 
-        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        List<Match> matchList = findMatchList(channelLink, matchRound);
 
         List<MatchInfoDto> matchInfoDtoList = matchList.stream()
                 .map(this::createMatchInfoDto)
@@ -117,6 +120,7 @@ public class MatchService {
         matchRoundInfoDto.setMatchInfoDtoList(matchInfoDtoList);
         return matchRoundInfoDto;
     }
+
 
     private Channel getChannel(String channelLink) {
         Channel findChannel = channelRepository.findByChannelLink(channelLink)
@@ -140,8 +144,8 @@ public class MatchService {
 
     private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
         roundList.forEach(round -> {
-                    List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, round);
-                    matchList.stream()
+            List<Match> matchList = findMatchList(channelLink, round);
+            matchList.stream()
                             .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                             .findFirst()
                             .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
@@ -172,6 +176,11 @@ public class MatchService {
         if (role != Role.HOST) {
             throw new InvalidParticipantAuthException();
         }
+    }
+
+    private List<Match> findMatchList(String channelLink, Integer matchRound) {
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(channelLink, matchRound);
+        return matchList;
     }
 
     private List<Participant> getParticipantList(String channelLink, Integer matchRound) {
@@ -214,7 +223,7 @@ public class MatchService {
         matchInfoDto.setMatchRoundCount(match.getRoundRealCount());
         matchInfoDto.setMatchRoundMaxCount(match.getRoundMaxCount());
 
-        List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+        List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
         List<MatchPlayerInfo> matchPlayerInfoList = createMatchPlayerInfoList(playerList);
         matchInfoDto.setMatchPlayerInfoList(matchPlayerInfoList);
 
@@ -242,12 +251,43 @@ public class MatchService {
 
         if (!participant.getGameId().equalsIgnoreCase(NO_DATA.getData())) {
             matchList.forEach(match -> {
-                List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_Id(match.getId());
+                List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
                 playerList.stream()
                         .filter(player -> participant.getGameId().equalsIgnoreCase(player.getParticipant().getGameId()))
                         .findFirst()
                         .ifPresent(player -> matchRoundInfoDto.setMyGameId(participant.getGameId()));
             });
+        }
+    }
+
+    private Participant checkHost(String channelLink) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+        checkRoleHost(participant.getRole());
+
+        return participant;
+    }
+
+    private void checkUpdateScore(List<Match> matchList) {
+        for (Match currentMatch : matchList) {
+            List<MatchPlayer> matchplayerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(currentMatch.getId());
+
+            int progressCount = 0;
+
+            for (MatchPlayer matchPlayer : matchplayerList) {
+                if (progressCount >= 5) {
+                    if (!matchPlayer.getParticipant().getParticipantStatus().equals(DISQUALIFICATION)) {
+                        matchPlayer.getParticipant().dropoutParticipantStatus();
+                    }
+                    continue;
+                }
+
+                if (matchPlayer.getParticipant().getParticipantStatus().equals(PROGRESS)) {
+                    progressCount++;
+                } else {
+                    matchPlayer.getParticipant().dropoutParticipantStatus();
+                }
+            }
         }
     }
 }
