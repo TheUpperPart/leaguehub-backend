@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> {
 
+    List<MatchPlayer> findAllByMatch_Id(Long matchId);
 
     List<MatchPlayer> findAllByMatch_MatchLinkAndMatch_MatchName(String matchLink, String matchName);
 

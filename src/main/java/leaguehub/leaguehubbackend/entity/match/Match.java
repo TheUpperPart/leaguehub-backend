@@ -57,4 +57,8 @@ public class Match extends BaseTimeEntity {
 
         return match;
     }
+
+    public void updateMatchStatus(MatchStatus matchStatus) {
+        this.matchStatus = matchStatus;
+    }
 }

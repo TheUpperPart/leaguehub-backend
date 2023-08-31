@@ -1,10 +1,19 @@
 package leaguehub.leaguehubbackend.service.match;
 
+import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
-import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
+import leaguehub.leaguehubbackend.dto.match.RiotAPIDto;
+import leaguehub.leaguehubbackend.entity.match.Match;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
+import leaguehub.leaguehubbackend.entity.match.MatchSet;
+import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
+import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;
@@ -32,6 +41,9 @@ public class MatchPlayerService {
     private String riot_api_key_1;
     @Value("${riot-api-key-2}")
     private String riot_api_key_2;
+    private final MatchPlayerRepository matchPlayerRepository;
+    private final MatchSetRepository matchSetRepository;
+    private final MatchService matchService;
 
     /**
      * 소환사의 라이엇 puuid를 얻는 메서드
@@ -129,17 +141,17 @@ public class MatchPlayerService {
 
 
     /**
-     * 최근 매치 id로 경기 세부사항 추출
+     * 라이엇 API로 경기 결과 호출
      *
-     * @param matchResponseDto
+     * @param gameId
      * @return matchRankResultDto
      */
     @SneakyThrows
-    public List<MatchRankResultDto> setMatchRank(MatchResponseDto matchResponseDto) {
-        String puuid = getSummonerPuuid(matchResponseDto.getGameId());
-        String matchId = getMatch(puuid);
+    public RiotAPIDto getMatchDetailFromRiot(String gameId) {
+        String puuid = getSummonerPuuid(gameId);
+        String riotMatchUuid = getMatch(puuid);
 
-        JSONObject matchDetailJSON = responseMatchDetail(matchId);
+        JSONObject matchDetailJSON = responseMatchDetail(riotMatchUuid);
 
 
         JSONObject info = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
@@ -148,6 +160,60 @@ public class MatchPlayerService {
         List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList);
 
 
-        return matchRankResultDtoList;
+        return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
+    }
+
+    public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount) {
+        List<MatchPlayer> findMatchPlayerList = getMatchPlayers(matchId);
+
+        RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
+
+        MatchSet matchSet = getMatchSet(matchId, setCount);
+
+        matchSet.updateRiotMatchUuid(matchDetailFromRiot.getMatchUuid());
+
+        List<MatchRankResultDto> matchRankResultDtoList = matchDetailFromRiot.getMatchRankResultDtoList();
+
+        matchRankResultDtoList
+                .forEach(matchRankResultDto ->
+                        findMatchPlayerList.stream()
+                                .filter(matchPlayer -> matchRankResultDto.getGameId().equals(matchPlayer.getParticipant().getGameId()))
+                                .forEach(matchPlayer -> matchPlayer.updateMatchPlayerScore(matchRankResultDto.getPlacement()))
+                );
+
+        matchSet.updateScore(true);
+
+        Match match = findMatchPlayerList.get(0).getMatch();
+        checkMatchEnd(matchSet, match);
+
+        return matchService.convertMatchInfoDto
+                (match, findMatchPlayerList);
+    }
+
+    private void checkMatchEnd(MatchSet matchSet, Match match) {
+        if(match.getRoundMaxCount() == matchSet.getSetCount()) {
+            match.updateMatchStatus(MatchStatus.END);
+        }
+    }
+
+    private List<MatchPlayer> getMatchPlayers(Long matchId) {
+        List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId);
+
+        if (findMatchPlayerList.size() == 0) {
+            throw new MatchNotFoundException();
+        }
+        return findMatchPlayerList;
+    }
+
+
+    private MatchSet getMatchSet(Long matchId, Integer setCount) {
+        MatchSet matchSet = matchSetRepository.findMatchSetByMatchIdAndAndSetCount(matchId, setCount)
+                .orElseThrow(() -> new MatchNotFoundException());
+
+        if (matchSet.getUpdateScore()) {
+            throw new MatchAlreadyUpdateException();
+        }
+
+        return matchSet;
     }
 }

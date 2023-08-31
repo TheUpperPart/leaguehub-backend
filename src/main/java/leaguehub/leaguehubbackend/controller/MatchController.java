@@ -9,14 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchResponseDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -33,19 +31,6 @@ public class MatchController {
     private final MatchPlayerService matchPlayerService;
     private final MatchService matchService;
 
-    @Operation(summary = "매치 결과 조회 및 저장 - 사용 x")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "매치 결과가 생성되었습니다."),
-            @ApiResponse(responseCode = "403", description = "매치 결과를 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/match/matchResult")
-    public ResponseEntity createMatchRank(@RequestBody MatchResponseDto matchResponseDto){
-
-        matchPlayerService.setMatchRank(matchResponseDto);
-
-        return new ResponseEntity<>("매치 결과가 생성되었습니다.", HttpStatus.CREATED);
-    }
-
     @Operation(summary = "라운드 수(몇 강) 리스트 반환")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
@@ -53,7 +38,7 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "매치 결과를 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/match/{channelLink}")
-    public ResponseEntity loadMatchRoundList(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity loadMatchRoundList(@PathVariable("channelLink") String channelLink) {
 
         MatchRoundListDto roundList = matchService.getRoundList(channelLink);
 
@@ -70,7 +55,7 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "권한이 관리자가 아님,채널을 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/match/{channelLink}/{matchRound}")
-    public ResponseEntity assignmentMatches(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound){
+    public ResponseEntity assignmentMatches(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound) {
 
         matchService.matchAssignment(channelLink, matchRound);
 
@@ -87,11 +72,12 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "권한이 관리자가 아님,채널을 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/match/{channelLink}/{matchRound}")
-    public ResponseEntity loadMatchInfo(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound){
+    public ResponseEntity loadMatchInfo(@PathVariable("channelLink") String channelLink, @PathVariable("matchRound") Integer matchRound) {
 
         MatchRoundInfoDto matchInfoDtoList = matchService.loadMatchPlayerList(channelLink, matchRound);
 
         return new ResponseEntity<>(matchInfoDtoList, OK);
+
     }
 
     @Operation(summary = "대회에 참여된 플레이어면 좌측 중간에 표시")
@@ -107,7 +93,21 @@ public class MatchController {
         int myMatchRound = matchService.getMyMatchRound(channelLink);
 
         return new ResponseEntity<>(myMatchRound, OK);
+
     }
 
+    @MessageMapping("/match/{matchId}/{matchSet}/score-update")
+    @SendTo("/match/greetings")
+    public ResponseEntity updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+        MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+        return new ResponseEntity<>(matchInfoDto, OK);
+    }
 
+    @MessageMapping("/match/{matchId}")
+    @SendTo("/match/greetings")
+    public ResponseEntity getMatchInfo(@PathVariable("matchId") Long matchId) {
+        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
+
+        return new ResponseEntity(matchInfo, OK);
+    }
 }

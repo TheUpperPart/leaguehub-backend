@@ -4,6 +4,7 @@ import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorEx
 import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -43,5 +44,17 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(errors, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity alreadyExistsValueInDataBase(
+            DataIntegrityViolationException exception
+    ) {
+        log.error("{}", exception.getMessage());
+
+        return new ResponseEntity<>(
+                exception.getMessage(),
+                BAD_REQUEST
+        );
     }
 }
