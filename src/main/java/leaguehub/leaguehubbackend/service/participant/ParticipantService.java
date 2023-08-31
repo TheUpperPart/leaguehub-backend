@@ -190,12 +190,9 @@ public class ParticipantService {
 
         findParticipant.approveParticipantMatch();
 
-        List<Participant> playerLists = participantRepository
-                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
-
-
-        channel.updateRealPlayer(playerLists.size());
+        updateRealPlayerCount(channelLink, channel);
     }
+
 
     /**
      * 해당 채널의 요청한 참가자를 거절함
@@ -207,9 +204,12 @@ public class ParticipantService {
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
 
+
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
         findParticipant.rejectParticipantRequest();
+
+        updateRealPlayerCount(channelLink, participant.getChannel());
     }
 
     /**
@@ -360,6 +360,13 @@ public class ParticipantService {
         Participant findParticipant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
                 .orElseThrow(ParticipantNotFoundException::new);
         return findParticipant;
+    }
+
+    private void updateRealPlayerCount(String channelLink, Channel channel) {
+        List<Participant> playerLists = participantRepository
+                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
+
+        channel.updateRealPlayer(playerLists.size());
     }
 
 
