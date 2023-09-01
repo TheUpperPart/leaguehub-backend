@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> {
 
     List<MatchPlayer> findAllByMatch_Id(Long matchId);
-
 
     List<MatchPlayer> findAllByMatch_MatchNameAndMatch_MatchRound(String matchName, Integer matchRound);
 
@@ -19,5 +19,8 @@ public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> 
 
     @Query("select mp from MatchPlayer mp join fetch mp.participant join fetch mp.match where mp.match.id =: matchId")
     List<MatchPlayer> findMatchPlayersAndMatchAndParticipantByMatchId(@Param("matchId") Long matchId);
+
+    @Query("select mp from MatchPlayer mp where mp.participant.id = :participantId and mp.match.id = :matchId")
+    Optional<MatchPlayer> findMatchPlayerByParticipantIdAndMatchId(@Param("participantId") Long participantId, @Param("matchId") Long matchId);
 
 }
