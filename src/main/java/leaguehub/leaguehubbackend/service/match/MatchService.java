@@ -97,7 +97,7 @@ public class MatchService {
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
 
-        if(!participant.getChannel().getMaxPlayer().equals(matchRound))
+        if (!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
@@ -147,8 +147,8 @@ public class MatchService {
 
     private void findLiveRound(String channelLink, List<Integer> roundList, MatchRoundListDto roundListDto) {
         roundList.forEach(round -> {
-            List<Match> matchList = findMatchList(channelLink, round);
-            matchList.stream()
+                    List<Match> matchList = findMatchList(channelLink, round);
+                    matchList.stream()
                             .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                             .findFirst()
                             .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
@@ -290,6 +290,7 @@ public class MatchService {
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
+    }
 
     private Participant checkHost(String channelLink) {
         Member member = memberService.findCurrentMember();
