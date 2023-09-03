@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
+import leaguehub.leaguehubbackend.dto.match.MatchScoreInfoDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
@@ -93,4 +94,13 @@ public class MatchController {
 
         return new ResponseEntity(matchInfo, OK);
     }
+
+    @GetMapping("/match/{matchId}/player/info")
+    public ResponseEntity loadMatchScore(@PathVariable("matchId") Long matchId) {
+
+        MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
+
+        return new ResponseEntity<>(matchScoreInfoDto, OK);
+    }
+
 }
