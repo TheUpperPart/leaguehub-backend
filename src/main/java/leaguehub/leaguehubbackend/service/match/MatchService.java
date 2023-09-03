@@ -1,9 +1,6 @@
 package leaguehub.leaguehubbackend.service.match;
 
-import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
+import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
@@ -13,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
+import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
@@ -23,10 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -323,4 +318,73 @@ public class MatchService {
         }
 
     }
+
+    public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
+        Member member = memberService.findCurrentMember();
+
+        List<MatchPlayer> matchPlayers = matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId);
+
+        List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = convertToMatchPlayerScoreInfoList(matchPlayers);
+
+        sortAndRankMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
+
+        String requestMatchPlayerId = findRequestMatchPlayerId(member, matchPlayers);
+
+        MatchScoreInfoDto matchScoreInfoDto = MatchScoreInfoDto.builder()
+                .matchPlayerScoreInfos(matchPlayerScoreInfoList)
+                .requestMatchPlayerId(requestMatchPlayerId)
+                .build();
+
+        return matchScoreInfoDto;
+    }
+
+    private List<MatchPlayerScoreInfo> convertToMatchPlayerScoreInfoList(List<MatchPlayer> matchPlayers) {
+        List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = new ArrayList<>();
+
+        for (MatchPlayer mp : matchPlayers) {
+            MatchPlayerScoreInfo info = MatchPlayerScoreInfo.builder()
+                    .matchPlayerId(mp.getId())
+                    .participantId(mp.getParticipant().getId())
+                    .participantImageUrl(mp.getParticipant().getProfileImageUrl())
+                    .participantGameId(mp.getParticipant().getGameId())
+                    .playerScore(mp.getPlayerScore())
+                    .build();
+
+            matchPlayerScoreInfoList.add(info);
+        }
+
+        return matchPlayerScoreInfoList;
+    }
+
+    private void sortAndRankMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
+        sortMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
+        assignRankToMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
+    }
+
+    private void sortMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
+        matchPlayerScoreInfoList.sort(Comparator
+                .comparing(MatchPlayerScoreInfo::getPlayerScore).reversed()
+                .thenComparing(MatchPlayerScoreInfo::getParticipantGameId));
+    }
+
+    private void assignRankToMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
+        int rank = 1;
+        for (int i = 0; i < matchPlayerScoreInfoList.size(); i++) {
+            MatchPlayerScoreInfo info = matchPlayerScoreInfoList.get(i);
+            if (i > 0 && !info.getPlayerScore().equals(matchPlayerScoreInfoList.get(i - 1).getPlayerScore())) {
+                rank = i + 1;
+            }
+            info.setMatchRank(rank);
+        }
+    }
+
+    private String findRequestMatchPlayerId(Member member, List<MatchPlayer> matchPlayers) {
+        for (MatchPlayer mp : matchPlayers) {
+            if (mp.getParticipant().getMember().getId().equals(member.getId())) {
+                return mp.getId().toString();
+            }
+        }
+        throw new MemberNotFoundException();
+    }
+
 }
