@@ -179,23 +179,18 @@ public class ParticipantService {
      * @param participantId
      */
     public void approveParticipantRequest(String channelLink, Long participantId) {
-
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
-        Channel channel = participant.getChannel();
 
-        checkRealPlayerCount(channel);
+        checkRealPlayerCount(participant.getChannel());
 
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
         findParticipant.approveParticipantMatch();
 
-        List<Participant> playerLists = participantRepository
-                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
-
-
-        channel.updateRealPlayer(playerLists.size());
+        updateRealPlayerCount(channelLink, participant.getChannel());
     }
+
 
     /**
      * 해당 채널의 요청한 참가자를 거절함
@@ -207,9 +202,18 @@ public class ParticipantService {
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
 
+
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
         findParticipant.rejectParticipantRequest();
+
+        updateRealPlayerCount(channelLink, participant.getChannel());
+    }
+
+    public void disqualifiedParticipant(String channelLink, Long participantId){
+        Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
+
+        findParticipant.disqualificationParticipant();
     }
 
     /**
@@ -219,10 +223,7 @@ public class ParticipantService {
      * @param participantId
      */
     public void updateHostRole(String channelLink, Long participantId) {
-        Participant participant = getParticipant(channelLink);
-        checkRoleHost(participant.getRole());
-
-        Participant findParticipant = getFindParticipant(channelLink, participantId);
+        Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
 
         findParticipant.updateHostRole();
     }
@@ -240,7 +241,6 @@ public class ParticipantService {
         if (category.equals(0)) {
             userGameInfoDto = getTierAndPlayCount(gameId);
         }
-
 
         return userGameInfoDto;
     }
@@ -361,6 +361,21 @@ public class ParticipantService {
                 .orElseThrow(ParticipantNotFoundException::new);
         return findParticipant;
     }
+
+    private void updateRealPlayerCount(String channelLink, Channel channel) {
+        List<Participant> playerLists = participantRepository
+                .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
+
+        channel.updateRealPlayer(playerLists.size());
+    }
+
+    private Participant checkHostAndGetParticipant(String channelLink, Long participantId) {
+        Participant participant = getParticipant(channelLink);
+        checkRoleHost(participant.getRole());
+
+        return getFindParticipant(channelLink, participantId);
+    }
+
 
 
     /**

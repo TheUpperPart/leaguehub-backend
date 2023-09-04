@@ -132,6 +132,24 @@ public class ParticipantController {
         return new ResponseEntity<>("reject participant", OK);
     }
 
+    @Operation(summary = "플레이어 실격처리", description = "관리자가 해당 게임 플레이어를 실격처리")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "participantId", description = "해당 채널 참가자의 고유 Id", example = "1")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "실격 처리 되었습니다."),
+            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PostMapping("/{channelLink}/{participantId}/disqualification")
+    public ResponseEntity disqualifiedParticipant(@PathVariable("channelLink") String channelLink,
+                                              @PathVariable("participantId") Long participantId) {
+
+        participantService.disqualifiedParticipant(channelLink, participantId);
+
+        return new ResponseEntity<>("disqualified participant", OK);
+    }
+
     @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")
     @Parameters(value = {
             @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),

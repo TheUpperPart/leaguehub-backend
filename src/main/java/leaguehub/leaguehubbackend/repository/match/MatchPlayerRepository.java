@@ -17,7 +17,7 @@ public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> 
     @Query("select mp from MatchPlayer mp join fetch mp.participant where mp.match.id = :matchId")
     List<MatchPlayer> findAllByMatch_IdOrderByPlayerScoreDesc(@Param("matchId") Long matchId);
 
-    @Query("select mp from MatchPlayer mp join fetch mp.participant join fetch mp.match where mp.match.id =: matchId")
+    @Query("select mp from MatchPlayer mp join fetch mp.participant join fetch mp.match where mp.match.id = :matchId")
     List<MatchPlayer> findMatchPlayersAndMatchAndParticipantByMatchId(@Param("matchId") Long matchId);
 
     Optional<MatchPlayer> findByParticipantIdAndMatchId(Long participantId, Long matchId);
