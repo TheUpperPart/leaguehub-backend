@@ -339,21 +339,15 @@ public class MatchService {
     }
 
     private List<MatchPlayerScoreInfo> convertToMatchPlayerScoreInfoList(List<MatchPlayer> matchPlayers) {
-        List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = new ArrayList<>();
-
-        for (MatchPlayer mp : matchPlayers) {
-            MatchPlayerScoreInfo info = MatchPlayerScoreInfo.builder()
-                    .matchPlayerId(mp.getId())
-                    .participantId(mp.getParticipant().getId())
-                    .participantImageUrl(mp.getParticipant().getProfileImageUrl())
-                    .participantGameId(mp.getParticipant().getGameId())
-                    .playerScore(mp.getPlayerScore())
-                    .build();
-
-            matchPlayerScoreInfoList.add(info);
-        }
-
-        return matchPlayerScoreInfoList;
+        return matchPlayers.stream()
+                .map(mp -> MatchPlayerScoreInfo.builder()
+                        .matchPlayerId(mp.getId())
+                        .participantId(mp.getParticipant().getId())
+                        .participantImageUrl(mp.getParticipant().getProfileImageUrl())
+                        .participantGameId(mp.getParticipant().getGameId())
+                        .playerScore(mp.getPlayerScore())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private void sortAndRankMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
