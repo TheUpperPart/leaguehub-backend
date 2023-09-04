@@ -42,6 +42,7 @@ public class MatchService {
     private final ChannelRepository channelRepository;
     private final ParticipantRepository participantRepository;
     private final MemberService memberService;
+    private static final int INITIAL_RANK = 1;
 
 
     /**
@@ -360,9 +361,8 @@ public class MatchService {
                 .comparing(MatchPlayerScoreInfo::getPlayerScore).reversed()
                 .thenComparing(MatchPlayerScoreInfo::getParticipantGameId));
     }
-
     private void assignRankToMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
-        int rank = 1;
+        int rank = INITIAL_RANK;
         for (int i = 0; i < matchPlayerScoreInfoList.size(); i++) {
             MatchPlayerScoreInfo info = matchPlayerScoreInfoList.get(i);
             if (i > 0 && !info.getPlayerScore().equals(matchPlayerScoreInfoList.get(i - 1).getPlayerScore())) {
