@@ -124,6 +124,26 @@ public class MatchService {
         return matchRoundInfoDto;
     }
 
+    public Integer getMyMatchRound(String channelLink) {
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+
+        MatchRoundListDto roundListDto = new MatchRoundListDto();
+        roundListDto.setLiveRound(0);
+
+        if (participant.getRole().equals(PLAYER)
+                && participant.getParticipantStatus().equals(PROGRESS)) {
+            int maxPlayers = participant.getChannel().getMaxPlayer();
+            List<Integer> roundList = calculateRoundList(maxPlayers);
+            roundListDto.setRoundList(roundList);
+
+            findLiveRound(channelLink, roundList, roundListDto);
+        }
+
+        return roundListDto.getLiveRound();
+
+    }
+
 
     private Channel getChannel(String channelLink) {
         Channel findChannel = channelRepository.findByChannelLink(channelLink)
