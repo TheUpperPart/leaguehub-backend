@@ -32,7 +32,7 @@ public class StompHandler implements ChannelInterceptor {
             Optional<String> accessToken = jwtService.extractAccessToken(accessor);
 
             if (accessToken.isEmpty()) {
-                log.info("Stomp : 토큰 기간 만료됨");
+                log.info("Stomp : 토큰이 헤더에 없음");
                 throw new AuthTokenNotFoundException();
             }
             if (jwtService.isTokenExpired(accessToken.get())) {

@@ -1,8 +1,6 @@
 package leaguehub.leaguehubbackend.service.match;
 
-import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
-import leaguehub.leaguehubbackend.dto.match.RiotAPIDto;
+import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchSet;
@@ -10,6 +8,7 @@ import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
@@ -29,6 +28,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -215,5 +215,33 @@ public class MatchPlayerService {
         }
 
         return matchSet;
+    }
+
+    private MatchPlayer findMatchPlayer(Long matchPlayerId, Long matchId) {
+        return matchPlayerRepository.findByParticipantIdAndMatchId(matchPlayerId, matchId)
+                .orElseThrow(MatchPlayerNotFoundException::new);
+    }
+
+    @Transactional
+    public void markPlayerAsReady(MatchSetReadyMessage message, Long matchId) {
+
+        Long matchPlayerId = message.getMatchPlayerId();
+
+        MatchPlayer matchPlayer = findMatchPlayer(matchPlayerId, matchId);
+
+        matchPlayer.changeStatusToReady();
+        matchPlayerRepository.save(matchPlayer);
+    }
+
+    public List<MatchSetStatusMessage> getAllPlayerStatusForMatch(Long matchId) {
+        List<MatchPlayer> matchPlayers = matchPlayerRepository.findAllByMatch_Id(matchId);
+
+        if (matchPlayers.isEmpty()) {
+            throw new MatchNotFoundException();
+        }
+
+        return matchPlayers.stream()
+                .map(mp -> new MatchSetStatusMessage (mp.getId(), mp.getPlayerStatus()))
+                .collect(Collectors.toList());
     }
 }

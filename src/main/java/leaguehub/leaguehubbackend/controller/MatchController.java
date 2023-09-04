@@ -8,18 +8,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundInfoDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
-import leaguehub.leaguehubbackend.dto.match.MatchScoreInfoDto;
+import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -31,6 +33,7 @@ public class MatchController {
 
     private final MatchPlayerService matchPlayerService;
     private final MatchService matchService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Operation(summary = "라운드 수(몇 강) 리스트 반환")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
@@ -112,6 +115,18 @@ public class MatchController {
         return new ResponseEntity(matchInfo, OK);
     }
 
+
+    @MessageMapping("/match/{matchId}")
+    @SendTo("/match/{matchId}")
+    public List<MatchSetStatusMessage> receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+
+        matchPlayerService.markPlayerAsReady(message, matchId);
+
+        List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
+
+        return allPlayerStatus;
+    }
+  
     @GetMapping("/match/{matchId}/player/info")
     public ResponseEntity loadMatchScore(@PathVariable("matchId") Long matchId) {
 
