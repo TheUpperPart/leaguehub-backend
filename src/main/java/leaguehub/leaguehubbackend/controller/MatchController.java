@@ -99,13 +99,14 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}")
-    public void receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+    @SendTo("/match/{matchId}")
+    public List<MatchSetStatusMessage> receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
 
         matchPlayerService.markPlayerAsReady(message, matchId);
 
         List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, allPlayerStatus);
+        return allPlayerStatus;
     }
 
 }
