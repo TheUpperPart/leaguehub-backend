@@ -217,17 +217,20 @@ public class MatchPlayerService {
         return matchSet;
     }
 
+    private MatchPlayer findMatchPlayer(Long matchPlayerId, Long matchId) {
+        return matchPlayerRepository.findByParticipantIdAndMatchId(matchPlayerId, matchId)
+                .orElseThrow(MatchPlayerNotFoundException::new);
+    }
+
     @Transactional
     public void markPlayerAsReady(MatchSetReadyMessage message, Long matchId) {
 
         Long matchPlayerId = message.getMatchPlayerId();
 
-        MatchPlayer matchPlayer = matchPlayerRepository.findMatchPlayerByParticipantIdAndMatchId(matchPlayerId, matchId)
-                .orElseThrow(MatchPlayerNotFoundException::new);
+        MatchPlayer matchPlayer = findMatchPlayer(matchPlayerId, matchId);
 
         matchPlayer.changeStatusToReady();
         matchPlayerRepository.save(matchPlayer);
-
     }
 
     public List<MatchSetStatusMessage> getAllPlayerStatusForMatch(Long matchId) {
