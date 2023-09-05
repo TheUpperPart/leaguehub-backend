@@ -115,7 +115,6 @@ public class MatchController {
         return new ResponseEntity(matchInfo, OK);
     }
 
-
     @MessageMapping("/match/{matchId}")
     @SendTo("/match/{matchId}")
     public List<MatchSetStatusMessage> receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
@@ -126,7 +125,15 @@ public class MatchController {
 
         return allPlayerStatus;
     }
-  
+
+    @Operation(summary = "현재 진행중인 매치의 정보 조회.")
+        @Parameters(value = {
+            @Parameter(name = "matchId", description = "조회 대상 matchId", example = "1"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "매치가 조회됨", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScoreInfoDto.class))),
+            @ApiResponse(responseCode = "404", description = "매치를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @GetMapping("/match/{matchId}/player/info")
     public ResponseEntity loadMatchScore(@PathVariable("matchId") Long matchId) {
 
