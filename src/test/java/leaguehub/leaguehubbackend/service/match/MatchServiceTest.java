@@ -17,11 +17,13 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
@@ -55,6 +57,18 @@ class MatchServiceTest {
     @Autowired
     MatchService matchService;
 
+
+    @AfterEach
+    public void tearDown() {
+        participantRepository.deleteAll();
+        matchRepository.deleteAll();
+        channelRuleRepository.deleteAll();
+        channelRepository.deleteAll();
+        memberRepository.deleteAll();
+        channelBoardRepository.deleteAll();
+
+        SecurityContextHolder.clearContext();
+    }
     Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
