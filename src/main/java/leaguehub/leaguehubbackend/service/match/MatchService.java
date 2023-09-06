@@ -257,6 +257,7 @@ public class MatchService {
                     matchPlayerInfo.setGameTier(matchPlayer.getParticipant().getGameTier());
                     matchPlayerInfo.setPlayerStatus(matchPlayer.getPlayerStatus());
                     matchPlayerInfo.setScore(matchPlayer.getPlayerScore());
+                    matchPlayerInfo.setProfileSrc(matchPlayer.getParticipant().getProfileImageUrl());
                     return matchPlayerInfo;
                 })
                 .collect(Collectors.toList());
