@@ -192,9 +192,9 @@ public class ParticipantController {
     @PostMapping("/{channelLink}/participant/observer")
     public ResponseEntity participateChannel(@PathVariable("channelLink") String channelLink) {
 
-        Participant participant = participantService.participateChannel(channelLink);
+        ParticipantChannelDto participantChannelDto = participantService.participateChannel(channelLink);
 
-        return new ResponseEntity<>(participant.getNickname(), OK);
+        return new ResponseEntity<>(participantChannelDto, OK);
     }
 
     @Operation(summary = "채널 나가기", description = "채널 링크를 통하여 해당 채널 나가기")
