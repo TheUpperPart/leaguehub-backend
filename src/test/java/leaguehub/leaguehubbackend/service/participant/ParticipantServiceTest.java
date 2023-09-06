@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.channel.GameCategory;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.RequestStatus;
@@ -681,12 +682,12 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
 
         //when
-        Participant participant = participantService.participateChannel(channel.getChannelLink());
+        ParticipantChannelDto participantChannelDto  = participantService.participateChannel(channel.getChannelLink());
         //then
 
-        assertThat(participant.getChannel().getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(participant.getRequestStatus()).isEqualTo(RequestStatus.NO_REQUEST);
-        assertThat(participant.getRole()).isEqualTo(Role.OBSERVER);
+        assertThat(participantChannelDto.getChannelLink()).isEqualTo(channel.getChannelLink());
+        assertThat(participantChannelDto.getGameCategory()).isEqualTo(GameCategory.TFT);
+        assertThat(participantChannelDto.getTitle()).isEqualTo(channel.getTitle());
     }
 
     @Test
