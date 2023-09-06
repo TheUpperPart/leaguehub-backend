@@ -22,6 +22,9 @@ public class MatchPlayerInfo {
     @Schema(description = "참가자 점수", example = "8(점), 5(점), ...")
     private Integer score;
 
+    @Schema(description = "참가자 프로필 이미지 주소", example = "https://league.s3.ap-northeast-2.amazonaws.com/imgSrc.png")
+    private String profileSrc;
+
 
     @Builder
     public MatchPlayerInfo(String gameId, String gameTier, PlayerStatus playerStatus, Integer score) {
