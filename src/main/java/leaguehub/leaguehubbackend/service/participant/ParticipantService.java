@@ -78,7 +78,7 @@ public class ParticipantService {
      * @param channelLink
      * @return Participant participant
      */
-    public Participant participateChannel(String channelLink) {
+    public ParticipantChannelDto participateChannel(String channelLink) {
 
         Member member = memberService.findCurrentMember();
 
@@ -91,7 +91,13 @@ public class ParticipantService {
         participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
         participantRepository.save(participant);
 
-        return participant;
+        return new ParticipantChannelDto(
+                channel.getChannelLink(),
+                channel.getTitle(),
+                channel.getGameCategory().getNum(),
+                channel.getChannelImageUrl(),
+                participant.getIndex()
+        );
     }
 
 
