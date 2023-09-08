@@ -69,7 +69,7 @@ public class ParticipantService {
     }
 
     public String findChannelHost(String channelLink) {
-        return participantRepository.findParticipantByRoleAndChannel_ChannelLinkOrderById(HOST, channelLink).getNickname();
+        return participantRepository.findParticipantByRoleAndChannel_ChannelLinkOrderById(HOST, channelLink).get(0).getNickname();
     }
 
     /**
@@ -81,7 +81,6 @@ public class ParticipantService {
     public Participant participateChannel(String channelLink) {
 
         Member member = memberService.findCurrentMember();
-        checkEmail(member.getBaseRole());
 
         Channel channel = channelService.getChannel(channelLink);
 
@@ -427,12 +426,14 @@ public class ParticipantService {
     }
 
     public void duplicateParticipant(Member member, String channelLink) {
-        participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
-                .ifPresent(participant -> duplicatePlayerIdCheck(participant));
+        Optional<Participant> existingParticipant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
+
+        if (existingParticipant.isPresent()) {
+            duplicatePlayerIdCheck();
+        }
     }
 
-
-    private void duplicatePlayerIdCheck(Participant participant) {
+    private void duplicatePlayerIdCheck() {
         throw new ParticipantDuplicatedGameIdException();
     }
 
