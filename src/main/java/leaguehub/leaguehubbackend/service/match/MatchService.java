@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -138,6 +140,18 @@ public class MatchService {
 
         return roundListDto.getLiveRound();
 
+    }
+
+    public void setMatchRoundCount(String channelLink, List<Integer> roundCount){
+
+        List<Match> findMatchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
+
+        if(findMatchList.isEmpty())
+            throw new MatchNotFoundException();
+
+        AtomicInteger roundCountIndex = new AtomicInteger(0);
+
+        updateMatchRoundCount(roundCount, findMatchList, roundCountIndex);
     }
 
 
@@ -400,6 +414,16 @@ public class MatchService {
             }
         }
         throw new MemberNotFoundException();
+    }
+
+    private static void updateMatchRoundCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
+        IntStream.rangeClosed(1, roundCount.size() + 1)
+                .forEach(roundIndex -> findMatchList.stream()
+                        .filter(match -> match.getMatchRound() == roundIndex)
+                        .forEach(match -> {
+                            match.updateMatchRoundMaxCount(roundCount.get(roundCountIndex.get()));
+                            roundCountIndex.incrementAndGet();
+                        }));
     }
 
 }
