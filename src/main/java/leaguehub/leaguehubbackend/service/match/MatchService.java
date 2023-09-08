@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -21,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -344,7 +347,10 @@ public class MatchService {
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
         Member member = memberService.findCurrentMember();
 
-        List<MatchPlayer> matchPlayers = matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId);
+        List<MatchPlayer> matchPlayers = Optional.ofNullable(
+                        matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId))
+                .filter(list -> !list.isEmpty())
+                .orElseThrow(MatchNotFoundException::new);
 
         List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = convertToMatchPlayerScoreInfoList(matchPlayers);
 
@@ -352,12 +358,10 @@ public class MatchService {
 
         String requestMatchPlayerId = findRequestMatchPlayerId(member, matchPlayers);
 
-        MatchScoreInfoDto matchScoreInfoDto = MatchScoreInfoDto.builder()
+        return MatchScoreInfoDto.builder()
                 .matchPlayerScoreInfos(matchPlayerScoreInfoList)
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
-
-        return matchScoreInfoDto;
     }
 
     private List<MatchPlayerScoreInfo> convertToMatchPlayerScoreInfoList(List<MatchPlayer> matchPlayers) {
@@ -399,7 +403,7 @@ public class MatchService {
                 return mp.getId().toString();
             }
         }
-        throw new MemberNotFoundException();
+        return "Observer";
     }
 
 }
