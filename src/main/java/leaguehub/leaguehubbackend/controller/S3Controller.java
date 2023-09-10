@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
+import leaguehub.leaguehubbackend.dto.s3.ImageUploadRequest;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.s3.S3FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,8 @@ public class S3Controller {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 이미지입니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/image")
-    public ResponseEntity saveProfile(MultipartFile multipartFile) {
-        String imageUrl = s3FileUploadService.uploadFile(multipartFile);
+    public ResponseEntity saveProfile(ImageUploadRequest imageUploadRequest) {
+        String imageUrl = s3FileUploadService.uploadFile(imageUploadRequest.uploadImage());
 
         return new ResponseEntity<>(imageUrl, OK);
     }
