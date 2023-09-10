@@ -70,7 +70,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(errorCode.getHttpStatus().value());
         response.getWriter().println(
                 "{ " +
                         "\"statusCode\" : \"" + errorCode.getHttpStatus()
