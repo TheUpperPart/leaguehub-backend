@@ -143,4 +143,22 @@ public class MatchController {
         return new ResponseEntity<>(matchScoreInfoDto, OK);
     }
 
+    @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 경기 횟수 설정")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "roundCountList", description = "설정할려는 횟수 배열", example = "[3, 4, 2, 1]")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 횟수가 배정되었습니다."),
+            @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PostMapping("/match/{channelLink}/count")
+    public ResponseEntity setMatchRoundCount(@PathVariable("channelLink") String channelLink,
+                                             @RequestBody List<Integer> roundCountList){
+
+        matchService.setMatchRoundCount(channelLink, roundCountList);
+
+        return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
+    }
+
 }

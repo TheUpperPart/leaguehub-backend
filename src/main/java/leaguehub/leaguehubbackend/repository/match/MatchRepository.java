@@ -8,4 +8,6 @@ import java.util.List;
 public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findAllByChannel_ChannelLinkAndMatchRoundOrderByMatchName(String channelLink, Integer matchRound);
 
+    List<Match> findAllByChannel_ChannelLink(String channelLink);
+
 }
