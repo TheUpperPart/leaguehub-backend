@@ -101,29 +101,32 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    @SendTo("/match/greetings")
-    public ResponseEntity updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+    @SendTo("/match/{matchId}")
+    public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+
         MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
-        return new ResponseEntity<>(matchInfoDto, OK);
-    }
 
-    @MessageMapping("/match/{matchId}")
-    @SendTo("/match/greetings")
-    public ResponseEntity getMatchInfo(@PathVariable("matchId") Long matchId) {
-        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
-
-        return new ResponseEntity(matchInfo, OK);
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfoDto);
     }
 
     @MessageMapping("/match/{matchId}")
     @SendTo("/match/{matchId}")
-    public List<MatchSetStatusMessage> receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+    public void getMatchInfo(@PathVariable("matchId") Long matchId) {
+
+        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
+
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfo);
+    }
+
+
+    @MessageMapping("/match/{matchId}/checkIn")
+    public void checkIn(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
 
         matchPlayerService.markPlayerAsReady(message, matchId);
 
         List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
 
-        return allPlayerStatus;
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, allPlayerStatus);
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
