@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
+import leaguehub.leaguehubbackend.exception.s3.exception.S3InvalidImageException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +72,8 @@ public class Channel extends BaseTimeEntity {
         if (channelImageUrl == null) {
             channelImageUrl = ""; //Default 값
         }
+        else if(!channelImageUrl.startsWith("https://league-hub-s3.s3.ap-northeast-2.amazonaws.com/"))
+            throw new S3InvalidImageException();
 
         return channelImageUrl;
     }
