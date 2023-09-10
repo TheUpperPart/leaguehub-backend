@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
 import leaguehub.leaguehubbackend.dto.s3.ImageUploadRequest;
+import leaguehub.leaguehubbackend.dto.s3.S3ResponseDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.s3.S3FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +39,8 @@ public class S3Controller {
     })
     @PostMapping("/image")
     public ResponseEntity saveProfile(ImageUploadRequest imageUploadRequest) {
-        String imageUrl = s3FileUploadService.uploadFile(imageUploadRequest.uploadImage());
+        S3ResponseDto s3ResponseDto = s3FileUploadService.uploadFile(imageUploadRequest.uploadImage());
 
-        return new ResponseEntity<>(imageUrl, OK);
+        return new ResponseEntity<>(s3ResponseDto, OK);
     }
 }

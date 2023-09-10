@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
+import leaguehub.leaguehubbackend.dto.s3.S3ResponseDto;
 import leaguehub.leaguehubbackend.exception.s3.exception.S3InvalidImageException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,7 @@ public class S3FileUploadService {
 
     private final AmazonS3Client amazonS3Client;
 
-    public String uploadFile(MultipartFile uploadFile) {
+    public S3ResponseDto uploadFile(MultipartFile uploadFile) {
 
         String origName = uploadFile.getOriginalFilename();
 
@@ -59,7 +60,9 @@ public class S3FileUploadService {
 
         file.delete();
 
-        return imageUrl;
+        S3ResponseDto s3ResponseDto = new S3ResponseDto();
+        s3ResponseDto.setImgUrl(imageUrl);
+        return s3ResponseDto;
 
     }
 }
