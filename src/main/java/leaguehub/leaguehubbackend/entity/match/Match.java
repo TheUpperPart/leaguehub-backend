@@ -61,4 +61,6 @@ public class Match extends BaseTimeEntity {
     public void updateMatchStatus(MatchStatus matchStatus) {
         this.matchStatus = matchStatus;
     }
+
+    public void updateMatchRoundMaxCount(Integer roundMaxCount) { this.roundMaxCount = roundMaxCount; }
 }

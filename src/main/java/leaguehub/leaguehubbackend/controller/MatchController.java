@@ -101,29 +101,32 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    @SendTo("/match/greetings")
-    public ResponseEntity updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+    @SendTo("/match/{matchId}")
+    public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+
         MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
-        return new ResponseEntity<>(matchInfoDto, OK);
-    }
 
-    @MessageMapping("/match/{matchId}")
-    @SendTo("/match/greetings")
-    public ResponseEntity getMatchInfo(@PathVariable("matchId") Long matchId) {
-        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
-
-        return new ResponseEntity(matchInfo, OK);
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfoDto);
     }
 
     @MessageMapping("/match/{matchId}")
     @SendTo("/match/{matchId}")
-    public List<MatchSetStatusMessage> receiveNote(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+    public void getMatchInfo(@PathVariable("matchId") Long matchId) {
+
+        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
+
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfo);
+    }
+
+
+    @MessageMapping("/match/{matchId}/checkIn")
+    public void checkIn(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
 
         matchPlayerService.markPlayerAsReady(message, matchId);
 
         List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
 
-        return allPlayerStatus;
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, allPlayerStatus);
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
@@ -138,6 +141,24 @@ public class MatchController {
         MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
 
         return new ResponseEntity<>(matchScoreInfoDto, OK);
+    }
+
+    @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 경기 횟수 설정")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "roundCountList", description = "설정할려는 횟수 배열", example = "[3, 4, 2, 1]")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 횟수가 배정되었습니다."),
+            @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PostMapping("/match/{channelLink}/count")
+    public ResponseEntity setMatchRoundCount(@PathVariable("channelLink") String channelLink,
+                                             @RequestBody List<Integer> roundCountList){
+
+        matchService.setMatchRoundCount(channelLink, roundCountList);
+
+        return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
 
 }

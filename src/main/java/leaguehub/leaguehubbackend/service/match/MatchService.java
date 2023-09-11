@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -141,6 +142,18 @@ public class MatchService {
 
         return roundListDto.getLiveRound();
 
+    }
+
+    public void setMatchRoundCount(String channelLink, List<Integer> roundCount){
+
+        List<Match> findMatchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
+
+        if(findMatchList.isEmpty())
+            throw new MatchNotFoundException();
+
+        AtomicInteger roundCountIndex = new AtomicInteger(0);
+
+        updateMatchRoundCount(roundCount, findMatchList, roundCountIndex);
     }
 
 
@@ -404,6 +417,16 @@ public class MatchService {
             }
         }
         return "Observer";
+    }
+
+    private static void updateMatchRoundCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
+        IntStream.rangeClosed(1, roundCount.size() + 1)
+                .forEach(roundIndex -> findMatchList.stream()
+                        .filter(match -> match.getMatchRound() == roundIndex)
+                        .forEach(match -> {
+                            match.updateMatchRoundMaxCount(roundCount.get(roundCountIndex.get()));
+                            roundCountIndex.incrementAndGet();
+                        }));
     }
 
 }
