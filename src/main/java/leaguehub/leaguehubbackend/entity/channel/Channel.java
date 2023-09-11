@@ -2,9 +2,11 @@ package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
+import leaguehub.leaguehubbackend.exception.s3.exception.S3InvalidImageException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import static java.util.UUID.randomUUID;
 
@@ -12,6 +14,10 @@ import static java.util.UUID.randomUUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Channel extends BaseTimeEntity {
+
+    @Value("${cloud.aws.s3.bucket.url}")
+    @Transient
+    private String defaultUrl;
 
     @Id
     @Column(name = "channel_id")
@@ -71,6 +77,8 @@ public class Channel extends BaseTimeEntity {
         if (channelImageUrl == null) {
             channelImageUrl = ""; //Default 값
         }
+        else if(!channelImageUrl.startsWith(defaultUrl))
+            throw new S3InvalidImageException();
 
         return channelImageUrl;
     }
