@@ -160,7 +160,7 @@ public class MatchPlayerService {
         return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
     }
 
-    public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount) {
+    public void updateMatchPlayerScore(Long matchId, Integer setCount) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
         RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
@@ -176,6 +176,7 @@ public class MatchPlayerService {
         matchRankResultDtoList
                 .forEach(matchRankResultDto ->
                         findMatchPlayerList.stream()
+                                .filter(matchPlayer -> matchPlayer.getId().equals(matchRankResultDto.getGameId()))
                                 .forEach(matchPlayer -> matchPlayer.updateMatchPlayerScore(matchRankResultDto.getPlacement()))
                 );
 
@@ -183,9 +184,6 @@ public class MatchPlayerService {
 
         Match match = findMatchPlayerList.get(0).getMatch();
         checkMatchEnd(matchSet, match);
-
-        return matchService.convertMatchInfoDto
-                (match, findMatchPlayerList);
     }
 
     /**
