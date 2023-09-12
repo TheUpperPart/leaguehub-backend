@@ -173,11 +173,9 @@ public class MatchPlayerService {
 
         validMatchResult(findMatchPlayerList, matchRankResultDtoList);
 
-
         matchRankResultDtoList
                 .forEach(matchRankResultDto ->
                         findMatchPlayerList.stream()
-                                .filter(matchPlayer -> validUpdatePlayerScore(matchRankResultDto, matchPlayer))
                                 .forEach(matchPlayer -> matchPlayer.updateMatchPlayerScore(matchRankResultDto.getPlacement()))
                 );
 
@@ -204,17 +202,6 @@ public class MatchPlayerService {
         if (count != findMatchPlayerList.size()) {
             throw new MatchResultIdNotFoundException();
         }
-    }
-
-    /**
-     * 실격이 아니고 게임 Id가 동일한지 검사하는 로직
-     * @param matchRankResultDto
-     * @param matchPlayer
-     * @return
-     */
-    private boolean validUpdatePlayerScore(MatchRankResultDto matchRankResultDto, MatchPlayer matchPlayer) {
-        return matchRankResultDto.getGameId().equals(matchPlayer.getParticipant().getGameId())
-                && (matchPlayer.getPlayerStatus() != PlayerStatus.DISQUALIFICATION);
     }
 
     private void checkMatchEnd(MatchSet matchSet, Match match) {
