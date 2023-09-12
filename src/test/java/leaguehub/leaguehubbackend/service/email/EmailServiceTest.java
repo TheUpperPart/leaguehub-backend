@@ -1,5 +1,7 @@
 package leaguehub.leaguehubbackend.service.email;
 
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
@@ -24,6 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Properties;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertThrows;
@@ -68,6 +71,7 @@ public class EmailServiceTest {
         when(userDetails.getUsername()).thenReturn(personalId);
         when(memberRepository.findMemberByPersonalId(personalId)).thenReturn(Optional.of(member));
         when(memberService.findCurrentMember()).thenReturn(member);
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
 
         emailService.sendEmailWithConfirmation(email);
 
@@ -123,6 +127,7 @@ public class EmailServiceTest {
         when(userDetails.getUsername()).thenReturn(personalId);
         when(memberRepository.findMemberByPersonalId(personalId)).thenReturn(Optional.of(member));
         when(memberService.findCurrentMember()).thenReturn(member);
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
 
         emailService.sendEmailWithConfirmation(email);
 

@@ -2,6 +2,8 @@ package leaguehub.leaguehubbackend.service.email;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
@@ -15,10 +17,16 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 @Slf4j
@@ -31,6 +39,8 @@ public class EmailService {
     private final EmailAuthRepository emailAuthRepository;
 
     private final MemberService memberService;
+
+    private final ResourceLoader resourceLoader;
 
     @Value("${EMAIL_SECRET_KEY}")
     private String secretKey;
@@ -62,18 +72,44 @@ public class EmailService {
         if (!isValidEmailFormat(email)) throw new InvalidEmailAddressException();
         if (memberRepository.findMemberByEmail(email).isPresent()) throw new DuplicateEmailException();
     }
-    private void sendConfirmationEmail(EmailAuth emailAuth, String uniqueToken) {
+
+    public void sendConfirmationEmail(EmailAuth emailAuth, String uniqueToken) {
         try {
-            String link = "http://" + leagueHubAddress + "/api/member/oauth/email?token=" + uniqueToken;
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(emailAuth.getEmail());
-            message.setSubject("회원가입 이메일 인증");
-            message.setText(link);
-            mailSender.send(message);
+            String link = generateConfirmationLink(uniqueToken);
+            String htmlTemplate = loadEmailTemplate("static/emailTemplate.html");
+            String htmlContent = changeTemplate(htmlTemplate, link);
+            sendEmail(emailAuth.getEmail(), "회원가입 이메일 인증", htmlContent);
         } catch (Exception e) {
+            log.error("Error in sendConfirmationEmail", e);
             throw new GlobalServerErrorException();
         }
     }
+    private String generateConfirmationLink(String uniqueToken) {
+        return "http://" + leagueHubAddress + "/api/member/oauth/email?token=" + uniqueToken;
+    }
+
+    private String loadEmailTemplate(String path) throws IOException {
+        ClassPathResource resource = new ClassPathResource(path);
+        InputStream inputStream = resource.getInputStream();
+        byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+        return new String(bdata, StandardCharsets.UTF_8);
+    }
+
+    private String changeTemplate(String template, String link) {
+        return template.replace("{{LINK}}", link);
+    }
+
+    private void sendEmail(String to, String subject, String content) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        mailSender.send(message);
+    }
+
     private EmailAuth createAndSaveEmailAuth(String email, Member member, String uniqueToken) {
         EmailAuth emailAuth = new EmailAuth(email, uniqueToken);
 
