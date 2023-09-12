@@ -203,8 +203,10 @@ public class MatchPlayerService {
     }
 
     private void checkMatchEnd(MatchSet matchSet, Match match) {
-        if(match.getRoundMaxCount() == matchSet.getSetCount()) {
+        if(match.getMatchSetCount() == matchSet.getSetCount()) {
             match.updateMatchStatus(MatchStatus.END);
+        } else {
+            match.updateCurrentMatchSet(matchSet.getSetCount());
         }
     }
 
