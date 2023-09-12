@@ -1,10 +1,7 @@
 package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.*;
-import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
-import leaguehub.leaguehubbackend.entity.match.MatchSet;
-import leaguehub.leaguehubbackend.entity.match.MatchStatus;
+import leaguehub.leaguehubbackend.entity.match.*;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
@@ -164,7 +161,7 @@ public class MatchPlayerService {
     }
 
     public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount) {
-        List<MatchPlayer> findMatchPlayerList = getMatchPlayers(matchId);
+        List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
         RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
 
@@ -174,10 +171,11 @@ public class MatchPlayerService {
 
         List<MatchRankResultDto> matchRankResultDtoList = matchDetailFromRiot.getMatchRankResultDtoList();
 
+        validMatchResult(findMatchPlayerList, matchRankResultDtoList);
+
         matchRankResultDtoList
                 .forEach(matchRankResultDto ->
                         findMatchPlayerList.stream()
-                                .filter(matchPlayer -> matchRankResultDto.getGameId().equals(matchPlayer.getParticipant().getGameId()))
                                 .forEach(matchPlayer -> matchPlayer.updateMatchPlayerScore(matchRankResultDto.getPlacement()))
                 );
 
@@ -188,6 +186,22 @@ public class MatchPlayerService {
 
         return matchService.convertMatchInfoDto
                 (match, findMatchPlayerList);
+    }
+
+    /**
+     * MatchResult에 실격한 멤버를 제외한 모든 멤버가 있는지 체크
+     * @param findMatchPlayerList
+     * @param matchRankResultDtoList
+     */
+    private void validMatchResult(List<MatchPlayer> findMatchPlayerList, List<MatchRankResultDto> matchRankResultDtoList) {
+        long count = matchRankResultDtoList.stream()
+                .flatMap(dto -> findMatchPlayerList.stream()
+                        .filter(player -> dto.getGameId().equals(player.getParticipant().getGameId())))
+                .count();
+
+        if (count != findMatchPlayerList.size()) {
+            throw new MatchResultIdNotFoundException();
+        }
     }
 
     private void checkMatchEnd(MatchSet matchSet, Match match) {
