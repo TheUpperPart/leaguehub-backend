@@ -101,7 +101,6 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    @SendTo("/match/{matchId}")
     public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
 
         MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
@@ -110,7 +109,6 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}")
-    @SendTo("/match/{matchId}")
     public void getMatchInfo(@PathVariable("matchId") Long matchId) {
 
         MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
