@@ -101,9 +101,11 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+    public List<MatchRankResultDto> updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
 
-        matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+        List<MatchRankResultDto> matchRankResultDtos = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+
+        return matchRankResultDtos;
     }
 
     @MessageMapping("/match/{matchId}")

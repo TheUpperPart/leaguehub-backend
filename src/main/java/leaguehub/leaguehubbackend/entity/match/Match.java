@@ -71,6 +71,6 @@ public class Match extends BaseTimeEntity {
     public void updateMatchRoundMaxCount(Integer roundMaxCount) { this.roundMaxCount = roundMaxCount; }
 
     public void updateCurrentMatchSet(Integer matchCurrentSet) {
-        this.matchCurrentSet = matchCurrentSet + 1;
+        this.matchCurrentSet = matchCurrentSet;
     }
 }
