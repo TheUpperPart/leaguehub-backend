@@ -103,9 +103,7 @@ public class MatchController {
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
     public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
 
-        MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
-
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfoDto);
+        matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
     }
 
     @MessageMapping("/match/{matchId}")
