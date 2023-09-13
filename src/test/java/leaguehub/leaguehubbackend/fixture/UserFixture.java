@@ -27,7 +27,7 @@ public class UserFixture {
 
     public static Member createGuestMember() {
         Member member = Member.builder()
-                .personalId("idGuest").profileImageUrl("urlGuest")
+                .personalId("Guest").profileImageUrl("urlGuest")
                 .nickname("nickNameGuest").refreshToken("refreshTokenGuest")
                 .emailAuth(new EmailAuth("idGuest@example.com", "authToken"))
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.GUEST)
