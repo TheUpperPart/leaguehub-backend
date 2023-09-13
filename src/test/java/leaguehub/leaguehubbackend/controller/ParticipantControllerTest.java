@@ -76,7 +76,7 @@ class ParticipantControllerTest {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
-        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));
+        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("연습용아이디가됨"));
         Member masterMember = memberRepository.save(UserFixture.createCustomeMember("채수채수밭"));
         Member alreadyMember = memberRepository.save(UserFixture.createCustomeMember("요청한사람"));
         Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
@@ -166,10 +166,10 @@ class ParticipantControllerTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (판수 제한 o) - 성공")
     void participateLimitedPlayCountMatchSuccessTest() throws Exception {
 
-        Channel channel = createCustomChannel(false, true, 800, null, 100);
-        UserFixture.setUpCustomAuth("손성한");
+        Channel channel = createCustomChannel(false, true, 2400, null, 1);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("연습용아이디가됨");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
@@ -183,10 +183,10 @@ class ParticipantControllerTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (마스터 10000점 이하, 판수 제한 o) - 성공")
     void participateLimitedMasterMatchSuccessTest() throws Exception {
 
-        Channel channel = createCustomChannel(true, true, 3200, null, 20);
-        UserFixture.setUpCustomAuth("채수채수밭");
+        Channel channel = createCustomChannel(true, true, 2400, null, 1);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("채수채수밭");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("연습용아이디가됨");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
@@ -270,10 +270,10 @@ class ParticipantControllerTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (티어 제한) - 실패")
     void participateLimitedTierMatchFailTest() throws Exception {
 
-        Channel channel = createCustomChannel(true, false, 800, null, 20);
-        UserFixture.setUpCustomAuth("손성한");
+        Channel channel = createCustomChannel(true, false, 400, null, 1);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("연습용아이디가됨");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/"+ channel.getChannelLink()+"/participant")
@@ -574,11 +574,11 @@ class ParticipantControllerTest {
     void participateUnAuthMatchFailTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Member guestMember = memberRepository.save(UserFixture.createGuestMember());
-        UserFixture.setUpCustomGuest("idGuest");
+        UserFixture.setUpCustomGuest("Guest");
 
         Channel channel = createCustomChannel(false, false, 800, null, 100);
 
-        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("손성한");
+        ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("연습용아이디가됨");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
         mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant/observer")
