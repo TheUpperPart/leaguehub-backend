@@ -52,7 +52,7 @@ public class JwtAuthenticationEntryPointTest {
         when(request.getAttribute("exception")).thenReturn(REQUEST_TOKEN_NOT_FOUND.getCode());
         entryPoint.commence(request, response, authException);
 
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
         assertTrue(response.getContentAsString().contains(AuthExceptionCode.REQUEST_TOKEN_NOT_FOUND.getMessage()));
     }
 
@@ -82,7 +82,7 @@ public class JwtAuthenticationEntryPointTest {
         when(request.getAttribute("exception")).thenReturn(AuthExceptionCode.AUTH_MEMBER_NOT_FOUND.getCode());
         entryPoint.commence(request, response, authException);
 
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
         assertTrue(response.getContentAsString().contains(AuthExceptionCode.AUTH_MEMBER_NOT_FOUND.getMessage()));
     }
 
