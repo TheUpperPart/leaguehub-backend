@@ -19,6 +19,7 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -155,6 +156,16 @@ public class MatchService {
 
         updateMatchSetCount(roundCount, findMatchList, roundCountIndex);
     }
+
+    public List<Integer> getMatchSetCount(String channelLink){
+
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkOrderByMatchRoundDesc(channelLink);
+        List<Integer> matchSetCountList = getMatchSetCountList(matchList);
+
+        return matchSetCountList;
+    }
+
+
 
 
     private Channel getChannel(String channelLink) {
@@ -428,6 +439,20 @@ public class MatchService {
                             match.updateMatchSetCount(roundCount.get(roundCountIndex.get()));
                             roundCountIndex.incrementAndGet();
                         }));
+    }
+
+    private static List<Integer> getMatchSetCountList(List<Match> matchList) {
+        List<Integer> matchSetCountList = new ArrayList<>();
+        int matchRound = 0;
+        for(Match match : matchList){
+            if(matchRound == match.getMatchRound())
+                continue;
+            else {
+                matchSetCountList.add(match.getMatchSetCount());
+                matchRound = match.getMatchRound();
+            }
+        }
+        return matchSetCountList;
     }
 
 }

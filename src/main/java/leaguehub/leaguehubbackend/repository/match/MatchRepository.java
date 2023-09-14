@@ -10,4 +10,6 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 
     List<Match> findAllByChannel_ChannelLink(String channelLink);
 
+    List<Match> findAllByChannel_ChannelLinkOrderByMatchRoundDesc(String channelLink);
+
 }
