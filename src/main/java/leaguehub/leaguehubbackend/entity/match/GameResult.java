@@ -1,10 +1,10 @@
 package leaguehub.leaguehubbackend.entity.match;
 
-import jakarta.persistence.Id;
 import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
