@@ -8,7 +8,7 @@ import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundExcepti
 import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
-import leaguehub.leaguehubbackend.repository.match.GameResultRepository;
+import leaguehub.leaguehubbackend.mongo_repository.GameResultRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
