@@ -144,7 +144,7 @@ public class MatchService {
 
     }
 
-    public void setMatchRoundCount(String channelLink, List<Integer> roundCount){
+    public void setMatchSetCount(String channelLink, List<Integer> roundCount){
 
         List<Match> findMatchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
 
@@ -153,7 +153,7 @@ public class MatchService {
 
         AtomicInteger roundCountIndex = new AtomicInteger(0);
 
-        updateMatchRoundCount(roundCount, findMatchList, roundCountIndex);
+        updateMatchSetCount(roundCount, findMatchList, roundCountIndex);
     }
 
 
@@ -255,8 +255,8 @@ public class MatchService {
         matchInfoDto.setMatchId(match.getId());
         matchInfoDto.setMatchStatus(match.getMatchStatus());
         matchInfoDto.setMatchRound(match.getMatchRound());
-        matchInfoDto.setMatchRoundCount(match.getRoundRealCount());
-        matchInfoDto.setMatchRoundMaxCount(match.getRoundMaxCount());
+        matchInfoDto.setMatchCurrentSet(match.getMatchCurrentSet());
+        matchInfoDto.setMatchSetCount(match.getMatchSetCount());
 
         List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
         List<MatchPlayerInfo> matchPlayerInfoList = createMatchPlayerInfoList(playerList);
@@ -307,7 +307,8 @@ public class MatchService {
                 .matchName(match.getMatchName())
                 .matchStatus(match.getMatchStatus())
                 .matchRound(match.getMatchRound())
-                .matchRoundCount(match.getRoundRealCount())
+                .matchSetCount(match.getMatchSetCount())
+                .matchCurrentSet(match.getMatchCurrentSet())
                 .matchPlayerInfoList(convertMatchPlayerInfoList(matchPlayers))
                 .build();
     }
@@ -419,12 +420,12 @@ public class MatchService {
         return "Observer";
     }
 
-    private static void updateMatchRoundCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
+    private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
         IntStream.rangeClosed(1, roundCount.size() + 1)
                 .forEach(roundIndex -> findMatchList.stream()
                         .filter(match -> match.getMatchRound() == roundIndex)
                         .forEach(match -> {
-                            match.updateMatchRoundMaxCount(roundCount.get(roundCountIndex.get()));
+                            match.updateMatchSetCount(roundCount.get(roundCountIndex.get()));
                             roundCountIndex.incrementAndGet();
                         }));
     }

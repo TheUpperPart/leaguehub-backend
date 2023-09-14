@@ -160,7 +160,7 @@ public class MatchPlayerService {
         return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
     }
 
-    public void updateMatchPlayerScore(Long matchId, Integer setCount) {
+    public List<MatchRankResultDto> updateMatchPlayerScore(Long matchId, Integer setCount) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
         RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
@@ -184,6 +184,8 @@ public class MatchPlayerService {
 
         Match match = findMatchPlayerList.get(0).getMatch();
         checkMatchEnd(matchSet, match);
+
+        return matchRankResultDtoList;
     }
 
     /**
@@ -203,8 +205,10 @@ public class MatchPlayerService {
     }
 
     private void checkMatchEnd(MatchSet matchSet, Match match) {
-        if(match.getRoundMaxCount() == matchSet.getSetCount()) {
+        if(match.getMatchSetCount() == matchSet.getSetCount()) {
             match.updateMatchStatus(MatchStatus.END);
+        } else {
+            match.updateCurrentMatchSet(matchSet.getSetCount() + 1);
         }
     }
 

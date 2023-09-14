@@ -29,9 +29,9 @@ public class Match extends BaseTimeEntity {
 
     private String matchPasswd;
 
-    private Integer roundMaxCount;
+    private Integer matchSetCount;
 
-    private Integer roundRealCount;
+    private Integer matchCurrentSet;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
@@ -51,8 +51,8 @@ public class Match extends BaseTimeEntity {
         match.matchRound = matchRound;
         match.matchName = matchName;
         match.matchPasswd = GlobalConstant.NO_DATA.getData();
-        match.roundMaxCount = 1;
-        match.roundRealCount = 0;
+        match.matchCurrentSet = 0;
+        match.matchSetCount = 3;
         match.channel = channel;
 
         return match;
@@ -62,5 +62,9 @@ public class Match extends BaseTimeEntity {
         this.matchStatus = matchStatus;
     }
 
-    public void updateMatchRoundMaxCount(Integer roundMaxCount) { this.roundMaxCount = roundMaxCount; }
+    public void updateMatchSetCount(Integer matchSetCount) { this.matchSetCount = matchSetCount; }
+
+    public void updateCurrentMatchSet(Integer matchCurrentSet) {
+        this.matchCurrentSet = matchCurrentSet;
+    }
 }

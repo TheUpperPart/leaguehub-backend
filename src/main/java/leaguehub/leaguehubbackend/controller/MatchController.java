@@ -101,9 +101,12 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    public void updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
+    public List<MatchRankResultDto> updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
 
-        matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+        List<MatchRankResultDto> matchRankResultDtos = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+
+        simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchRankResultDtos);
+        return matchRankResultDtos;
     }
 
     @MessageMapping("/match/{matchId}")
@@ -152,7 +155,7 @@ public class MatchController {
     public ResponseEntity setMatchRoundCount(@PathVariable("channelLink") String channelLink,
                                              @RequestBody List<Integer> roundCountList){
 
-        matchService.setMatchRoundCount(channelLink, roundCountList);
+        matchService.setMatchSetCount(channelLink, roundCountList);
 
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
