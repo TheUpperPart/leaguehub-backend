@@ -160,4 +160,20 @@ public class MatchController {
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
 
+
+    @Operation(summary = "해당 채널 세트의 결과 - 이전 경기 결과를 가져옴(Mongo 형식)")
+    @Parameters(value = {
+            @Parameter(name = "matchSetId", description = "불러오고 싶은 매치 세트의 PK", example = "3"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 횟수가 배정되었습니다."),
+            @ApiResponse(responseCode = "404", description = "매치 세트를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @GetMapping("/match/{matchSetId}/result")
+    public ResponseEntity getGameResult(@PathVariable Long matchSetId) {
+        List<MatchRankResultDto> gameResult = matchPlayerService.getGameResult(matchSetId);
+
+        return new ResponseEntity(gameResult, OK);
+    }
+
 }

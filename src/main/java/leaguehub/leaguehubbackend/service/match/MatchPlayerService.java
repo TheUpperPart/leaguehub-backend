@@ -8,6 +8,7 @@ import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundExcepti
 import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
+import leaguehub.leaguehubbackend.mongo_repository.GameResultRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class MatchPlayerService {
     private final MatchPlayerRepository matchPlayerRepository;
     private final MatchSetRepository matchSetRepository;
     private final MatchService matchService;
+    private final GameResultRepository gameResultRepository;
 
     /**
      * 소환사의 라이엇 puuid를 얻는 메서드
@@ -182,10 +184,18 @@ public class MatchPlayerService {
 
         matchSet.updateScore(true);
 
+        gameResultRepository.save(GameResult.createGameResult(matchSet.getId(), matchRankResultDtoList));
+
         Match match = findMatchPlayerList.get(0).getMatch();
         checkMatchEnd(matchSet, match);
 
         return matchRankResultDtoList;
+    }
+
+    public List<MatchRankResultDto> getGameResult(Long matchSetId) {
+        GameResult gameResult = gameResultRepository.findById(matchSetId).orElseThrow(() -> new MatchResultIdNotFoundException());
+
+        return gameResult.getMatchRankResult();
     }
 
     /**
