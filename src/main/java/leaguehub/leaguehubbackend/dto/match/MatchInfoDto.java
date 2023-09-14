@@ -25,22 +25,22 @@ public class MatchInfoDto {
     private Integer matchRound;
 
     @Schema(description = "해당 매치 경기 현재 횟수", example = "1(회)")
-    private Integer matchRoundCount;
+    private Integer matchCurrentSet;
 
     @Schema(description = "해당 매치 최대 경기 횟수", example = "3(회)")
-    private Integer matchRoundMaxCount;
+    private Integer matchSetCount;
 
     @Schema(description = "매치에 속해있는 플레이어의 정보", example = "배열로 반환")
     private List<MatchPlayerInfo> matchPlayerInfoList;
 
     @Builder
-    public MatchInfoDto(String matchName, Long matchId, MatchStatus matchStatus, Integer matchRound, Integer matchRoundCount, Integer matchRoundMaxCount, List<MatchPlayerInfo> matchPlayerInfoList) {
+    public MatchInfoDto(String matchName, Long matchId, MatchStatus matchStatus, Integer matchRound, Integer matchCurrentSet, Integer matchSetCount, List<MatchPlayerInfo> matchPlayerInfoList) {
         this.matchName = matchName;
         this.matchId = matchId;
         this.matchStatus = matchStatus;
         this.matchRound = matchRound;
-        this.matchRoundCount = matchRoundCount;
-        this.matchRoundMaxCount = matchRoundMaxCount;
+        this.matchCurrentSet = matchCurrentSet;
+        this.matchSetCount = matchSetCount;
         this.matchPlayerInfoList = matchPlayerInfoList;
     }
 }
