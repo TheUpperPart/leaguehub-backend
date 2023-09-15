@@ -165,7 +165,7 @@ public class MatchController {
             @ApiResponse(responseCode = "200", description = "경기 횟수 반환"),
             @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("match/{channelLink/count}")
+    @GetMapping("match/{channelLink}/count")
     public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink){
 
         List<Integer> matchsetCountList = matchService.getMatchSetCount(channelLink);
