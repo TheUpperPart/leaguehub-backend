@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 
+import static leaguehub.leaguehubbackend.entity.match.MatchStatus.END;
 import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
@@ -99,6 +100,8 @@ public class MatchService {
 
         if (!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
+
+        checkPreviousMatchEnd(channelLink, matchRound);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
@@ -355,7 +358,16 @@ public class MatchService {
                 }
             }
         }
+    }
 
+    private void checkPreviousMatchEnd(String channelLink, Integer matchRound) {
+        if(matchRound != 1){
+            List<Match> previousMatch = findMatchList(channelLink, matchRound - 1);
+            previousMatch.stream()
+                    .filter(match -> !match.getMatchStatus().equals(END))
+                    .findAny()
+                    .ifPresent(match -> { throw new MatchNotFoundException(); });
+        }
     }
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
