@@ -2,7 +2,10 @@ package leaguehub.leaguehubbackend.exception.match;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.exception.match.exception.*;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
+import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -56,19 +59,6 @@ public class MatchExceptionHandler {
     @ExceptionHandler(MatchAlreadyUpdateException.class)
     public ResponseEntity<ExceptionResponse> matchAlreadyUpdateException(
             MatchAlreadyUpdateException e
-    ) {
-        ExceptionCode exceptionCode = e.getExceptionCode();
-        log.error("{}", exceptionCode.getMessage());
-
-        return new ResponseEntity<>(
-                new ExceptionResponse(exceptionCode),
-                exceptionCode.getHttpStatus()
-        );
-    }
-
-    @ExceptionHandler(MatchNotEndException.class)
-    public ResponseEntity<ExceptionResponse> MatchNotEndException(
-            MatchNotEndException e
     ) {
         ExceptionCode exceptionCode = e.getExceptionCode();
         log.error("{}", exceptionCode.getMessage());
