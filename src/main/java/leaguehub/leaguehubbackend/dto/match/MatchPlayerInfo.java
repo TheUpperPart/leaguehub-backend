@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.dto.match;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -25,12 +26,15 @@ public class MatchPlayerInfo {
     @Schema(description = "참가자 프로필 이미지 주소", example = "https://league.s3.ap-northeast-2.amazonaws.com/imgSrc.png")
     private String profileSrc;
 
+    @Schema(description = "매치 결과 상태", example = "진행중 | 탈락 | 다음 라운드로 진출 | 실격")
+    private MatchPlayerResultStatus matchPlayerResultStatus;
 
     @Builder
-    public MatchPlayerInfo(String gameId, String gameTier, PlayerStatus playerStatus, Integer score) {
+    public MatchPlayerInfo(String gameId, String gameTier, PlayerStatus playerStatus, Integer score, MatchPlayerResultStatus matchPlayerResultStatus) {
         this.gameId = gameId;
         this.gameTier = gameTier;
         this.playerStatus = playerStatus;
         this.score = score;
+        this.matchPlayerResultStatus = matchPlayerResultStatus;
     }
 }

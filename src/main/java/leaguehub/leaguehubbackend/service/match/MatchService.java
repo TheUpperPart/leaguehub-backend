@@ -87,7 +87,7 @@ public class MatchService {
     }
 
     /**
-     * 경기 첫 배정
+     * 경기 배정
      *
      * @param channelLink
      * @param matchRound
@@ -96,9 +96,6 @@ public class MatchService {
         Participant participant = checkHost(channelLink);
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
-
-        if (!participant.getChannel().getMaxPlayer().equals(matchRound))
-            checkUpdateScore(matchList);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
@@ -320,7 +317,8 @@ public class MatchService {
                         matchPlayer.getParticipant().getGameId(),
                         matchPlayer.getParticipant().getGameTier(),
                         matchPlayer.getPlayerStatus(),
-                        matchPlayer.getPlayerScore()
+                        matchPlayer.getPlayerScore(),
+                        matchPlayer.getMatchPlayerResultStatus()
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
@@ -334,29 +332,6 @@ public class MatchService {
         return participant;
     }
 
-    private void checkUpdateScore(List<Match> matchList) {
-        for (Match currentMatch : matchList) {
-            List<MatchPlayer> matchplayerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(currentMatch.getId());
-
-            int progressCount = 0;
-
-            for (MatchPlayer matchPlayer : matchplayerList) {
-                if (progressCount >= 5) {
-                    if (!matchPlayer.getParticipant().getParticipantStatus().equals(DISQUALIFICATION)) {
-                        matchPlayer.getParticipant().dropoutParticipantStatus();
-                    }
-                    continue;
-                }
-
-                if (matchPlayer.getParticipant().getParticipantStatus().equals(PROGRESS)) {
-                    progressCount++;
-                } else {
-                    matchPlayer.getParticipant().dropoutParticipantStatus();
-                }
-            }
-        }
-
-    }
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
         Member member = memberService.findCurrentMember();
