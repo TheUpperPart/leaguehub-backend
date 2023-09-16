@@ -1,6 +1,9 @@
 package leaguehub.leaguehubbackend.service.match;
 
-import leaguehub.leaguehubbackend.dto.match.*;
+import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
+import leaguehub.leaguehubbackend.dto.match.MatchSetReadyMessage;
+import leaguehub.leaguehubbackend.dto.match.MatchSetStatusMessage;
+import leaguehub.leaguehubbackend.dto.match.RiotAPIDto;
 import leaguehub.leaguehubbackend.entity.match.*;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
@@ -10,6 +13,7 @@ import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoun
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.mongo_repository.GameResultRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -23,10 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.ADVANCE;
+import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.DROPOUT;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +49,7 @@ public class MatchPlayerService {
     private final MatchSetRepository matchSetRepository;
     private final MatchService matchService;
     private final GameResultRepository gameResultRepository;
+    private final MatchRepository matchRepository;
 
     /**
      * 소환사의 라이엇 puuid를 얻는 메서드
@@ -192,14 +199,20 @@ public class MatchPlayerService {
         return matchRankResultDtoList;
     }
 
-    public List<MatchRankResultDto> getGameResult(Long matchSetId) {
-        GameResult gameResult = gameResultRepository.findById(matchSetId).orElseThrow(() -> new MatchResultIdNotFoundException());
+    public List<GameResult> getGameResult(Long matchId) {
+        List<MatchSet> matchSets = matchSetRepository.findMatchSetsByMatch_Id(matchId);
+        if (matchSets.isEmpty()) throw new MatchResultIdNotFoundException();
 
-        return gameResult.getMatchRankResult();
+        List<GameResult> gameResultList = matchSets.stream()
+                .map(matchSet -> gameResultRepository.findById(matchSet.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        return gameResultList;
     }
 
     /**
      * MatchResult에 실격한 멤버를 제외한 모든 멤버가 있는지 체크
+     *
      * @param findMatchPlayerList
      * @param matchRankResultDtoList
      */
@@ -215,8 +228,9 @@ public class MatchPlayerService {
     }
 
     private void checkMatchEnd(MatchSet matchSet, Match match) {
-        if(match.getMatchSetCount() == matchSet.getSetCount()) {
+        if (match.getMatchSetCount() == matchSet.getSetCount()) {
             match.updateMatchStatus(MatchStatus.END);
+            updateEndMatchResult(match);
         } else {
             match.updateCurrentMatchSet(matchSet.getSetCount() + 1);
         }
@@ -267,7 +281,107 @@ public class MatchPlayerService {
         }
 
         return matchPlayers.stream()
-                .map(mp -> new MatchSetStatusMessage (mp.getId(), mp.getPlayerStatus()))
+                .map(mp -> new MatchSetStatusMessage(mp.getId(), mp.getPlayerStatus()))
                 .collect(Collectors.toList());
+    }
+
+    public void updateEndMatchResult(Match match) {
+        List<MatchPlayer> matchPlayersWithoutDisqualification = matchPlayerRepository.findMatchPlayersWithoutDisqualification(match.getId());
+        Integer winScore = matchPlayersWithoutDisqualification.get(3).getPlayerScore();
+
+        long winCount = matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore() > winScore)
+                .peek(mp -> mp.updateMatchPlayerResultStatus(ADVANCE))
+                .count();
+
+        List<MatchPlayer> tieMatchPlayerList = matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore().equals(winScore))
+                .collect(Collectors.toList());
+
+        matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore() < winScore)
+                .forEach(mp -> {
+                    mp.updateMatchPlayerResultStatus(DROPOUT);
+                    mp.getParticipant().dropoutParticipantStatus();
+                });
+
+        if (winCount == 3 && tieMatchPlayerList.size() == 1) {
+            MatchPlayer matchPlayer = tieMatchPlayerList.get(0);
+            matchPlayer.updateMatchPlayerResultStatus(ADVANCE);
+        } else if (winCount < 4 && tieMatchPlayerList.size() > 1) {
+            List<MatchSet> matchSets =
+                    matchSetRepository.findMatchSetsByMatch_Id(match.getId());
+            List<GameResult> gameResults =
+                    matchSets.stream()
+                            .map(set ->
+                                    gameResultRepository.findById(set.getId()).get())
+                            .collect(Collectors.toList());
+
+            tieBreaker(tieMatchPlayerList, gameResults);
+        }
+    }
+
+
+    public void tieBreaker(List<MatchPlayer> tieMatchPlayerList,
+                            List<GameResult> gameResultList) {
+        Map<String, Integer> countFirst = new ConcurrentHashMap<>();
+
+        gameResultList.stream()
+                .flatMap(gameResult -> gameResult.getMatchRankResult().stream())
+                .filter(matchRankResultDto -> matchRankResultDto.getPlacement() == 1)
+                .forEach(matchRankResultDto ->
+                        countFirst.put(matchRankResultDto.getGameId(),
+                                countFirst.getOrDefault(matchRankResultDto.getGameId(), 0) + 1));
+
+
+        int maxValue = Collections.max(countFirst.values());
+        List<String> keysWithMaxValue = countFirst.entrySet()
+                .stream()
+                .filter(entry -> Objects.equals(entry.getValue(), maxValue))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        tieMatchPlayerList.removeIf(matchPlayer -> {
+            if (!keysWithMaxValue.contains(matchPlayer.getParticipant().getGameId())) {
+                matchPlayer.updateMatchPlayerResultStatus(DROPOUT);
+                matchPlayer.getParticipant().dropoutParticipantStatus();
+                return true;
+            }
+            return false;
+        });
+
+
+        if (tieMatchPlayerList.size() == 1) {
+            tieMatchPlayerList.get(0).updateMatchPlayerResultStatus(ADVANCE);
+
+        }
+
+        if (tieMatchPlayerList.size() > 1) {
+            GameResult gameResult = gameResultList.get(gameResultList.size() - 1);
+
+            Optional<MatchPlayer> maxPlaceTiePlayer = tieMatchPlayerList.stream()
+                    .filter(matchPlayer -> gameResult.getMatchRankResult().stream()
+                            .anyMatch(result -> matchPlayer.getParticipant().getGameId() == result.getGameId()))
+                    .min(Comparator.comparingInt(matchPlayer -> gameResult.getMatchRankResult().stream()
+                            .filter(result -> matchPlayer.getParticipant().getGameId() == result.getGameId())
+                            .map(MatchRankResultDto::getPlacement)
+                            .findFirst()
+                            .orElse(Integer.MAX_VALUE)));
+
+            if (maxPlaceTiePlayer.isPresent()) {
+                MatchPlayer playerToKeep = maxPlaceTiePlayer.get();
+                playerToKeep.updateMatchPlayerResultStatus(ADVANCE);
+
+                tieMatchPlayerList.removeIf(matchPlayer -> {
+                    if (!matchPlayer.getId().equals(playerToKeep.getId())) {
+                        matchPlayer.updateMatchPlayerResultStatus(DROPOUT);
+                        matchPlayer.getParticipant().dropoutParticipantStatus();
+                        return true;
+                    }
+                    return false;
+                });
+            }
+
+        }
     }
 }
