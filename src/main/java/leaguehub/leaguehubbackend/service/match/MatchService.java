@@ -19,6 +19,7 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,10 +152,18 @@ public class MatchService {
         if(findMatchList.isEmpty())
             throw new MatchNotFoundException();
 
-        AtomicInteger roundCountIndex = new AtomicInteger(0);
-
-        updateMatchSetCount(roundCount, findMatchList, roundCountIndex);
+        updateMatchSetCount(roundCount, findMatchList);
     }
+
+    public List<Integer> getMatchSetCount(String channelLink){
+
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkOrderByMatchRoundDesc(channelLink);
+        List<Integer> matchSetCountList = getMatchSetCountList(matchList);
+
+        return matchSetCountList;
+    }
+
+
 
 
     private Channel getChannel(String channelLink) {
@@ -421,14 +430,30 @@ public class MatchService {
         return "Observer";
     }
 
-    private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
-        IntStream.rangeClosed(1, roundCount.size() + 1)
-                .forEach(roundIndex -> findMatchList.stream()
-                        .filter(match -> match.getMatchRound() == roundIndex)
-                        .forEach(match -> {
-                            match.updateMatchSetCount(roundCount.get(roundCountIndex.get()));
-                            roundCountIndex.incrementAndGet();
-                        }));
+    private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList) {
+        int responseIndex = 0;
+        for(int i = roundCount.size(); i >= 1; i--){
+            for(Match match : findMatchList){
+                if(match.getMatchRound().equals(i))
+                    match.updateMatchSetCount(roundCount.get(responseIndex));
+            }
+            responseIndex++;
+        }
+
+    }
+
+    private static List<Integer> getMatchSetCountList(List<Match> matchList) {
+        List<Integer> matchSetCountList = new ArrayList<>();
+        int matchRound = 0;
+        for(Match match : matchList){
+            if(matchRound == match.getMatchRound())
+                continue;
+            else {
+                matchSetCountList.add(match.getMatchSetCount());
+                matchRound = match.getMatchRound();
+            }
+        }
+        return matchSetCountList;
     }
 
 }

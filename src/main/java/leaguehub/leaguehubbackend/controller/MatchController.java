@@ -157,7 +157,19 @@ public class MatchController {
 
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
+    @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 설정된 경기 횟수를 반환")
+    @Parameter(name = "roundCountList", description = "설정할려는 횟수 배열 결승전부터", example = "[3, 4, 2, 1]")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 횟수 반환"),
+            @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @GetMapping("match/{channelLink}/count")
+    public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink){
 
+        List<Integer> matchsetCountList = matchService.getMatchSetCount(channelLink);
+
+        return new ResponseEntity(matchsetCountList, OK);
+    }
 
     @Operation(summary = "해당 채널 세트의 결과 - 이전 경기 결과를 가져옴(Mongo 형식)")
     @Parameters(value = {
