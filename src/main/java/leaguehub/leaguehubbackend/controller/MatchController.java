@@ -123,9 +123,7 @@ public class MatchController {
 
         matchPlayerService.markPlayerAsReady(message, matchId);
 
-        List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
-
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, allPlayerStatus);
+        simpMessagingTemplate.convertAndSend("/match/" + matchId, "success");
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
