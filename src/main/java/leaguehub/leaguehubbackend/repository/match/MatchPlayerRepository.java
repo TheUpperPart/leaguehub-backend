@@ -26,4 +26,6 @@ public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> 
 
     Optional<MatchPlayer> findByParticipantIdAndMatchId(Long participantId, Long matchId);
 
+    Optional<MatchPlayer> findMatchPlayerByIdAndMatch_Id(Long matchPlayerId, Long matchId);
+
 }
