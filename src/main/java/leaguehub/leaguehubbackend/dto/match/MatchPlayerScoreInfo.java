@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.dto.match;
 
 
+import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,5 +20,7 @@ public class MatchPlayerScoreInfo {
     private String participantGameId;
 
     private Integer playerScore;
+
+    private PlayerStatus playerStatus;
 
 }

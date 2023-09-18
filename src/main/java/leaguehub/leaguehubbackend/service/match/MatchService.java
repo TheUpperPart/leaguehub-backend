@@ -386,6 +386,7 @@ public class MatchService {
                         .participantImageUrl(mp.getParticipant().getProfileImageUrl())
                         .participantGameId(mp.getParticipant().getGameId())
                         .playerScore(mp.getPlayerScore())
+                        .playerStatus(mp.getPlayerStatus())
                         .build())
                 .collect(Collectors.toList());
     }
