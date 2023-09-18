@@ -1,13 +1,14 @@
 package leaguehub.leaguehubbackend.entity.match;
 
 import jakarta.persistence.*;
+import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @NoArgsConstructor
-public class MatchSet {
+public class MatchSet extends BaseTimeEntity {
 
     @Id
     @Column(name = "match_set_id")
