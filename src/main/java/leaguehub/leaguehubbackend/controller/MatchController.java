@@ -101,8 +101,9 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    public List<MatchRankResultDto> updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
-
+    public List<MatchRankResultDto> updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {
+        Long matchId = Long.valueOf(matchIdStr);
+        Integer matchSet = Integer.valueOf(matchSetStr);
         List<MatchRankResultDto> matchRankResultDtos = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchRankResultDtos);
@@ -110,8 +111,8 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}")
-    public void getMatchInfo(@PathVariable("matchId") Long matchId) {
-
+    public void getMatchInfo(@DestinationVariable("matchId") String matchIdStr) {
+        Long matchId = Long.valueOf(matchIdStr);
         MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfo);
@@ -119,11 +120,11 @@ public class MatchController {
 
 
     @MessageMapping("/match/{matchId}/checkIn")
-    public void checkIn(@PathVariable("matchId") Long matchId, @Payload MatchSetReadyMessage message) {
+    public void checkIn(@DestinationVariable("matchId") String matchIdStr, @Payload MatchSetReadyMessage message) {
 
-        matchPlayerService.markPlayerAsReady(message, matchId);
+        matchPlayerService.markPlayerAsReady(message, matchIdStr);
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, message);
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message);
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
