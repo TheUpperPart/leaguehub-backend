@@ -119,7 +119,7 @@ public class MatchController {
 
 
     @MessageMapping("/match/{matchId}/checkIn")
-    public void checkIn(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+    public void checkIn(@PathVariable("matchId") Long matchId, @Payload MatchSetReadyMessage message) {
 
         matchPlayerService.markPlayerAsReady(message, matchId);
 

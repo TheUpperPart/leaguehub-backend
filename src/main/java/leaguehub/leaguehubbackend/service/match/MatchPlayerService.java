@@ -244,7 +244,7 @@ public class MatchPlayerService {
     }
 
     private MatchPlayer findMatchPlayer(Long matchPlayerId, Long matchId) {
-        return matchPlayerRepository.findByParticipantIdAndMatchId(matchPlayerId, matchId)
+        return matchPlayerRepository.findMatchPlayerByIdAndMatch_Id(matchPlayerId, matchId)
                 .orElseThrow(MatchPlayerNotFoundException::new);
     }
 
