@@ -10,4 +10,7 @@ public interface MatchSetRepository extends JpaRepository<MatchSet, Long> {
     Optional<MatchSet> findMatchSetByMatchIdAndAndSetCount(Long matchId, Integer setCount);
 
     List<MatchSet> findAllByMatch_Channel_ChannelLink(String channelLink);
+
+    List<MatchSet> findMatchSetsByMatch_Id(Long matchId);
+
 }
