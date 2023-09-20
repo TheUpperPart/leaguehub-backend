@@ -84,7 +84,7 @@ class ParticipantServiceTest {
         Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
-        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));
+        Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("연습용아이디가됨"));
         Member masterMember = memberRepository.save(UserFixture.createCustomeMember("채수채수밭"));
         Member alreadyMember = memberRepository.save(UserFixture.createCustomeMember("요청한사람"));
         Member rejectedMember = memberRepository.save(UserFixture.createCustomeMember("거절된사람"));
@@ -189,11 +189,11 @@ class ParticipantServiceTest {
     @DisplayName("해당 채널의  경기 참가 테스트 (티어, 판수 제한 o) - 성공")
     void participatelimitedMatchSuccessTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
-        Channel channel = createCustomChannel(true, true, 2100, null, 100);
-        UserFixture.setUpCustomAuth("손성한");
+        Channel channel = createCustomChannel(true, true, 2100, null, 1);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
         ParticipantDto responseDto = new ParticipantDto();
 
-        responseDto.setGameId("손성한");
+        responseDto.setGameId("연습용아이디가됨");
 
         participantService.participateMatch(responseDto, channel.getChannelLink());
 
@@ -213,11 +213,11 @@ class ParticipantServiceTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (티어 마스터 20000점 이하, 판수 제한 o) - 성공")
     void participatelimitedMatchMasterSuccessTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
-        Channel channel = createCustomChannel(true, true, 3200, null, 20);
-        UserFixture.setUpCustomAuth("채수채수밭");
+        Channel channel = createCustomChannel(true, true, 2400, null, 1);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
         ParticipantDto responseDto = new ParticipantDto();
 
-        responseDto.setGameId("채수채수밭");
+        responseDto.setGameId("연습용아이디가됨");
 
         participantService.participateMatch(responseDto, channel.getChannelLink());
 
@@ -297,11 +297,11 @@ class ParticipantServiceTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (티어 제한 o) - 실패")
     void participatelimitedTierMatchFailTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
-        Channel channel = createCustomChannel(true, false, 800, null, 100);
-        UserFixture.setUpCustomAuth("손성한");
+        Channel channel = createCustomChannel(true, false, 400, null, 100);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
         ParticipantDto responseDto = new ParticipantDto();
 
-        responseDto.setGameId("손성한");
+        responseDto.setGameId("연습용아이디가됨");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
@@ -313,10 +313,10 @@ class ParticipantServiceTest {
     void participatelimitedTierMatchFailTest_tierMin() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Channel channel = createCustomChannel(true, false, null, 2400, 100);
-        UserFixture.setUpCustomAuth("손성한");
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
         ParticipantDto responseDto = new ParticipantDto();
 
-        responseDto.setGameId("손성한");
+        responseDto.setGameId("연습용아이디가됨");
 
         assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
@@ -343,11 +343,11 @@ class ParticipantServiceTest {
     @DisplayName("해당 채널의 경기 참가 테스트 (티어 마스터 100점 이하, 판수 제한 o) - 실패")
     void participatelimitedMatchMasterFailTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
-        Channel channel = createCustomChannel(true, true, 2400, null, 20);
-        UserFixture.setUpCustomAuth("채수채수밭");
+        Channel channel = createCustomChannel(true, true, 400, null, 20);
+        UserFixture.setUpCustomAuth("연습용아이디가됨");
         ParticipantDto responseDto = new ParticipantDto();
 
-        responseDto.setGameId("채수채수밭");
+        responseDto.setGameId("연습용아이디가됨");
 
         //when
         assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
@@ -686,7 +686,7 @@ class ParticipantServiceTest {
         //then
 
         assertThat(participantChannelDto.getChannelLink()).isEqualTo(channel.getChannelLink());
-        assertThat(participantChannelDto.getGameCategory()).isEqualTo(GameCategory.TFT);
+        assertThat(participantChannelDto.getGameCategory()).isEqualTo(GameCategory.TFT.getNum());
         assertThat(participantChannelDto.getTitle()).isEqualTo(channel.getTitle());
     }
 

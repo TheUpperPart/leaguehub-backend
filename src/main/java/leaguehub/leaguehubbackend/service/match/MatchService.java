@@ -19,6 +19,7 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 
+import static leaguehub.leaguehubbackend.entity.match.MatchStatus.END;
 import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
 
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
@@ -96,6 +98,11 @@ public class MatchService {
         Participant participant = checkHost(channelLink);
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
+      
+        if (!participant.getChannel().getMaxPlayer().equals(matchRound))
+            checkUpdateScore(matchList);
+
+        checkPreviousMatchEnd(channelLink, matchRound);
 
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
@@ -148,10 +155,18 @@ public class MatchService {
         if(findMatchList.isEmpty())
             throw new MatchNotFoundException();
 
-        AtomicInteger roundCountIndex = new AtomicInteger(0);
-
-        updateMatchSetCount(roundCount, findMatchList, roundCountIndex);
+        updateMatchSetCount(roundCount, findMatchList);
     }
+
+    public List<Integer> getMatchSetCount(String channelLink){
+
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkOrderByMatchRoundDesc(channelLink);
+        List<Integer> matchSetCountList = getMatchSetCountList(matchList);
+
+        return matchSetCountList;
+    }
+
+
 
 
     private Channel getChannel(String channelLink) {
@@ -332,6 +347,39 @@ public class MatchService {
         return participant;
     }
 
+    private void checkUpdateScore(List<Match> matchList) {
+        for (Match currentMatch : matchList) {
+            List<MatchPlayer> matchplayerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(currentMatch.getId());
+
+            int progressCount = 0;
+
+            for (MatchPlayer matchPlayer : matchplayerList) {
+                if (progressCount >= 5) {
+                    if (!matchPlayer.getParticipant().getParticipantStatus().equals(DISQUALIFICATION)) {
+                        matchPlayer.getParticipant().dropoutParticipantStatus();
+                    }
+                    continue;
+                }
+
+                if (matchPlayer.getParticipant().getParticipantStatus().equals(PROGRESS)) {
+                    progressCount++;
+                } else {
+                    matchPlayer.getParticipant().dropoutParticipantStatus();
+                }
+            }
+        }
+    }
+
+    private void checkPreviousMatchEnd(String channelLink, Integer matchRound) {
+        if(matchRound != 1){
+            List<Match> previousMatch = findMatchList(channelLink, matchRound - 1);
+            previousMatch.stream()
+                    .filter(match -> !match.getMatchStatus().equals(END))
+                    .findAny()
+                    .ifPresent(match -> { throw new MatchNotFoundException(); });
+        }
+    }
+
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
         Member member = memberService.findCurrentMember();
@@ -361,6 +409,7 @@ public class MatchService {
                         .participantImageUrl(mp.getParticipant().getProfileImageUrl())
                         .participantGameId(mp.getParticipant().getGameId())
                         .playerScore(mp.getPlayerScore())
+                        .playerStatus(mp.getPlayerStatus())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -395,14 +444,30 @@ public class MatchService {
         return "Observer";
     }
 
-    private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList, AtomicInteger roundCountIndex) {
-        IntStream.rangeClosed(1, roundCount.size() + 1)
-                .forEach(roundIndex -> findMatchList.stream()
-                        .filter(match -> match.getMatchRound() == roundIndex)
-                        .forEach(match -> {
-                            match.updateMatchSetCount(roundCount.get(roundCountIndex.get()));
-                            roundCountIndex.incrementAndGet();
-                        }));
+    private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList) {
+        int responseIndex = 0;
+        for(int i = roundCount.size(); i >= 1; i--){
+            for(Match match : findMatchList){
+                if(match.getMatchRound().equals(i))
+                    match.updateMatchSetCount(roundCount.get(responseIndex));
+            }
+            responseIndex++;
+        }
+
+    }
+
+    private static List<Integer> getMatchSetCountList(List<Match> matchList) {
+        List<Integer> matchSetCountList = new ArrayList<>();
+        int matchRound = 0;
+        for(Match match : matchList){
+            if(matchRound == match.getMatchRound())
+                continue;
+            else {
+                matchSetCountList.add(match.getMatchSetCount());
+                matchRound = match.getMatchRound();
+            }
+        }
+        return matchSetCountList;
     }
 
 }

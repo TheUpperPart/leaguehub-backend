@@ -102,8 +102,9 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    public List<MatchRankResultDto> updateMatchPlayerScore(@PathVariable("matchId") Long matchId, @PathVariable("matchSet") Integer matchSet) {
-
+    public List<MatchRankResultDto> updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {
+        Long matchId = Long.valueOf(matchIdStr);
+        Integer matchSet = Integer.valueOf(matchSetStr);
         List<MatchRankResultDto> matchRankResultDtos = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchRankResultDtos);
@@ -111,8 +112,8 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}")
-    public void getMatchInfo(@PathVariable("matchId") Long matchId) {
-
+    public void getMatchInfo(@DestinationVariable("matchId") String matchIdStr) {
+        Long matchId = Long.valueOf(matchIdStr);
         MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfo);
@@ -120,13 +121,11 @@ public class MatchController {
 
 
     @MessageMapping("/match/{matchId}/checkIn")
-    public void checkIn(@DestinationVariable Long matchId, @Payload MatchSetReadyMessage message) {
+    public void checkIn(@DestinationVariable("matchId") String matchIdStr, @Payload MatchSetReadyMessage message) {
 
-        matchPlayerService.markPlayerAsReady(message, matchId);
+        matchPlayerService.markPlayerAsReady(message, matchIdStr);
 
-        List<MatchSetStatusMessage> allPlayerStatus = matchPlayerService.getAllPlayerStatusForMatch(matchId);
-
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, allPlayerStatus);
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message);
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
@@ -160,7 +159,19 @@ public class MatchController {
 
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
+    @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 설정된 경기 횟수를 반환")
+    @Parameter(name = "roundCountList", description = "설정할려는 횟수 배열 결승전부터", example = "[3, 4, 2, 1]")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 횟수 반환"),
+            @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @GetMapping("match/{channelLink}/count")
+    public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink){
 
+        List<Integer> matchsetCountList = matchService.getMatchSetCount(channelLink);
+
+        return new ResponseEntity(matchsetCountList, OK);
+    }
 
     @Operation(summary = "해당 채널 매치의 결과 - 이전 경기 결과를 가져옴(Mongo 형식) 매치 세트 결과를 다 가져온다.")
     @Parameters(value = {

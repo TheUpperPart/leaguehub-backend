@@ -265,13 +265,14 @@ public class MatchPlayerService {
     }
 
     private MatchPlayer findMatchPlayer(Long matchPlayerId, Long matchId) {
-        return matchPlayerRepository.findByParticipantIdAndMatchId(matchPlayerId, matchId)
+        return matchPlayerRepository.findMatchPlayerByIdAndMatch_Id(matchPlayerId, matchId)
                 .orElseThrow(MatchPlayerNotFoundException::new);
     }
 
     @Transactional
-    public void markPlayerAsReady(MatchSetReadyMessage message, Long matchId) {
+    public void markPlayerAsReady(MatchSetReadyMessage message, String matchIdStr) {
 
+        Long matchId = Long.valueOf(matchIdStr);
         Long matchPlayerId = message.getMatchPlayerId();
 
         MatchPlayer matchPlayer = findMatchPlayer(matchPlayerId, matchId);
