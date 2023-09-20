@@ -34,4 +34,12 @@ public class MatchSet extends BaseTimeEntity {
         this.updateScore = updateScore;
     }
 
+    public static MatchSet createMatchSet(Match match, Integer setCount){
+        MatchSet matchSet = new MatchSet();
+        matchSet.match = match;
+        matchSet.updateScore = false;
+        matchSet.setCount = setCount;
+
+        return matchSet;
+    }
 }
