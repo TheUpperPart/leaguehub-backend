@@ -162,9 +162,9 @@ public class MatchController {
     }
 
 
-    @Operation(summary = "해당 채널 세트의 결과 - 이전 경기 결과를 가져옴(Mongo 형식)")
+    @Operation(summary = "해당 채널 매치의 결과 - 이전 경기 결과를 가져옴(Mongo 형식) 매치 세트 결과를 다 가져온다.")
     @Parameters(value = {
-            @Parameter(name = "matchSetId", description = "불러오고 싶은 매치 세트의 PK", example = "3"),
+            @Parameter(name = "matchId", description = "불러오고 싶은 매치의 PK", example = "3"),
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경기 횟수가 배정되었습니다."),
