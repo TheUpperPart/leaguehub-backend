@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.match.*;
+import leaguehub.leaguehubbackend.entity.match.GameResult;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
@@ -172,19 +173,19 @@ public class MatchController {
         return new ResponseEntity(matchsetCountList, OK);
     }
 
-    @Operation(summary = "해당 채널 세트의 결과 - 이전 경기 결과를 가져옴(Mongo 형식)")
+    @Operation(summary = "해당 채널 매치의 결과 - 이전 경기 결과를 가져옴(Mongo 형식) 매치 세트 결과를 다 가져온다.")
     @Parameters(value = {
-            @Parameter(name = "matchSetId", description = "불러오고 싶은 매치 세트의 PK", example = "3"),
+            @Parameter(name = "matchId", description = "불러오고 싶은 매치의 PK", example = "3"),
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경기 횟수가 배정되었습니다."),
             @ApiResponse(responseCode = "404", description = "매치 세트를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("/match/{matchSetId}/result")
-    public ResponseEntity getGameResult(@PathVariable Long matchSetId) {
-        List<MatchRankResultDto> gameResult = matchPlayerService.getGameResult(matchSetId);
+    @GetMapping("/match/{matchId}/result")
+    public ResponseEntity getGameResult(@PathVariable Long matchId) {
+        List<GameResult> gameResultList = matchPlayerService.getGameResult(matchId);
 
-        return new ResponseEntity(gameResult, OK);
+        return new ResponseEntity(gameResultList, OK);
     }
 
 }

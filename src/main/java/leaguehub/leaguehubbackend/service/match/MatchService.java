@@ -89,7 +89,7 @@ public class MatchService {
     }
 
     /**
-     * 경기 첫 배정
+     * 경기 배정
      *
      * @param channelLink
      * @param matchRound
@@ -98,7 +98,7 @@ public class MatchService {
         Participant participant = checkHost(channelLink);
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
-
+      
         if (!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
 
@@ -332,7 +332,8 @@ public class MatchService {
                         matchPlayer.getParticipant().getGameId(),
                         matchPlayer.getParticipant().getGameTier(),
                         matchPlayer.getPlayerStatus(),
-                        matchPlayer.getPlayerScore()
+                        matchPlayer.getPlayerScore(),
+                        matchPlayer.getMatchPlayerResultStatus()
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
@@ -378,6 +379,7 @@ public class MatchService {
                     .ifPresent(match -> { throw new MatchNotFoundException(); });
         }
     }
+
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
         Member member = memberService.findCurrentMember();
