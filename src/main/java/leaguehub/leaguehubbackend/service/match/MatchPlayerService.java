@@ -17,6 +17,7 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -227,6 +228,12 @@ public class MatchPlayerService {
         }
     }
 
+    /**
+     * 매치가 끝난지 체크하는 로직
+     * 매치가 끝났다면 매치 상태를 업데이트하고 updateEndMatchResult로 진출자, 탈락자를 결정한다.
+     * @param matchSet
+     * @param match
+     */
     private void checkMatchEnd(MatchSet matchSet, Match match) {
         if (match.getMatchSetCount() == matchSet.getSetCount()) {
             match.updateMatchStatus(MatchStatus.END);
@@ -285,103 +292,171 @@ public class MatchPlayerService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 매치 종료 후 진출자, 탈락자를 결정한다.
+     * 실격을 제외한 매치 플레이어들을 점수대로 정렬해 불러와서
+     * 4번째 위치한 선수를 기준으로 동점자, 진출자, 탈락자를 결정한다.
+     * @param match
+     */
     public void updateEndMatchResult(Match match) {
         List<MatchPlayer> matchPlayersWithoutDisqualification = matchPlayerRepository.findMatchPlayersWithoutDisqualification(match.getId());
-        Integer winScore = matchPlayersWithoutDisqualification.get(3).getPlayerScore();
+        Integer advanceScore = matchPlayersWithoutDisqualification.get(3).getPlayerScore();
 
-        long winCount = matchPlayersWithoutDisqualification.stream()
-                .filter(mp -> mp.getPlayerScore() > winScore)
-                .peek(mp -> mp.updateMatchPlayerResultStatus(ADVANCE))
-                .count();
+        long winCount = advanceMatchPlayer(matchPlayersWithoutDisqualification, advanceScore);
 
-        List<MatchPlayer> tieMatchPlayerList = matchPlayersWithoutDisqualification.stream()
-                .filter(mp -> mp.getPlayerScore().equals(winScore))
-                .collect(Collectors.toList());
+        List<MatchPlayer> tieMatchPlayerList = getTiePlayerList(matchPlayersWithoutDisqualification, advanceScore);
 
-        matchPlayersWithoutDisqualification.stream()
-                .filter(mp -> mp.getPlayerScore() < winScore)
-                .forEach(mp -> {
-                    mp.updateMatchPlayerResultStatus(DROPOUT);
-                    mp.getParticipant().dropoutParticipantStatus();
-                });
+        dropoutMatchPlayerWithScore(matchPlayersWithoutDisqualification, advanceScore);
 
         if (winCount == 3 && tieMatchPlayerList.size() == 1) {
             MatchPlayer matchPlayer = tieMatchPlayerList.get(0);
             matchPlayer.updateMatchPlayerResultStatus(ADVANCE);
         } else if (winCount < 4 && tieMatchPlayerList.size() > 1) {
-            List<MatchSet> matchSets =
-                    matchSetRepository.findMatchSetsByMatch_Id(match.getId());
-            List<GameResult> gameResults =
-                    matchSets.stream()
-                            .map(set ->
-                                    gameResultRepository.findById(set.getId()).get())
-                            .collect(Collectors.toList());
+            tieBreaker(tieMatchPlayerList, match.getId());
+        }
+    }
 
-            tieBreaker(tieMatchPlayerList, gameResults);
+    private void dropoutMatchPlayerWithScore(List<MatchPlayer> matchPlayersWithoutDisqualification, Integer advanceScore) {
+        matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore() < advanceScore)
+                .forEach(mp -> {
+                    dropoutMatchPlayerAndParticipantStatus(mp);
+                });
+    }
+
+    private void dropoutMatchPlayerAndParticipantStatus(MatchPlayer mp) {
+        mp.updateMatchPlayerResultStatus(DROPOUT);
+        mp.getParticipant().dropoutParticipantStatus();
+    }
+
+    @NotNull
+    private List<MatchPlayer> getTiePlayerList(List<MatchPlayer> matchPlayersWithoutDisqualification, Integer advanceScore) {
+        List<MatchPlayer> tieMatchPlayerList = matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore().equals(advanceScore))
+                .collect(Collectors.toList());
+        return tieMatchPlayerList;
+    }
+
+    private long advanceMatchPlayer(List<MatchPlayer> matchPlayersWithoutDisqualification, Integer advanceScore) {
+        long winCount = matchPlayersWithoutDisqualification.stream()
+                .filter(mp -> mp.getPlayerScore() > advanceScore)
+                .peek(mp -> mp.updateMatchPlayerResultStatus(ADVANCE))
+                .count();
+        return winCount;
+    }
+
+
+    /**
+     * 동점자 처리 로직
+     * i. 1등을 많이 한 플레이어
+     * ii. 가장 최근 게임 등수에서 가장 높은 순위를 가진 플레이어
+     * @param tieMatchPlayerList
+     * @param matchId
+     */
+    public void tieBreaker(List<MatchPlayer> tieMatchPlayerList, Long matchId) {
+        List<MatchSet> matchSets = matchSetRepository.findMatchSetsByMatch_Id(matchId);
+        List<GameResult> matchSetResult = getMatchSetResult(matchSets);
+
+        //게임 Id만 뽑는 로직
+        List<String> tiePlayerGameIdList = tieMatchPlayerList.stream()
+                .map(matchPlayer -> matchPlayer.getParticipant().getGameId())
+                .collect(Collectors.toList());
+
+
+        tiePlayerGameIdList = mostFirstPlayer(matchSetResult, tiePlayerGameIdList);
+
+        if (tiePlayerGameIdList.size() != 1) {
+            lastGamePlacement(tiePlayerGameIdList, matchSetResult);
+        }
+
+        updateMatchPlayerStatus(tieMatchPlayerList, tiePlayerGameIdList);
+
+    }
+
+    private void updateMatchPlayerStatus(List<MatchPlayer> tieMatchPlayerList, List<String> tiePlayerGameIdList) {
+        for (MatchPlayer matchPlayer : tieMatchPlayerList) {
+            if (tiePlayerGameIdList.contains(matchPlayer.getParticipant().getGameId())) {
+                matchPlayer.updateMatchPlayerResultStatus(ADVANCE);
+            } else {
+                dropoutMatchPlayerAndParticipantStatus(matchPlayer);
+            }
         }
     }
 
 
-    public void tieBreaker(List<MatchPlayer> tieMatchPlayerList,
-                            List<GameResult> gameResultList) {
-        Map<String, Integer> countFirst = new ConcurrentHashMap<>();
+    /**
+     * 가장 1등을 많이 한 플레이어(들)을 가져오는 로직
+     * 없으면 동점자들을 들어온 그대로 다시 반환한다.
+     * 있는데 여러명이라면 여러명을 다시 반환해 tiePlayerGameIdList로 만들어버린다.
+     * @param matchSetResult
+     * @param tiePlayerGameIdList
+     * @return
+     */
+    private List<String> mostFirstPlayer(List<GameResult> matchSetResult, List<String> tiePlayerGameIdList) {
+        Map<String, Integer> countFirstPlayerMap = new ConcurrentHashMap<>();
 
-        gameResultList.stream()
-                .flatMap(gameResult -> gameResult.getMatchRankResult().stream())
-                .filter(matchRankResultDto -> matchRankResultDto.getPlacement() == 1)
-                .forEach(matchRankResultDto ->
-                        countFirst.put(matchRankResultDto.getGameId(),
-                                countFirst.getOrDefault(matchRankResultDto.getGameId(), 0) + 1));
+        int maxCount = 0;
+
+        for (GameResult gameResult : matchSetResult) {
+            for (MatchRankResultDto matchRankResultDto : gameResult.getMatchRankResult()) {
+                if (matchRankResultDto.getPlacement() == 1) {
+                    String gameId = matchRankResultDto.getGameId();
+                    int count = countFirstPlayerMap.getOrDefault(gameId, 0) + 1;
+                    countFirstPlayerMap.put(gameId, count);
+                    maxCount = Math.max(maxCount, count);
+                }
+            }
+        }
+
+        List<String> mostFirstPlayerInTieList = new ArrayList<>();
+        for (String gameId : countFirstPlayerMap.keySet()) {
+            if (maxCount == countFirstPlayerMap.get(gameId) && tiePlayerGameIdList.contains(gameId)) {
+                mostFirstPlayerInTieList.add(gameId);
+            }
+        }
+
+        if (mostFirstPlayerInTieList.size() != 0) {
+            return mostFirstPlayerInTieList;
+        }
+
+        return tiePlayerGameIdList;
+    }
+
+    /**
+     * 가장 최근 게임에서 가장 높은 등수를 가진 참가자를 뽑는 로직
+     * 가장 최근 게임은 가장 최근에 수정된 gameResult 로 판단함
+     * @param tiePlayerGameIdList
+     * @param matchSetResult
+     */
+    private void lastGamePlacement(List<String> tiePlayerGameIdList, List<GameResult> matchSetResult) {
+        matchSetResult.sort(Comparator.comparing(GameResult::getModifiedDate).reversed());
+
+        List<MatchRankResultDto> matchRankResult = matchSetResult.get(0).getMatchRankResult();
+
+        int highestPlacement = Integer.MAX_VALUE;
+        String playerWithHighestPlacement = null;
 
 
-        int maxValue = Collections.max(countFirst.values());
-        List<String> keysWithMaxValue = countFirst.entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(entry.getValue(), maxValue))
-                .map(Map.Entry::getKey)
+        for (String gameId : tiePlayerGameIdList) {
+            for (MatchRankResultDto matchRankResultDto : matchRankResult) {
+                Integer placement = matchRankResultDto.getPlacement();
+                String resultGameId = matchRankResultDto.getGameId();
+                if (gameId.equals(resultGameId)
+                        && highestPlacement > placement) {
+                    highestPlacement = placement;
+                    playerWithHighestPlacement = resultGameId;
+                }
+            }
+        }
+
+        tiePlayerGameIdList.clear();
+        tiePlayerGameIdList.add(playerWithHighestPlacement);
+    }
+
+    private List<GameResult> getMatchSetResult(List<MatchSet> matchSets) {
+        return matchSets.stream()
+                .map(set ->
+                        gameResultRepository.findById(set.getId()).get())
                 .collect(Collectors.toList());
-
-        tieMatchPlayerList.removeIf(matchPlayer -> {
-            if (!keysWithMaxValue.contains(matchPlayer.getParticipant().getGameId())) {
-                matchPlayer.updateMatchPlayerResultStatus(DROPOUT);
-                matchPlayer.getParticipant().dropoutParticipantStatus();
-                return true;
-            }
-            return false;
-        });
-
-
-        if (tieMatchPlayerList.size() == 1) {
-            tieMatchPlayerList.get(0).updateMatchPlayerResultStatus(ADVANCE);
-
-        }
-
-        if (tieMatchPlayerList.size() > 1) {
-            GameResult gameResult = gameResultList.get(gameResultList.size() - 1);
-
-            Optional<MatchPlayer> maxPlaceTiePlayer = tieMatchPlayerList.stream()
-                    .filter(matchPlayer -> gameResult.getMatchRankResult().stream()
-                            .anyMatch(result -> matchPlayer.getParticipant().getGameId() == result.getGameId()))
-                    .min(Comparator.comparingInt(matchPlayer -> gameResult.getMatchRankResult().stream()
-                            .filter(result -> matchPlayer.getParticipant().getGameId() == result.getGameId())
-                            .map(MatchRankResultDto::getPlacement)
-                            .findFirst()
-                            .orElse(Integer.MAX_VALUE)));
-
-            if (maxPlaceTiePlayer.isPresent()) {
-                MatchPlayer playerToKeep = maxPlaceTiePlayer.get();
-                playerToKeep.updateMatchPlayerResultStatus(ADVANCE);
-
-                tieMatchPlayerList.removeIf(matchPlayer -> {
-                    if (!matchPlayer.getId().equals(playerToKeep.getId())) {
-                        matchPlayer.updateMatchPlayerResultStatus(DROPOUT);
-                        matchPlayer.getParticipant().dropoutParticipantStatus();
-                        return true;
-                    }
-                    return false;
-                });
-            }
-
-        }
     }
 }
