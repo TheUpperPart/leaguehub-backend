@@ -23,6 +23,9 @@ public class MatchPlayer extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PlayerStatus playerStatus;
 
+    @Enumerated(EnumType.STRING)
+    private MatchPlayerResultStatus matchPlayerResultStatus;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
@@ -34,6 +37,7 @@ public class MatchPlayer extends BaseTimeEntity {
     public static MatchPlayer createMatchPlayer(Participant participant, Match match){
         MatchPlayer matchPlayer = new MatchPlayer();
         matchPlayer.playerStatus = PlayerStatus.WAITING;
+        matchPlayer.matchPlayerResultStatus = MatchPlayerResultStatus.PROGRESS;
         matchPlayer.participant = participant;
         matchPlayer.playerScore = 0;
         matchPlayer.match = match;
@@ -45,4 +49,8 @@ public class MatchPlayer extends BaseTimeEntity {
         this.playerScore += 9 - placement;
     }
     public void changeStatusToReady() { this.playerStatus = PlayerStatus.READY; }
+
+    public void updateMatchPlayerResultStatus(MatchPlayerResultStatus matchPlayerResultStatus) {
+        this.matchPlayerResultStatus = matchPlayerResultStatus;
+    }
 }

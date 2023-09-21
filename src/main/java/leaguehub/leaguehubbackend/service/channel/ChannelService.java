@@ -161,5 +161,8 @@ public class ChannelService {
         checkRoleHost(participant.getRole());
 
         participant.getChannel().updateChannelStatus(ChannelStatus.convertStatus(status));
+
+        if(status == 1)
+            matchService.processMatchSet(channelLink);
     }
 }

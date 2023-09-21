@@ -4,32 +4,32 @@ import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
+import leaguehub.leaguehubbackend.entity.match.MatchSet;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
-import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 
 import static leaguehub.leaguehubbackend.entity.match.MatchStatus.END;
@@ -47,6 +47,7 @@ public class MatchService {
     private final MatchPlayerRepository matchPlayerRepository;
     private final ChannelRepository channelRepository;
     private final ParticipantRepository participantRepository;
+    private final MatchSetRepository matchSetRepository;
     private final MemberService memberService;
     private static final int INITIAL_RANK = 1;
 
@@ -89,7 +90,7 @@ public class MatchService {
     }
 
     /**
-     * 경기 첫 배정
+     * 경기 배정
      *
      * @param channelLink
      * @param matchRound
@@ -98,7 +99,7 @@ public class MatchService {
         Participant participant = checkHost(channelLink);
 
         List<Match> matchList = findMatchList(channelLink, matchRound);
-
+      
         if (!participant.getChannel().getMaxPlayer().equals(matchRound))
             checkUpdateScore(matchList);
 
@@ -149,6 +150,9 @@ public class MatchService {
     }
 
     public void setMatchSetCount(String channelLink, List<Integer> roundCount){
+        Participant participant = checkHost(channelLink);
+
+        checkChannelProceeding(participant);
 
         List<Match> findMatchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
 
@@ -166,8 +170,11 @@ public class MatchService {
         return matchSetCountList;
     }
 
+    public void processMatchSet(String channelLink){
+        List<Match> matchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
 
-
+        createMatchSet(matchList);
+    }
 
     private Channel getChannel(String channelLink) {
         Channel findChannel = channelRepository.findByChannelLink(channelLink)
@@ -332,7 +339,8 @@ public class MatchService {
                         matchPlayer.getParticipant().getGameId(),
                         matchPlayer.getParticipant().getGameTier(),
                         matchPlayer.getPlayerStatus(),
-                        matchPlayer.getPlayerScore()
+                        matchPlayer.getPlayerScore(),
+                        matchPlayer.getMatchPlayerResultStatus()
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
@@ -378,6 +386,7 @@ public class MatchService {
                     .ifPresent(match -> { throw new MatchNotFoundException(); });
         }
     }
+
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
         Member member = memberService.findCurrentMember();
@@ -452,6 +461,18 @@ public class MatchService {
             responseIndex++;
         }
 
+    }
+
+    private static void checkChannelProceeding(Participant participant) {
+        if(participant.getChannel().getChannelStatus().equals(PROCEEDING))
+            throw new ChannelStatusAlreadyException();
+    }
+
+    private void createMatchSet(List<Match> matchList) {
+        matchList.stream()
+                .flatMap(match -> IntStream.rangeClosed(1, match.getMatchSetCount())
+                        .mapToObj(setCount -> MatchSet.createMatchSet(match, setCount)))
+                .forEach(matchSetRepository::save);
     }
 
     private static List<Integer> getMatchSetCountList(List<Match> matchList) {

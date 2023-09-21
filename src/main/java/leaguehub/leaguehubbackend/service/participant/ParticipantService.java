@@ -6,6 +6,8 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
@@ -16,6 +18,7 @@ import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorEx
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
@@ -54,6 +57,7 @@ public class ParticipantService {
     @Value("${riot-api-key-1}")
     private String riot_api_key;
     private final ChannelRuleRepository channelRuleRepository;
+    private final MatchPlayerRepository matchPlayerRepository;
 
 
     public int findParticipantPermission(String channelLink) {
@@ -219,6 +223,10 @@ public class ParticipantService {
         Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
 
         findParticipant.disqualificationParticipant();
+        matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
+                .forEach(matchPlayer ->
+                        matchPlayer.updateMatchPlayerResultStatus
+                                (MatchPlayerResultStatus.DISQUALIFICATION));
     }
 
     /**
