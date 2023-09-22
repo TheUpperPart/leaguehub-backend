@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.dto.chat;
 
+import leaguehub.leaguehubbackend.entity.chat.MessageType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,10 +16,10 @@ public class MatchMessage {
 
     private Long matchId;
 
-    private String participantId;
+    private Long participantId;
 
     private LocalDateTime timestamp;
 
-    private String type;
+    private MessageType type;
 
 }
