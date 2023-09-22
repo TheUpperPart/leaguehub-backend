@@ -162,12 +162,11 @@ public class ChannelService {
         Participant participant = getParticipant(member.getId(), channelLink);
         checkRoleHost(participant.getRole());
 
-        participant.getChannel().updateChannelStatus(ChannelStatus.convertStatus(status));
+        Channel channel = participant.getChannel();
+        channel.updateChannelStatus(ChannelStatus.convertStatus(status));
 
         if (status == 2) {
-            Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
-            channel.orElseThrow(ChannelNotFoundException::new);
-            matchChatService.deleteChannelMatchChat(channel.get());
+            matchChatService.deleteChannelMatchChat(channel);
         }
 
         if (status == 1) {
