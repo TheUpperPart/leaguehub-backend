@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -53,5 +55,26 @@ public class MatchChatService {
 
     private void publishMessage(String key, String messageJson) {
         stringRedisTemplate.convertAndSend(key, messageJson);
+    }
+
+    public List<MatchMessage> findMatchChatHistory(String channelIdStr, String matchIdStr) {
+        Long matchId = Long.valueOf(matchIdStr);
+        Long channelId = Long.valueOf(channelIdStr);
+
+        String targetMatch = String.format(REDIS_KEY_FORMAT, channelId, matchId);
+
+        List<String> messageList = stringRedisTemplate.opsForList().range(targetMatch, 0, -1);
+
+        return messageList.stream()
+                .map(this::convertJsonToMatchMessage)
+                .collect(Collectors.toList());
+    }
+
+    private MatchMessage convertJsonToMatchMessage(String json) {
+        try {
+            return objectMapper.readValue(json, MatchMessage.class);
+        } catch (JsonProcessingException e) {
+            throw new MatchChatMessageConversionException();
+        }
     }
 }
