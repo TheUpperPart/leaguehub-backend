@@ -4,6 +4,7 @@ package leaguehub.leaguehubbackend.service.chat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
+import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.exception.chat.exception.MatchChatMessageConversionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -24,6 +28,7 @@ public class MatchChatService {
     private final ObjectMapper objectMapper;
     private static final String REDIS_KEY_FORMAT = "channelId:%d:matchId:%d:messages";
     private static final String PUBLISH_KEY_FORMAT = "matchId:%d:messages";
+    private static final String DELETE_CHANNEL_CHAT_FORMAT = "channelId:%d:matchId:*:messages";
 
     public void processMessage(MatchMessage message) {
 
@@ -57,6 +62,7 @@ public class MatchChatService {
         stringRedisTemplate.convertAndSend(key, messageJson);
     }
 
+
     public List<MatchMessage> findMatchChatHistory(String channelIdStr, String matchIdStr) {
         Long matchId = Long.valueOf(matchIdStr);
         Long channelId = Long.valueOf(channelIdStr);
@@ -75,6 +81,16 @@ public class MatchChatService {
             return objectMapper.readValue(json, MatchMessage.class);
         } catch (JsonProcessingException e) {
             throw new MatchChatMessageConversionException();
+        }
+    }
+    public void deleteChannelMatchChat(Channel channel) {
+        String targetChannel = String.format(DELETE_CHANNEL_CHAT_FORMAT, channel.getId());
+        Set<String> keys = stringRedisTemplate.keys(targetChannel);
+
+        if (keys != null) {
+            for (String key : keys) {
+                stringRedisTemplate.delete(key);
+            }
         }
     }
 }

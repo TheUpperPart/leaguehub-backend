@@ -26,20 +26,6 @@ public class SecurityConfiguration {
 
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = new JwtAuthenticationEntryPoint();
 
-    private static final String[] WHITE_LIST_URLS = {
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/v3/api-docs/**",
-            "/h2-console/**",
-            "/api/member/oauth/kakao",
-            "/api/member/token",
-            "/api/member/oauth/**",
-            "/verifiedPage.html",
-            "/invalidPage.html",
-            "/ws/**",
-            "/app/**"
-    };
-
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
@@ -52,22 +38,16 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                WHITE_LIST_URLS
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                .addFilterAfter(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handle -> handle
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
-                .addFilterAfter(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(config.corsFilter())
                 .build();
 

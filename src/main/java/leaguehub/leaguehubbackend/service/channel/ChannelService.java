@@ -18,6 +18,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
@@ -43,6 +44,7 @@ public class ChannelService {
     private final ParticipantRepository participantRepository;
     private final MatchService matchService;
     private final ChannelRuleRepository channelRuleRepository;
+    private final MatchChatService matchChatService;
 
     @Transactional
     public ParticipantChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -160,9 +162,15 @@ public class ChannelService {
         Participant participant = getParticipant(member.getId(), channelLink);
         checkRoleHost(participant.getRole());
 
-        participant.getChannel().updateChannelStatus(ChannelStatus.convertStatus(status));
+        Channel channel = participant.getChannel();
+        channel.updateChannelStatus(ChannelStatus.convertStatus(status));
 
-        if(status == 1)
+        if (status == 2) {
+            matchChatService.deleteChannelMatchChat(channel);
+        }
+
+        if (status == 1) {
             matchService.processMatchSet(channelLink);
+        }
     }
 }
