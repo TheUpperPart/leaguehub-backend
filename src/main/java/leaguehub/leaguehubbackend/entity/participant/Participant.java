@@ -51,6 +51,8 @@ public class Participant extends BaseTimeEntity {
     @Column(name = "custom_channel_index")
     private int index;
 
+    private String puuid;
+
     public static Participant createHostChannel(Member member, Channel channel) {
         Participant participant = new Participant();
         participant.nickname = member.getNickname();
@@ -108,10 +110,11 @@ public class Participant extends BaseTimeEntity {
     }
 
 
-    public Participant updateParticipantStatus(String gameId, String gameTier, String nickname) {
+    public Participant updateParticipantStatus(String gameId, String gameTier, String nickname, String puuid) {
         this.gameId = gameId;
         this.gameTier = gameTier;
         this.nickname = nickname;
+        this.puuid = puuid;
 
         this.requestStatus = RequestStatus.REQUEST;
 
