@@ -5,6 +5,7 @@ import leaguehub.leaguehubbackend.dto.match.MatchSetReadyMessage;
 import leaguehub.leaguehubbackend.dto.match.MatchSetStatusMessage;
 import leaguehub.leaguehubbackend.dto.match.RiotAPIDto;
 import leaguehub.leaguehubbackend.entity.match.*;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
@@ -119,29 +120,27 @@ public class MatchPlayerService {
 
 
     @SneakyThrows
-    public List<MatchRankResultDto> setPlacement(JSONArray participantList) {
+    public List<MatchRankResultDto> setPlacement(JSONArray participantList, List<MatchPlayer> findMatchPlayerList) {
         List<MatchRankResultDto> dtoList = new ArrayList<>();
 
 
-        for (int i = 0; i < 8; i++) {
-            JSONObject participants = (JSONObject) jsonParser.parse(participantList.get(i).toString());
+        for (int jsonIndex = 0; jsonIndex < 8; jsonIndex++) {
+
+            JSONObject participants = (JSONObject) jsonParser.parse(participantList.get(jsonIndex).toString());
+
             Integer placement = Integer.parseInt(participants.get("placement").toString());
+
             String parti1puuid = participants.get("puuid").toString();
 
-
-            String summonerName = webClient.get()
-                    .uri("https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/" + parti1puuid + riot_api_key_1)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new GlobalServerErrorException()))
-                    .bodyToMono(JSONObject.class)
-                    .block().get("name").toString();
-
             MatchRankResultDto matchRankResultDto = new MatchRankResultDto();
-            matchRankResultDto.setGameId(summonerName);
-            matchRankResultDto.setPlacement(placement);
-
-            dtoList.add(matchRankResultDto);
-
+            findMatchPlayerList.stream()
+                    .map(MatchPlayer::getParticipant)
+                    .filter(participant -> participant.getPuuid().equalsIgnoreCase(parti1puuid))
+                    .forEach(participant -> {
+                        matchRankResultDto.setGameId(participant.getGameId());
+                        matchRankResultDto.setPlacement(placement);
+                        dtoList.add(matchRankResultDto);
+                    });
         }
         return dtoList;
     }
@@ -154,7 +153,7 @@ public class MatchPlayerService {
      * @return matchRankResultDto
      */
     @SneakyThrows
-    public RiotAPIDto getMatchDetailFromRiot(String gameId) {
+    public RiotAPIDto getMatchDetailFromRiot(String gameId, List<MatchPlayer> findMatchPlayerList) {
         String puuid = getSummonerPuuid(gameId);
         String riotMatchUuid = getMatch(puuid);
 
@@ -164,7 +163,7 @@ public class MatchPlayerService {
         JSONObject info = (JSONObject) jsonParser.parse(matchDetailJSON.get("info").toString());
         JSONArray participantList = (JSONArray) jsonParser.parse(info.get("participants").toString());
 
-        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList);
+        List<MatchRankResultDto> matchRankResultDtoList = setPlacement(participantList, findMatchPlayerList);
 
 
         return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
@@ -173,7 +172,7 @@ public class MatchPlayerService {
     public List<MatchRankResultDto> updateMatchPlayerScore(Long matchId, Integer setCount) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
-        RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
+        RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId(), findMatchPlayerList);
 
         MatchSet matchSet = getMatchSet(matchId, setCount);
 
