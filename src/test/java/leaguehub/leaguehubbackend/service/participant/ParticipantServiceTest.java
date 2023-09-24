@@ -116,10 +116,10 @@ class ParticipantServiceTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
-        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -130,7 +130,7 @@ class ParticipantServiceTest {
     private Participant getParticipant(String DummyName1, Channel channel, String DummyGameId1, String DummyNickname1) {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember(DummyName1));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus(DummyGameId1, "platinum", DummyNickname1);
+        dummy1.updateParticipantStatus(DummyGameId1, "platinum", DummyNickname1, "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         return dummy1;
     }
 
@@ -378,8 +378,8 @@ class ParticipantServiceTest {
         Participant part2 = participantRepository.save(Participant.participateChannel(platinumMember, channel));
         Participant part3 = participantRepository.save(Participant.participateChannel(ironMember, channel));
 
-        part2.updateParticipantStatus("손성한", "platinum III", "손성한");
-        part3.updateParticipantStatus("썹맹구", "iron III", "썹맹구");
+        part2.updateParticipantStatus("손성한", "platinum III", "손성한", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
+        part3.updateParticipantStatus("썹맹구", "iron III", "썹맹구", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         part2.approveParticipantMatch();
         part3.approveParticipantMatch();
@@ -413,8 +413,8 @@ class ParticipantServiceTest {
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("DummyGameId1", "platinum III", "DummyNickname1");
-        dummy2.updateParticipantStatus("DummyGameId2", "iron III", "DummyNickname2");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum III", "DummyNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
+        dummy2.updateParticipantStatus("DummyGameId2", "iron III", "DummyNickname2", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
         assertThatThrownBy(() -> participantService.loadRequestStatusPlayerList(channel.getChannelLink()))
@@ -434,7 +434,7 @@ class ParticipantServiceTest {
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
-        dummy1.updateParticipantStatus("DummyGameId1", "platinum III", "DummyNickname1");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum III", "DummyNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
         List<ResponseStatusPlayerDto> DtoList = participantService.loadRequestStatusPlayerList(channel.getChannelLink());
@@ -616,7 +616,7 @@ class ParticipantServiceTest {
 
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
-        dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1");
+        dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
         participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
