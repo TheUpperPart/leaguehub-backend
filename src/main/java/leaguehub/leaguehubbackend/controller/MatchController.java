@@ -102,21 +102,12 @@ public class MatchController {
     }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
-    public List<MatchRankResultDto> updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {
+    public void updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {
         Long matchId = Long.valueOf(matchIdStr);
         Integer matchSet = Integer.valueOf(matchSetStr);
-        List<MatchRankResultDto> matchRankResultDtos = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+        MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchRankResultDtos);
-        return matchRankResultDtos;
-    }
-
-    @MessageMapping("/match/{matchId}")
-    public void getMatchInfo(@DestinationVariable("matchId") String matchIdStr) {
-        Long matchId = Long.valueOf(matchIdStr);
-        MatchInfoDto matchInfo = matchService.getMatchInfo(matchId);
-
-        simpMessagingTemplate.convertAndSend("/match/" + matchId, matchInfo);
+        simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchInfoDto);
     }
 
 
