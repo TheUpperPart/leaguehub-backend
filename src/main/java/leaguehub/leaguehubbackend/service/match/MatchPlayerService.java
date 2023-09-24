@@ -1,9 +1,6 @@
 package leaguehub.leaguehubbackend.service.match;
 
-import leaguehub.leaguehubbackend.dto.match.MatchRankResultDto;
-import leaguehub.leaguehubbackend.dto.match.MatchSetReadyMessage;
-import leaguehub.leaguehubbackend.dto.match.MatchSetStatusMessage;
-import leaguehub.leaguehubbackend.dto.match.RiotAPIDto;
+import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.match.*;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
@@ -31,9 +28,12 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.ADVANCE;
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.DROPOUT;
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.READY;
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.WAITING;
 
 @Service
 @RequiredArgsConstructor
@@ -170,7 +170,7 @@ public class MatchPlayerService {
         return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
     }
 
-    public List<MatchRankResultDto> updateMatchPlayerScore(Long matchId, Integer setCount) {
+    public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
         RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId());
@@ -183,6 +183,9 @@ public class MatchPlayerService {
 
         validMatchResult(findMatchPlayerList, matchRankResultDtoList);
 
+        replaceMatchResult(findMatchPlayerList.stream()
+                .map(matchPlayer -> matchPlayer.getParticipant().getGameId()).collect(Collectors.toList()), matchRankResultDtoList);
+
         matchRankResultDtoList
                 .forEach(matchRankResultDto ->
                         findMatchPlayerList.stream()
@@ -194,10 +197,25 @@ public class MatchPlayerService {
 
         gameResultRepository.save(GameResult.createGameResult(matchSet.getId(), matchRankResultDtoList));
 
+        findMatchPlayerList.stream()
+                .forEach(matchPlayer -> matchPlayer.updatePlayerCheckInStatus(WAITING));
+
         Match match = findMatchPlayerList.get(0).getMatch();
         checkMatchEnd(matchSet, match);
 
-        return matchRankResultDtoList;
+        MatchInfoDto matchInfoDto = matchService.convertMatchInfoDto(match, findMatchPlayerList);
+
+        return matchInfoDto;
+    }
+
+    private void replaceMatchResult(List<String> findMatchPlayerGameIdList, List<MatchRankResultDto> matchRankResultDtoList) {
+        matchRankResultDtoList.removeIf(matchRankResultDto ->
+                !findMatchPlayerGameIdList.contains(matchRankResultDto.getGameId()));
+
+        matchRankResultDtoList.stream().sorted(Comparator.comparing(MatchRankResultDto::getPlacement));
+
+        IntStream.range(0, matchRankResultDtoList.size())
+                .forEach(i -> matchRankResultDtoList.get(i).setPlacement(i + 1));
     }
 
     public List<GameResult> getGameResult(Long matchId) {
@@ -231,6 +249,7 @@ public class MatchPlayerService {
     /**
      * 매치가 끝난지 체크하는 로직
      * 매치가 끝났다면 매치 상태를 업데이트하고 updateEndMatchResult로 진출자, 탈락자를 결정한다.
+     *
      * @param matchSet
      * @param match
      */
@@ -277,7 +296,7 @@ public class MatchPlayerService {
 
         MatchPlayer matchPlayer = findMatchPlayer(matchPlayerId, matchId);
 
-        matchPlayer.changeStatusToReady();
+        matchPlayer.updatePlayerCheckInStatus(READY);
         matchPlayerRepository.save(matchPlayer);
     }
 
@@ -297,6 +316,7 @@ public class MatchPlayerService {
      * 매치 종료 후 진출자, 탈락자를 결정한다.
      * 실격을 제외한 매치 플레이어들을 점수대로 정렬해 불러와서
      * 4번째 위치한 선수를 기준으로 동점자, 진출자, 탈락자를 결정한다.
+     *
      * @param match
      */
     public void updateEndMatchResult(Match match) {
@@ -351,6 +371,7 @@ public class MatchPlayerService {
      * 동점자 처리 로직
      * i. 1등을 많이 한 플레이어
      * ii. 가장 최근 게임 등수에서 가장 높은 순위를 가진 플레이어
+     *
      * @param tieMatchPlayerList
      * @param matchId
      */
@@ -389,6 +410,7 @@ public class MatchPlayerService {
      * 가장 1등을 많이 한 플레이어(들)을 가져오는 로직
      * 없으면 동점자들을 들어온 그대로 다시 반환한다.
      * 있는데 여러명이라면 여러명을 다시 반환해 tiePlayerGameIdList로 만들어버린다.
+     *
      * @param matchSetResult
      * @param tiePlayerGameIdList
      * @return
@@ -426,6 +448,7 @@ public class MatchPlayerService {
     /**
      * 가장 최근 게임에서 가장 높은 등수를 가진 참가자를 뽑는 로직
      * 가장 최근 게임은 가장 최근에 수정된 gameResult 로 판단함
+     *
      * @param tiePlayerGameIdList
      * @param matchSetResult
      */
