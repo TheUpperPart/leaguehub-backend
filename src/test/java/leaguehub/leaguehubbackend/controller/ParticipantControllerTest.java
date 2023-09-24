@@ -581,7 +581,7 @@ class ParticipantControllerTest {
         ParticipantDto participantResponseDto = ParticipantFixture.createParticipantResponseDto("연습용아이디가됨");
         String dtoToJson = mapper.writeValueAsString(participantResponseDto);
 
-        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant/observer")
+        mockMvc.perform(post("/api/" + channel.getChannelLink() + "/participant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(dtoToJson))
                 .andExpect(status().isUnauthorized());

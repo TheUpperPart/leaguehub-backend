@@ -734,7 +734,7 @@ class ParticipantServiceTest {
     void participateUnAuthMatchFailTest() throws Exception {
         //given, 역할이 OBSERVER인 참가자, 해당 채널, 해당 채널 룰, 유저 디테일
         Member guestMember = memberRepository.save(UserFixture.createGuestMember());
-        UserFixture.setUpCustomGuest("idGuest");
+        UserFixture.setUpCustomGuest("Guest");
 
         Channel channel = createCustomChannel(false, false, 800, null, 100);
         ParticipantDto responseDto = new ParticipantDto();

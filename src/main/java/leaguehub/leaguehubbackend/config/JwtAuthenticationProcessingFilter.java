@@ -47,7 +47,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/ws/**",
             "/app/**"
     );
-    private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+    private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
