@@ -17,7 +17,7 @@ public class MatchPlayerInfo {
     @Schema(description = "플레이어의 게임 티어", example = "Diamond II")
     private String gameTier;
 
-    @Schema(description = "플레이어의 경기 상태", example = "대기 | 경기 중 | 실격 | 탈락 | 승급 | 우승")
+    @Schema(description = "플레이어의 체크인 상태", example = "READY, WAITING")
     private PlayerStatus playerStatus;
 
     @Schema(description = "참가자 점수", example = "8(점), 5(점), ...")
