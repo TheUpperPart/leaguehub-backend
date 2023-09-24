@@ -12,6 +12,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.Set;
 
@@ -59,8 +62,28 @@ public class MatchChatService {
         stringRedisTemplate.convertAndSend(key, messageJson);
     }
 
-    public void deleteChannelMatchChat(Channel channel) {
 
+    public List<MatchMessage> findMatchChatHistory(String channelIdStr, String matchIdStr) {
+        Long matchId = Long.valueOf(matchIdStr);
+        Long channelId = Long.valueOf(channelIdStr);
+
+        String targetMatch = String.format(REDIS_KEY_FORMAT, channelId, matchId);
+
+        List<String> messageList = stringRedisTemplate.opsForList().range(targetMatch, 0, -1);
+
+        return messageList.stream()
+                .map(this::convertJsonToMatchMessage)
+                .collect(Collectors.toList());
+    }
+
+    private MatchMessage convertJsonToMatchMessage(String json) {
+        try {
+            return objectMapper.readValue(json, MatchMessage.class);
+        } catch (JsonProcessingException e) {
+            throw new MatchChatMessageConversionException();
+        }
+    }
+    public void deleteChannelMatchChat(Channel channel) {
         String targetChannel = String.format(DELETE_CHANNEL_CHAT_FORMAT, channel.getId());
         Set<String> keys = stringRedisTemplate.keys(targetChannel);
 
