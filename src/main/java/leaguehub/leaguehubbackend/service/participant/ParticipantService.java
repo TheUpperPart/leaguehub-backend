@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantSummonerDetail;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -45,6 +47,7 @@ import static leaguehub.leaguehubbackend.entity.participant.Role.*;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ParticipantService {
 
@@ -273,13 +276,15 @@ public class ParticipantService {
 
         checkDuplicateNickname(responseDto.getGameId(), channelLink);
 
-        String userGameInfo = requestUserGameInfo(responseDto.getGameId());
+        ParticipantSummonerDetail participantSummonerDetail = requestUserGameInfo(responseDto.getGameId());
+        String userGameInfo = participantSummonerDetail.getUserGameInfo();
+        String puuid = participantSummonerDetail.getPuuid();
 
         GameTier tier = searchTier(userGameInfo);
 
         checkRule(channelRule, userGameInfo, tier);
 
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.toString(), responseDto.getNickname());
+        participant.updateParticipantStatus(responseDto.getGameId(), tier.toString(), responseDto.getNickname(), puuid);
     }
 
     /**
@@ -457,7 +462,7 @@ public class ParticipantService {
      * @param nickname
      * @return id
      */
-    public String getSummonerId(String nickname) {
+    public JSONObject getSummonerId(String nickname) {
         String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
 
         JSONObject summonerDetail = webClient.get()
@@ -468,7 +473,7 @@ public class ParticipantService {
                 .bodyToMono(JSONObject.class)
                 .block();
 
-        return summonerDetail.get("id").toString();
+        return summonerDetail;
     }
 
 
@@ -479,9 +484,12 @@ public class ParticipantService {
      * @param nickname
      * @return
      */
-    public String requestUserGameInfo(String nickname) {
+    public ParticipantSummonerDetail requestUserGameInfo(String nickname) {
 
-        String gameId = getSummonerId(nickname);
+        JSONObject summonerDetail = getSummonerId(nickname);
+
+        String gameId = summonerDetail.get("id").toString();
+        String puuid = summonerDetail.get("puuid").toString();
 
         String tierUrl = "https://kr.api.riotgames.com/tft/league/v1/entries/by-summoner/";
 
@@ -494,7 +502,11 @@ public class ParticipantService {
 
         String arraytoString = summonerDetails.toJSONString();
 
-        return arraytoString;
+        ParticipantSummonerDetail participantSummonerDetail = new ParticipantSummonerDetail();
+        participantSummonerDetail.setPuuid(puuid);
+        participantSummonerDetail.setUserGameInfo(arraytoString);
+
+        return participantSummonerDetail;
 
     }
 
@@ -560,7 +572,8 @@ public class ParticipantService {
      */
     public ResponseUserGameInfoDto getTierAndPlayCount(String nickname) {
 
-        String userGameInfo = requestUserGameInfo(nickname);
+        ParticipantSummonerDetail participantSummonerDetail = requestUserGameInfo(nickname);
+        String userGameInfo = participantSummonerDetail.getUserGameInfo();
 
         GameTier tier = searchTier(userGameInfo);
 

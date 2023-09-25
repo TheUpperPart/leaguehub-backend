@@ -108,10 +108,10 @@ class ParticipantControllerTest {
         Participant doneParticipant1 = participantRepository.save(Participant.participateChannel(doneMember1, channel));
         Participant doneParticipant2 = participantRepository.save(Participant.participateChannel(doneMember2, channel));
 
-        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1");
+        alreadyParticipant.updateParticipantStatus("participantGameId1", "bronze ii", "participantNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         rejectedParticipant.rejectParticipantRequest();
-        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2");
-        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3");
+        doneParticipant1.updateParticipantStatus("participantGameId2", "platinum ii", "participantNickname2", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
+        doneParticipant2.updateParticipantStatus("participantGameId3", "iron ii", "participantNickname3", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         doneParticipant1.approveParticipantMatch();
         doneParticipant2.approveParticipantMatch();
 
@@ -122,7 +122,7 @@ class ParticipantControllerTest {
     private Participant getParticipant(String participantDummyName, Channel channel, String participantDummyGameId, String participantDummyNickname) {
         Member dummyMember1 = memberRepository.save(UserFixture.createCustomeMember(participantDummyName));
         Participant dummy1 = participantRepository.save(Participant.participateChannel(dummyMember1, channel));
-        dummy1.updateParticipantStatus(participantDummyGameId, "platinum", participantDummyNickname);
+        dummy1.updateParticipantStatus(participantDummyGameId, "platinum", participantDummyNickname, "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
         return dummy1;
     }
 
