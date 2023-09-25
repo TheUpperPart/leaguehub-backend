@@ -99,6 +99,7 @@ public class ParticipantService {
         participantRepository.save(participant);
 
         return new ParticipantChannelDto(
+                channel.getId(),
                 channel.getChannelLink(),
                 channel.getTitle(),
                 channel.getGameCategory().getNum(),
