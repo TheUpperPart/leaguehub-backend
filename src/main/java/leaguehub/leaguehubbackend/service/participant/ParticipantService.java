@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -46,6 +47,7 @@ import static leaguehub.leaguehubbackend.entity.participant.Role.*;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ParticipantService {
 
