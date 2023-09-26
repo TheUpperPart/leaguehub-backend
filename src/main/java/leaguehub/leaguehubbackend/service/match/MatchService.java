@@ -389,8 +389,6 @@ public class MatchService {
 
 
     public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
-        Member member = memberService.findCurrentMember();
-
         List<MatchPlayer> matchPlayers = Optional.ofNullable(
                         matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId))
                 .filter(list -> !list.isEmpty())
@@ -399,13 +397,19 @@ public class MatchService {
         List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = convertToMatchPlayerScoreInfoList(matchPlayers);
 
         sortAndRankMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
-
-        String requestMatchPlayerId = findRequestMatchPlayerId(member, matchPlayers);
+        String requestMatchPlayerId = getRequestMatchPlayerId(matchPlayers);
 
         return MatchScoreInfoDto.builder()
                 .matchPlayerScoreInfos(matchPlayerScoreInfoList)
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
+    }
+
+    private String getRequestMatchPlayerId(List<MatchPlayer> matchPlayers) {
+        if (memberService.checkIfMemberIsAnonymous()) {
+            return "anonymous";
+        }
+        return findRequestMatchPlayerId(memberService.findCurrentMember(), matchPlayers);
     }
 
     private List<MatchPlayerScoreInfo> convertToMatchPlayerScoreInfoList(List<MatchPlayer> matchPlayers) {

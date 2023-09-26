@@ -47,6 +47,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/ws/**",
             "/app/**"
     );
+    private static final List<String> NO_AUTH_URLS = Arrays.asList(
+            "/api/match/*/player/info"
+    );
+
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -58,12 +62,38 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        try {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        } catch (AuthInvalidTokenException | AuthExpiredTokenException | AuthMemberNotFoundException e) {
-            request.setAttribute("exception", e.getMessage());
-            throw e;
+
+        if (NO_AUTH_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path))) {
+            try {
+                checkAccessTokenAndAuthentication(request, response, filterChain);
+            } catch (AuthTokenNotFoundException e) {
+                saveAnonymousUserAuthentication();
+                filterChain.doFilter(request, response);
+            } catch (Exception e) {
+                request.setAttribute("exception", e.getMessage());
+                throw e;
+            }
+        } else {
+            try {
+                checkAccessTokenAndAuthentication(request, response, filterChain);
+            } catch (AuthInvalidTokenException | AuthExpiredTokenException | AuthMemberNotFoundException e) {
+                request.setAttribute("exception", e.getMessage());
+                throw e;
+            }
         }
+    }
+
+    public void saveAnonymousUserAuthentication() {
+        UserDetails anonymousUser = org.springframework.security.core.userdetails.User.builder()
+                .username("anonymous")
+                .password("anonymous")
+                .roles("ANONYMOUS")
+                .build();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                anonymousUser, null, authoritiesMapper.mapAuthorities(anonymousUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
