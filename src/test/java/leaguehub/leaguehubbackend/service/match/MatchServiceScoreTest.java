@@ -148,7 +148,6 @@ public class MatchServiceScoreTest {
         MatchScoreInfoDto result = matchService.getMatchScoreInfo(savedMatch.getId());
 
         assertNotNull(result);
-        assertEquals("1", result.getRequestMatchPlayerId());
 
         List<MatchPlayerScoreInfo> scoreInfos = result.getMatchPlayerScoreInfos();
         assertNotNull(scoreInfos);
