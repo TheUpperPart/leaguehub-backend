@@ -389,19 +389,26 @@ public class MatchPlayerService {
 
         int tiePlayerCount = tieMatchPlayerList.size();
 
+        //가장 많이 1등 한 사람들을 뽑는 로직
         List<String> firstPlayer = mostFirstPlayer(matchSetResult, tiePlayerGameIdList);
+
+        //진출 숫자가 1등 플레이어보다 많으면 1등 플레이어 모두 진출
         if (advanceCount - firstPlayer.size() >= 0) {
+            //1등 플레이어 제외 모두 drop으로 바뀜
             updateMatchPlayerStatus(tieMatchPlayerList, firstPlayer);
             tieMatchPlayerList.removeIf(matchPlayer -> firstPlayer.contains(matchPlayer.getParticipant().getGameId()));
             tiePlayerGameIdList.removeAll(firstPlayer);
             advanceCount -= firstPlayer.size();
             tiePlayerCount -= firstPlayer.size();
         } else {
+            //그게 아니면 1등 플레이어들만 남기고 전부 탈락
             updateMatchPlayerStatus(tieMatchPlayerList, firstPlayer);
             tieMatchPlayerList.removeIf(matchPlayer -> !firstPlayer.contains(matchPlayer.getParticipant().getGameId()));
         }
 
+        //advanceCount가 0보다 크면 들어감, 만약 advanceCount가 0이면, 위에서 전부 Drop 했기 때문에 그냥 넘어감
         if (advanceCount > 0) {
+            //1등 플레이어 로직으로 걸러진 동점자들이 남은 advanceCount보다 크면 최근 경기 등수 대로, 만약 작거나 같으면 전부 진출
             if (tiePlayerCount > advanceCount) {
                 List<String> tiePlayerGameIdOfAdvanceList = lastGamePlacement(tiePlayerGameIdList, matchSetResult, advanceCount);
                 updateMatchPlayerStatus(tieMatchPlayerList, tiePlayerGameIdOfAdvanceList);
