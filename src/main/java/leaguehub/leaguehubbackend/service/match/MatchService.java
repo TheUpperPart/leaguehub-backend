@@ -338,11 +338,14 @@ public class MatchService {
     public List<MatchPlayerInfo> convertMatchPlayerInfoList(List<MatchPlayer> matchPlayers) {
         return matchPlayers.stream()
                 .map(matchPlayer -> new MatchPlayerInfo(
+                        matchPlayer.getId(),
+                        matchPlayer.getParticipant().getId(),
                         matchPlayer.getParticipant().getGameId(),
                         matchPlayer.getParticipant().getGameTier(),
                         matchPlayer.getPlayerStatus(),
                         matchPlayer.getPlayerScore(),
-                        matchPlayer.getMatchPlayerResultStatus()
+                        matchPlayer.getMatchPlayerResultStatus(),
+                        matchPlayer.getParticipant().getProfileImageUrl()
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());

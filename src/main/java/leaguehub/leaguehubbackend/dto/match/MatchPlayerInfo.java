@@ -36,11 +36,14 @@ public class MatchPlayerInfo {
     private MatchPlayerResultStatus matchPlayerResultStatus;
 
     @Builder
-    public MatchPlayerInfo(String gameId, String gameTier, PlayerStatus playerStatus, Integer score, MatchPlayerResultStatus matchPlayerResultStatus) {
+    public MatchPlayerInfo(Long matchPlayerId, Long participantId, String gameId, String gameTier, PlayerStatus playerStatus, Integer score, MatchPlayerResultStatus matchPlayerResultStatus, String profileSrc) {
+        this.matchPlayerId = matchPlayerId;
+        this.participantId = participantId;
         this.gameId = gameId;
         this.gameTier = gameTier;
         this.playerStatus = playerStatus;
         this.score = score;
         this.matchPlayerResultStatus = matchPlayerResultStatus;
+        this.profileSrc = profileSrc;
     }
 }
