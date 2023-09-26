@@ -20,11 +20,13 @@ import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,6 +141,16 @@ public class MemberService {
         return loginMemberResponse;
     }
 
+    public Boolean checkIfMemberIsAnonymous() {
+        UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
 
+        for (GrantedAuthority authority : authorities) {
+            if ("ROLE_ANONYMOUS".equals(authority.getAuthority())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
