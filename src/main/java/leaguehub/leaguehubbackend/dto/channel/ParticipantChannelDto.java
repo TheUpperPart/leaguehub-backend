@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ParticipantChannelDto {
 
+    @Schema(description = "채널 Id", example = "1")
+    private Long channelId;
+
     @Schema(description = "조회하는 매치 링크", example = "42aa1b11ab88")
     private String channelLink;
 
@@ -23,7 +26,8 @@ public class ParticipantChannelDto {
     @Schema(description = "사이드 바의 채널의 순서 인덱스", example = "0, 1, 2")
     private Integer customChannelIndex;
 
-    public ParticipantChannelDto(String channelLink, String title, Integer gameCategory, String imgSrc, Integer customChannelIndex) {
+    public ParticipantChannelDto(Long channelId, String channelLink, String title, Integer gameCategory, String imgSrc, Integer customChannelIndex) {
+        this.channelId = channelId;
         this.channelLink = channelLink;
         this.title = title;
         this.gameCategory = gameCategory;
