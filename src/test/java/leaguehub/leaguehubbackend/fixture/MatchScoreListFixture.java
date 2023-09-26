@@ -1,45 +1,46 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.match.MatchPlayerScoreInfo;
+import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MatchScoreListFixture {
-    public static List<MatchPlayerScoreInfo> createExpectedList() {
+    public static List<MatchPlayerInfo> createExpectedList() {
         return Arrays.asList(
-                MatchPlayerScoreInfo.builder()
+                MatchPlayerInfo.builder()
                         .matchPlayerId(1L)
                         .participantId(1L)
                         .matchRank(1)
-                        .participantImageUrl("url")
-                        .participantGameId("NO_DATA")
-                        .playerScore(8)
+                        .profileSrc("url")
+                        .gameId("NO_DATA")
+                        .score(8)
                         .build(),
-                MatchPlayerScoreInfo.builder()
+                MatchPlayerInfo.builder()
                         .matchPlayerId(2L)
                         .participantId(2L)
                         .matchRank(2)
-                        .participantImageUrl("url")
-                        .participantGameId("NO_DATA")
-                        .playerScore(7)
+                        .profileSrc("url")
+                        .gameId("NO_DATA")
+                        .score(7)
                         .build(),
-                MatchPlayerScoreInfo.builder()
+                MatchPlayerInfo.builder()
                         .matchPlayerId(3L)
                         .participantId(3L)
                         .matchRank(2)
-                        .participantImageUrl("url")
-                        .participantGameId("NO_DATA")
-                        .playerScore(7)
+                        .profileSrc("url")
+                        .gameId("NO_DATA")
+                        .score(7)
                         .build(),
-                MatchPlayerScoreInfo.builder()
+                MatchPlayerInfo.builder()
                         .matchPlayerId(4L)
                         .participantId(4L)
                         .matchRank(4)
-                        .participantImageUrl("url")
-                        .participantGameId("NO_DATA")
-                        .playerScore(6)
+                        .profileSrc("url")
+                        .gameId("NO_DATA")
+                        .score(6)
                         .build()
         );
     }
 }
+
