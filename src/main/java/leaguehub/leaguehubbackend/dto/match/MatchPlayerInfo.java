@@ -11,6 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MatchPlayerInfo {
 
+    @Schema(description = "플레이어의 matchPlayerId", example = "1")
+    private Long matchPlayerId;
+
+    @Schema(description = "플레이어의 ParticipantId", example = "2")
+    private Long participantId;
+
     @Schema(description = "플레이어의 게임 닉네임", example = "돈절래")
     private String gameId;
 

@@ -288,6 +288,8 @@ public class MatchService {
         List<MatchPlayerInfo> matchPlayerInfoList = playerList.stream()
                 .map(matchPlayer -> {
                     MatchPlayerInfo matchPlayerInfo = new MatchPlayerInfo();
+                    matchPlayerInfo.setMatchPlayerId(matchPlayer.getId());
+                    matchPlayerInfo.setParticipantId(matchPlayer.getParticipant().getId());
                     matchPlayerInfo.setGameId(matchPlayer.getParticipant().getGameId());
                     matchPlayerInfo.setGameTier(matchPlayer.getParticipant().getGameTier());
                     matchPlayerInfo.setPlayerStatus(matchPlayer.getPlayerStatus());
