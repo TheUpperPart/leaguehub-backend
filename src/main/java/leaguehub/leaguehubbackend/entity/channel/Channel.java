@@ -75,7 +75,7 @@ public class Channel extends BaseTimeEntity {
     //채널 이미지 Url에 대한 정보가 없으면 기본 채널 이미지를 반환한다.
     private String validateChannelImageUrl(String channelImageUrl) {
         if (channelImageUrl == null) {
-            channelImageUrl = ""; //Default 값
+            channelImageUrl = null; //Default 값
         }
         else if(!channelImageUrl.startsWith(defaultUrl))
             throw new S3InvalidImageException();
