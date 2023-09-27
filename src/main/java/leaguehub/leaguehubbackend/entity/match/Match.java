@@ -33,6 +33,8 @@ public class Match extends BaseTimeEntity {
 
     private Integer matchCurrentSet;
 
+    private boolean alarm;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
@@ -54,6 +56,7 @@ public class Match extends BaseTimeEntity {
         match.matchCurrentSet = 0;
         match.matchSetCount = 3;
         match.channel = channel;
+        match.alarm = false;
 
         return match;
     }
@@ -67,4 +70,10 @@ public class Match extends BaseTimeEntity {
     public void updateCurrentMatchSet(Integer matchCurrentSet) {
         this.matchCurrentSet = matchCurrentSet;
     }
+
+    public void updateCallAlarm(){ this.alarm = true; }
+
+    public void updateOffAlarm(){ this.alarm = false; }
+
+
 }
