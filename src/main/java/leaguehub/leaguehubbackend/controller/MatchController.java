@@ -179,4 +179,13 @@ public class MatchController {
         return new ResponseEntity(gameResultList, OK);
     }
 
+    @MessageMapping("/match/{channelLink}/{matchId}/admin")
+    public void callAdmin(@DestinationVariable("channelLink") String channlLink,
+                          @DestinationVariable("matchId") String matchId) {
+
+        matchService.callAdmin(channlLink, Long.valueOf(matchId));
+
+        simpMessagingTemplate.convertAndSend("/match/" + matchId);
+    }
+
 }
