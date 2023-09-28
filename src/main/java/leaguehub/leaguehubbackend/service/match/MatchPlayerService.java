@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.match.*;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
@@ -82,8 +81,8 @@ public class MatchPlayerService {
      * @param puuid
      * @return
      */
-    public String getMatch(String puuid) {
-        long endTime = System.currentTimeMillis() / 1000;
+    public String getMatch(String puuid, long endTime) {
+//        long endTime = System.currentTimeMillis() / 1000;
         long statTime = 0;
 
         String matchUrl = "https://asia.api.riotgames.com/tft/match/v1/matches/by-puuid/";
@@ -100,9 +99,7 @@ public class MatchPlayerService {
 
 
         return matchArray.get(0).toString();
-
     }
-
 
     @SneakyThrows
     public JSONObject responseMatchDetail(String matchId) {
@@ -153,9 +150,9 @@ public class MatchPlayerService {
      * @return matchRankResultDto
      */
     @SneakyThrows
-    public RiotAPIDto getMatchDetailFromRiot(String gameId, List<MatchPlayer> findMatchPlayerList) {
+    public RiotAPIDto getMatchDetailFromRiot(String gameId, List<MatchPlayer> findMatchPlayerList, Long endTime) {
         String puuid = getSummonerPuuid(gameId);
-        String riotMatchUuid = getMatch(puuid);
+        String riotMatchUuid = getMatch(puuid, endTime);
 
         JSONObject matchDetailJSON = responseMatchDetail(riotMatchUuid);
 
@@ -169,18 +166,20 @@ public class MatchPlayerService {
         return new RiotAPIDto(riotMatchUuid, matchRankResultDtoList);
     }
 
-    public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount) {
+    public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount, Long endTime) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
-        RiotAPIDto matchDetailFromRiot = getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId(), findMatchPlayerList);
+        RiotAPIDto matchDetailFromRiot =
+                getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId(),
+                        findMatchPlayerList, endTime);
 
         MatchSet matchSet = getMatchSet(matchId, setCount);
 
-        matchSet.updateRiotMatchUuid(matchDetailFromRiot.getMatchUuid());
+        if (matchSet.getRiotMatchUuid() == null) matchSet.updateRiotMatchUuid(matchDetailFromRiot.getMatchUuid());
 
         List<MatchRankResultDto> matchRankResultDtoList = matchDetailFromRiot.getMatchRankResultDtoList();
-
         validMatchResult(findMatchPlayerList, matchRankResultDtoList);
+        Collections.sort(matchRankResultDtoList, Comparator.comparing(MatchRankResultDto::getPlacement));
 
         replaceMatchResult(findMatchPlayerList.stream()
                 .map(matchPlayer -> matchPlayer.getParticipant().getGameId()).collect(Collectors.toList()), matchRankResultDtoList);
@@ -188,9 +187,10 @@ public class MatchPlayerService {
         matchRankResultDtoList
                 .forEach(matchRankResultDto ->
                         findMatchPlayerList.stream()
-                                .filter(matchPlayer -> matchPlayer.getId().equals(matchRankResultDto.getGameId()))
+                                .filter(matchPlayer -> matchPlayer.getParticipant().getGameId().equals(matchRankResultDto.getGameId()))
                                 .forEach(matchPlayer -> matchPlayer.updateMatchPlayerScore(matchRankResultDto.getPlacement()))
                 );
+
 
         matchSet.updateScore(true);
 
@@ -202,7 +202,8 @@ public class MatchPlayerService {
         Match match = findMatchPlayerList.get(0).getMatch();
         checkMatchEnd(matchSet, match);
 
-        MatchInfoDto matchInfoDto = matchService.convertMatchInfoDto(match, findMatchPlayerList);
+        List<MatchPlayer> allByMatchId = matchPlayerRepository.findAllByMatch_Id(matchId);
+        MatchInfoDto matchInfoDto = matchService.convertMatchInfoDto(match, allByMatchId);
 
         return matchInfoDto;
     }
@@ -222,8 +223,11 @@ public class MatchPlayerService {
         if (matchSets.isEmpty()) throw new MatchResultIdNotFoundException();
 
         List<GameResult> gameResultList = matchSets.stream()
-                .map(matchSet -> gameResultRepository.findById(matchSet.getId()).orElseThrow())
+                .map(matchSet -> gameResultRepository.findGameResultById(matchSet.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
+
 
         return gameResultList;
     }
@@ -332,7 +336,7 @@ public class MatchPlayerService {
             MatchPlayer matchPlayer = tieMatchPlayerList.get(0);
             matchPlayer.updateMatchPlayerResultStatus(ADVANCE);
         } else if (winCount < 4 && tieMatchPlayerList.size() > 1) {
-            tieBreaker(tieMatchPlayerList, match.getId());
+            tieBreaker(tieMatchPlayerList, match.getId(), 4 - Long.valueOf(winCount).intValue());
         }
     }
 
@@ -374,7 +378,7 @@ public class MatchPlayerService {
      * @param tieMatchPlayerList
      * @param matchId
      */
-    public void tieBreaker(List<MatchPlayer> tieMatchPlayerList, Long matchId) {
+    public void tieBreaker(List<MatchPlayer> tieMatchPlayerList, Long matchId, Integer advanceCount) {
         List<MatchSet> matchSets = matchSetRepository.findMatchSetsByMatch_Id(matchId);
         List<GameResult> matchSetResult = getMatchSetResult(matchSets);
 
@@ -383,15 +387,35 @@ public class MatchPlayerService {
                 .map(matchPlayer -> matchPlayer.getParticipant().getGameId())
                 .collect(Collectors.toList());
 
+        int tiePlayerCount = tieMatchPlayerList.size();
 
-        tiePlayerGameIdList = mostFirstPlayer(matchSetResult, tiePlayerGameIdList);
+        //가장 많이 1등 한 사람들을 뽑는 로직
+        List<String> firstPlayer = mostFirstPlayer(matchSetResult, tiePlayerGameIdList);
 
-        if (tiePlayerGameIdList.size() != 1) {
-            lastGamePlacement(tiePlayerGameIdList, matchSetResult);
+        //진출 숫자가 1등 플레이어보다 많으면 1등 플레이어 모두 진출
+        if (advanceCount - firstPlayer.size() >= 0) {
+            //1등 플레이어 제외 모두 drop으로 바뀜
+            updateMatchPlayerStatus(tieMatchPlayerList, firstPlayer);
+            tieMatchPlayerList.removeIf(matchPlayer -> firstPlayer.contains(matchPlayer.getParticipant().getGameId()));
+            tiePlayerGameIdList.removeAll(firstPlayer);
+            advanceCount -= firstPlayer.size();
+            tiePlayerCount -= firstPlayer.size();
+        } else {
+            //그게 아니면 1등 플레이어들만 남기고 전부 탈락
+            updateMatchPlayerStatus(tieMatchPlayerList, firstPlayer);
+            tieMatchPlayerList.removeIf(matchPlayer -> !firstPlayer.contains(matchPlayer.getParticipant().getGameId()));
         }
 
-        updateMatchPlayerStatus(tieMatchPlayerList, tiePlayerGameIdList);
-
+        //advanceCount가 0보다 크면 들어감, 만약 advanceCount가 0이면, 위에서 전부 Drop 했기 때문에 그냥 넘어감
+        if (advanceCount > 0) {
+            //1등 플레이어 로직으로 걸러진 동점자들이 남은 advanceCount보다 크면 최근 경기 등수 대로, 만약 작거나 같으면 전부 진출
+            if (tiePlayerCount > advanceCount) {
+                List<String> tiePlayerGameIdOfAdvanceList = lastGamePlacement(tiePlayerGameIdList, matchSetResult, advanceCount);
+                updateMatchPlayerStatus(tieMatchPlayerList, tiePlayerGameIdOfAdvanceList);
+            } else {
+                updateMatchPlayerStatus(tieMatchPlayerList, tiePlayerGameIdList);
+            }
+        }
     }
 
     private void updateMatchPlayerStatus(List<MatchPlayer> tieMatchPlayerList, List<String> tiePlayerGameIdList) {
@@ -450,30 +474,27 @@ public class MatchPlayerService {
      *
      * @param tiePlayerGameIdList
      * @param matchSetResult
+     * @return
      */
-    private void lastGamePlacement(List<String> tiePlayerGameIdList, List<GameResult> matchSetResult) {
-        matchSetResult.sort(Comparator.comparing(GameResult::getModifiedDate).reversed());
+    private List<String> lastGamePlacement(List<String> tiePlayerGameIdList, List<GameResult> matchSetResult, Integer advanceCount) {
+        matchSetResult.sort(Comparator.comparing(GameResult::getModified_date).reversed());
 
         List<MatchRankResultDto> matchRankResult = matchSetResult.get(0).getMatchRankResult();
 
-        int highestPlacement = Integer.MAX_VALUE;
-        String playerWithHighestPlacement = null;
+        matchRankResult.sort(Comparator.comparing(MatchRankResultDto::getPlacement));
+
+        List<String> tiePlayerGameIdOfAdvanceList = new ArrayList<>();
 
 
-        for (String gameId : tiePlayerGameIdList) {
-            for (MatchRankResultDto matchRankResultDto : matchRankResult) {
-                Integer placement = matchRankResultDto.getPlacement();
-                String resultGameId = matchRankResultDto.getGameId();
-                if (gameId.equals(resultGameId)
-                        && highestPlacement > placement) {
-                    highestPlacement = placement;
-                    playerWithHighestPlacement = resultGameId;
-                }
+        for (MatchRankResultDto matchRankResultDto : matchRankResult) {
+            String resultGameId = matchRankResultDto.getGameId();
+            if (tiePlayerGameIdList.contains(resultGameId) && advanceCount > 0) {
+                tiePlayerGameIdOfAdvanceList.add(resultGameId);
+                advanceCount--;
             }
         }
 
-        tiePlayerGameIdList.clear();
-        tiePlayerGameIdList.add(playerWithHighestPlacement);
+        return tiePlayerGameIdOfAdvanceList;
     }
 
     private List<GameResult> getMatchSetResult(List<MatchSet> matchSets) {
