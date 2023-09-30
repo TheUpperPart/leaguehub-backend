@@ -10,5 +10,5 @@ import java.util.List;
 public class MatchScoreInfoDto {
     private String requestMatchPlayerId;
 
-    private List<MatchPlayerScoreInfo> matchPlayerScoreInfos;
+    private List<MatchPlayerInfo> matchPlayerInfos;
 }
