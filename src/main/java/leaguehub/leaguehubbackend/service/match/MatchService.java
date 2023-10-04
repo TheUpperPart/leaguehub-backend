@@ -14,6 +14,7 @@ import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlrea
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
@@ -174,6 +175,18 @@ public class MatchService {
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLink(channelLink);
 
         createMatchSet(matchList);
+    }
+
+    public void callAdmin(String channelLink, Long matchId){
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+
+        if(!participant.getParticipantStatus().equals(PROGRESS)) { throw new ParticipantRejectedRequestedException(); }
+
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new MatchNotFoundException());
+
+        match.updateCallAlarm();
     }
 
     private Channel getChannel(String channelLink) {
@@ -345,7 +358,8 @@ public class MatchService {
                         matchPlayer.getPlayerStatus(),
                         matchPlayer.getPlayerScore(),
                         matchPlayer.getMatchPlayerResultStatus(),
-                        matchPlayer.getParticipant().getProfileImageUrl()
+                        matchPlayer.getParticipant().getProfileImageUrl(),
+                        matchPlayer.getPlayerScore()
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
@@ -399,15 +413,38 @@ public class MatchService {
                 .filter(list -> !list.isEmpty())
                 .orElseThrow(MatchNotFoundException::new);
 
-        List<MatchPlayerScoreInfo> matchPlayerScoreInfoList = convertToMatchPlayerScoreInfoList(matchPlayers);
+        List<MatchPlayerInfo> matchPlayerInfoList = convertMatchPlayerInfoList(matchPlayers);
 
-        sortAndRankMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
+        sortAndRankMatchPlayerInfoList(matchPlayerInfoList);
+
         String requestMatchPlayerId = getRequestMatchPlayerId(matchPlayers);
 
         return MatchScoreInfoDto.builder()
-                .matchPlayerScoreInfos(matchPlayerScoreInfoList)
+                .matchPlayerInfos(matchPlayerInfoList)
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
+    }
+
+    private void sortAndRankMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
+        sortMatchPlayerInfoList(matchPlayerInfoList);
+        assignRankToMatchPlayerInfoList(matchPlayerInfoList);
+    }
+
+    private void sortMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
+        matchPlayerInfoList.sort(Comparator
+                .comparing(MatchPlayerInfo::getScore).reversed()
+                .thenComparing(MatchPlayerInfo::getGameId));
+    }
+
+    private void assignRankToMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
+        int rank = INITIAL_RANK;
+        for (int i = 0; i < matchPlayerInfoList.size(); i++) {
+            MatchPlayerInfo info = matchPlayerInfoList.get(i);
+            if (i > 0 && !info.getScore().equals(matchPlayerInfoList.get(i - 1).getScore())) {
+                rank = i + 1;
+            }
+            info.setMatchRank(rank);
+        }
     }
 
     private String getRequestMatchPlayerId(List<MatchPlayer> matchPlayers) {
@@ -415,40 +452,6 @@ public class MatchService {
             return "anonymous";
         }
         return findRequestMatchPlayerId(memberService.findCurrentMember(), matchPlayers);
-    }
-
-    private List<MatchPlayerScoreInfo> convertToMatchPlayerScoreInfoList(List<MatchPlayer> matchPlayers) {
-        return matchPlayers.stream()
-                .map(mp -> MatchPlayerScoreInfo.builder()
-                        .matchPlayerId(mp.getId())
-                        .participantId(mp.getParticipant().getId())
-                        .participantImageUrl(mp.getParticipant().getProfileImageUrl())
-                        .participantGameId(mp.getParticipant().getGameId())
-                        .playerScore(mp.getPlayerScore())
-                        .playerStatus(mp.getPlayerStatus())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    private void sortAndRankMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
-        sortMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
-        assignRankToMatchPlayerScoreInfoList(matchPlayerScoreInfoList);
-    }
-
-    private void sortMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
-        matchPlayerScoreInfoList.sort(Comparator
-                .comparing(MatchPlayerScoreInfo::getPlayerScore).reversed()
-                .thenComparing(MatchPlayerScoreInfo::getParticipantGameId));
-    }
-    private void assignRankToMatchPlayerScoreInfoList(List<MatchPlayerScoreInfo> matchPlayerScoreInfoList) {
-        int rank = INITIAL_RANK;
-        for (int i = 0; i < matchPlayerScoreInfoList.size(); i++) {
-            MatchPlayerScoreInfo info = matchPlayerScoreInfoList.get(i);
-            if (i > 0 && !info.getPlayerScore().equals(matchPlayerScoreInfoList.get(i - 1).getPlayerScore())) {
-                rank = i + 1;
-            }
-            info.setMatchRank(rank);
-        }
     }
 
     private String findRequestMatchPlayerId(Member member, List<MatchPlayer> matchPlayers) {

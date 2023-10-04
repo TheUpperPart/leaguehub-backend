@@ -73,7 +73,7 @@ public class MatchController {
             @Parameter(name = "matchRound", description = "조회하고 싶은 매치의 라운드(1, 2, 3)", example = "1, 2, 3, 4")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "매치가 조회되었습니다. - 배열로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchInfoDto.class))),
+            @ApiResponse(responseCode = "200", description = "매치가 조회되었습니다. - 배열로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchRoundInfoDto.class))),
             @ApiResponse(responseCode = "403", description = "권한이 관리자가 아님,채널을 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/match/{channelLink}/{matchRound}")
@@ -93,7 +93,7 @@ public class MatchController {
     })
     @MessageMapping("/match/{channelLink}")
     @SendTo("/match/round")
-    public ResponseEntity getRoundLive(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity getRoundLive(@PathVariable("channelLink") String channelLink) {
 
         int myMatchRound = matchService.getMyMatchRound(channelLink);
 
@@ -105,7 +105,8 @@ public class MatchController {
     public void updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {
         Long matchId = Long.valueOf(matchIdStr);
         Integer matchSet = Integer.valueOf(matchSetStr);
-        MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet);
+        long endTime = System.currentTimeMillis() / 1000;
+        MatchInfoDto matchInfoDto = matchPlayerService.updateMatchPlayerScore(matchId, matchSet, endTime);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId + "/" + matchSet, matchInfoDto);
     }
@@ -144,12 +145,13 @@ public class MatchController {
     })
     @PostMapping("/match/{channelLink}/count")
     public ResponseEntity setMatchRoundCount(@PathVariable("channelLink") String channelLink,
-                                             @RequestBody List<Integer> roundCountList){
+                                             @RequestBody List<Integer> roundCountList) {
 
         matchService.setMatchSetCount(channelLink, roundCountList);
 
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
+
     @Operation(summary = "해당 채널의 (1, 2, 3)라운드에 대한 설정된 경기 횟수를 반환")
     @Parameter(name = "roundCountList", description = "설정할려는 횟수 배열 결승전부터", example = "[3, 4, 2, 1]")
     @ApiResponses(value = {
@@ -157,7 +159,7 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "매치 또는 채널을 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("match/{channelLink}/count")
-    public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink){
+    public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink) {
 
         List<Integer> matchsetCountList = matchService.getMatchSetCount(channelLink);
 
@@ -177,6 +179,15 @@ public class MatchController {
         List<GameResult> gameResultList = matchPlayerService.getGameResult(matchId);
 
         return new ResponseEntity(gameResultList, OK);
+    }
+
+    @MessageMapping("/match/{channelLink}/{matchId}/admin")
+    public void callAdmin(@DestinationVariable("channelLink") String channlLink,
+                          @DestinationVariable("matchId") String matchId) {
+
+        matchService.callAdmin(channlLink, Long.valueOf(matchId));
+
+        simpMessagingTemplate.convertAndSend("/match/" + matchId);
     }
 
 }

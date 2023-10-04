@@ -29,6 +29,9 @@ public class MatchPlayerInfo {
     @Schema(description = "참가자 점수", example = "8(점), 5(점), ...")
     private Integer score;
 
+    @Schema(description = "참가자 순위", example = "1, 2, 3, 3, 5...")
+    private Integer matchRank;
+
     @Schema(description = "참가자 프로필 이미지 주소", example = "https://league.s3.ap-northeast-2.amazonaws.com/imgSrc.png")
     private String profileSrc;
 
@@ -36,7 +39,7 @@ public class MatchPlayerInfo {
     private MatchPlayerResultStatus matchPlayerResultStatus;
 
     @Builder
-    public MatchPlayerInfo(Long matchPlayerId, Long participantId, String gameId, String gameTier, PlayerStatus playerStatus, Integer score, MatchPlayerResultStatus matchPlayerResultStatus, String profileSrc) {
+    public MatchPlayerInfo(Long matchPlayerId, Long participantId, String gameId, String gameTier, PlayerStatus playerStatus, Integer score, MatchPlayerResultStatus matchPlayerResultStatus, String profileSrc, Integer matchRank) {
         this.matchPlayerId = matchPlayerId;
         this.participantId = participantId;
         this.gameId = gameId;
@@ -45,5 +48,8 @@ public class MatchPlayerInfo {
         this.score = score;
         this.matchPlayerResultStatus = matchPlayerResultStatus;
         this.profileSrc = profileSrc;
+        this.matchRank = matchRank;
     }
+
+
 }

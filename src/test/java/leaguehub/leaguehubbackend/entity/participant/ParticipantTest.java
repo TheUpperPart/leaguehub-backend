@@ -58,7 +58,7 @@ class ParticipantTest {
         Participant participant = participantRepository.save(Participant.createHostChannel(member, channel));
 
 
-        assertThat(participantRepository.findAll().size()).isEqualTo(1);
+        assertThat(participantRepository.findAllByChannel_ChannelLink(channel.getChannelLink()).size()).isEqualTo(1);
         assertThat(participant.getChannel()).isEqualTo(channel);
         assertThat(participant.getMember()).isEqualTo(member);
         assertThat(participant.getRole()).isEqualTo(Role.HOST);

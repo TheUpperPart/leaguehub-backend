@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.service.match;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.match.MatchPlayerScoreInfo;
+import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
 import leaguehub.leaguehubbackend.dto.match.MatchScoreInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
@@ -20,7 +20,6 @@ import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
-import leaguehub.leaguehubbackend.fixture.MatchScoreListFixture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
@@ -31,7 +30,6 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +39,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -146,15 +145,37 @@ public class MatchServiceScoreTest {
     public void getMatchScoreInfoSuccessTest() throws Exception {
 
         MatchScoreInfoDto result = matchService.getMatchScoreInfo(savedMatch.getId());
-
         assertNotNull(result);
-        assertEquals("1", result.getRequestMatchPlayerId());
+        assertEquals("5", result.getRequestMatchPlayerId());
 
-        List<MatchPlayerScoreInfo> scoreInfos = result.getMatchPlayerScoreInfos();
+        List<MatchPlayerInfo> scoreInfos = result.getMatchPlayerInfos();
         assertNotNull(scoreInfos);
         assertEquals(4, scoreInfos.size());
 
     }
+
+    @Test
+    @DisplayName("순위 정렬 테스트")
+    public void test() throws Exception {
+
+        Long matchId = 1L;
+
+        MatchScoreInfoDto testDto = matchService.getMatchScoreInfo(matchId);
+
+        assertNotNull(testDto);
+        assertEquals("1", testDto.getRequestMatchPlayerId());
+
+        List<MatchPlayerInfo> matchPlayerInfos = testDto.getMatchPlayerInfos();
+        assertNotNull(matchPlayerInfos);
+        assertEquals(4, matchPlayerInfos.size());
+
+        assertEquals(1, matchPlayerInfos.get(0).getMatchRank());
+        assertEquals(2, matchPlayerInfos.get(1).getMatchRank());
+        assertEquals(2, matchPlayerInfos.get(2).getMatchRank());
+        assertEquals(4, matchPlayerInfos.get(3).getMatchRank());
+
+    }
+
 
     @Test
     @DisplayName("getMatchScoreInfo 테스트 - 유효하지 않은 matchId")
