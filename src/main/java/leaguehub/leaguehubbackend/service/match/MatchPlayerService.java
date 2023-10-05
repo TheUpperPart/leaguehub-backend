@@ -197,7 +197,7 @@ public class MatchPlayerService {
         List<MatchRank> matchRanks = matchRankResultDtoList.stream()
                 .map(dto -> MatchRank.createMatchRank(matchSet, dto.getGameId(), dto.getPlacement()))
                 .collect(Collectors.toList());
-
+        matchSet.addMatchRankList(matchRanks);
         matchRankRepository.saveAll(matchRanks);
 
         findMatchPlayerList.stream()

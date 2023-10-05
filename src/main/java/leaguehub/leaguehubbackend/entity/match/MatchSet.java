@@ -48,4 +48,8 @@ public class MatchSet extends BaseTimeEntity {
 
         return matchSet;
     }
+
+    public void addMatchRankList(List<MatchRank> matchRankList) {
+        this.matchRankList = matchRankList;
+    }
 }
