@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -230,6 +231,8 @@ public class MatchPlayerService {
                         matchSet.getMatchRankList().stream().map(matchRank -> new MatchRankResultDto(matchRank.getGameId(), matchRank.getPlacement()))
                                 .collect(Collectors.toList())
                 ).build()).collect(Collectors.toList());
+
+        gameResultDtoList.sort(Comparator.comparing(GameResultDto::getMatchSetCount));
 
         return gameResultDtoList;
     }
