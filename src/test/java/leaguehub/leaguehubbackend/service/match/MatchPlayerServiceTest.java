@@ -111,9 +111,7 @@ class MatchPlayerServiceTest {
     @Test
     @DisplayName("이전 경기 결과 조회 테스트-결과없음")
     void getGameResult_fail() {
-        List<GameResultDto> gameResultList = matchPlayerService.getGameResult(2L);
-
-        assertThat(gameResultList.size()).isEqualTo(0);
+        assertThatThrownBy(() -> matchPlayerService.getGameResult(2L)).isInstanceOf(MatchResultIdNotFoundException.class);
     }
 
 }
