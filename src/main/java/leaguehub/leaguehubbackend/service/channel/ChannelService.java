@@ -149,6 +149,7 @@ public class ChannelService {
     private ParticipantChannelDto convertParticipantChannelDto(Participant participant) {
         Channel channel = participant.getChannel();
         return new ParticipantChannelDto(
+                channel.getId(),
                 channel.getChannelLink(),
                 channel.getTitle(),
                 channel.getGameCategory().getNum(),
