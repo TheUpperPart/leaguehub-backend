@@ -130,25 +130,21 @@ public class MatchService {
         return matchRoundInfoDto;
     }
 
-    public Integer getMyMatchRound(String channelLink) {
+    public MyMatchDto getMyMatchRound(String channelLink) {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
 
-        MatchRoundListDto roundListDto = new MatchRoundListDto();
-        roundListDto.setLiveRound(0);
+        MyMatchDto myMatchDto = new MyMatchDto();
 
-        if (participant.getRole().equals(PLAYER)
-                && participant.getParticipantStatus().equals(PROGRESS)) {
-            int maxPlayers = participant.getChannel().getMaxPlayer();
-            List<Integer> roundList = calculateRoundList(maxPlayers);
-            roundListDto.setRoundList(roundList);
+        myMatchDto.setMyMatchRound(0);
+        myMatchDto.setMyMatchId(0L);
 
-            findLiveRound(channelLink, roundList, roundListDto);
-        }
+        findMyMatch(channelLink, participant, myMatchDto);
 
-        return roundListDto.getLiveRound();
-
+        return myMatchDto;
     }
+
+
 
     public void setMatchSetCount(String channelLink, List<Integer> roundCount){
         Participant participant = checkHost(channelLink);
@@ -187,6 +183,31 @@ public class MatchService {
                 .orElseThrow(() -> new MatchNotFoundException());
 
         match.updateCallAlarm();
+    }
+
+    private void findMyMatch(String channelLink, Participant participant, MyMatchDto myMatchDto) {
+        if(participant.getRole().equals(PLAYER)
+                && participant.getChannel().getChannelStatus().equals(PROCEEDING)){
+            matchRepository.findAllByChannel_ChannelLink(channelLink).stream()
+                    .filter(match -> !match.getMatchStatus().equals(END))
+                    .flatMap(match -> getMatchPlayerList(match).stream())
+                    .filter(matchPlayer -> isSameParticipant(matchPlayer, participant))
+                    .findFirst()
+                    .ifPresent(matchPlayer -> setMyMatchInfo(myMatchDto, matchPlayer.getMatch()));
+        }
+    }
+
+    private List< MatchPlayer> getMatchPlayerList(Match match) {
+        return  matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
+    }
+
+    private boolean isSameParticipant(MatchPlayer matchPlayer, Participant participant) {
+        return  matchPlayer.getParticipant().getId().equals(participant.getId());
+    }
+
+    private void setMyMatchInfo(MyMatchDto mymatchDTO, Match match){
+        mymatchDTO.setMyMatchId(match.getId());
+        mymatchDTO.setMyMatchRound(match.getMatchRound());
     }
 
     private Channel getChannel(String channelLink) {
