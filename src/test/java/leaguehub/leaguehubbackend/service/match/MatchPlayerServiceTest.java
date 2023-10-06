@@ -1,18 +1,17 @@
 package leaguehub.leaguehubbackend.service.match;
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.dto.match.GameResultDto;
 import leaguehub.leaguehubbackend.dto.match.MatchInfoDto;
 import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
-import leaguehub.leaguehubbackend.entity.match.GameResult;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
-import leaguehub.leaguehubbackend.mongo_repository.GameResultRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +34,7 @@ class MatchPlayerServiceTest {
     @Autowired
     MatchPlayerRepository matchPlayerRepository;
     @Autowired
-    GameResultRepository gameResultRepository;
+    MatchRankRepository matchRankRepository;
     @Autowired
     MatchRepository matchRepository;
     @Autowired
@@ -98,14 +96,14 @@ class MatchPlayerServiceTest {
     @Test
     @DisplayName("이전 경기 결과 조회 테스트")
     void getGameResult() {
-        List<GameResult> gameResultList = matchPlayerService.getGameResult(1L);
+        List<GameResultDto> gameResultList = matchPlayerService.getGameResult(1L);
 
         assertThat(gameResultList.size()).isEqualTo(2);
-        assertThat(gameResultList.get(0).getMatchRankResult().stream()
+        assertThat(gameResultList.get(0).getMatchRankResultDtos().stream()
                 .filter(matchRankResultDto -> matchRankResultDto.getGameId().equals("무진스 협회장"))
                 .findFirst().get().getPlacement()).isEqualTo(6);
 
-        assertThat(gameResultList.get(1).getMatchRankResult().stream()
+        assertThat(gameResultList.get(1).getMatchRankResultDtos().stream()
                 .filter(matchRankResultDto -> matchRankResultDto.getGameId().equals("무진스 협회장"))
                 .findFirst().get().getPlacement()).isEqualTo(2);
     }
@@ -113,18 +111,7 @@ class MatchPlayerServiceTest {
     @Test
     @DisplayName("이전 경기 결과 조회 테스트-결과없음")
     void getGameResult_fail() {
-        List<GameResult> gameResultList = matchPlayerService.getGameResult(2L);
-
-        assertThat(gameResultList.size()).isEqualTo(0);
+        assertThatThrownBy(() -> matchPlayerService.getGameResult(2L)).isInstanceOf(MatchResultIdNotFoundException.class);
     }
 
-    @BeforeEach
-    void rollBack() {
-        List<GameResult> gameResultList = matchPlayerService.getGameResult(1L);
-        List<Long> idList = Arrays.asList(1L, 2L);
-        if (gameResultList.size() >= 3) {
-            gameResultList.stream().filter(gameResult -> !idList.contains(gameResult.getId()))
-                    .forEach(gameResult -> gameResultRepository.delete(gameResult));
-        }
-    }
 }

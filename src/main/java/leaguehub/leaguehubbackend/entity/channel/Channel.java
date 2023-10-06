@@ -77,8 +77,6 @@ public class Channel extends BaseTimeEntity {
         if (channelImageUrl == null) {
             channelImageUrl = null; //Default 값
         }
-        else if(!channelImageUrl.startsWith(defaultUrl))
-            throw new S3InvalidImageException();
 
         return channelImageUrl;
     }

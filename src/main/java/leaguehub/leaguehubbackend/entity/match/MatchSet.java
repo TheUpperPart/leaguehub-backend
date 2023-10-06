@@ -5,6 +5,9 @@ import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -26,6 +29,9 @@ public class MatchSet extends BaseTimeEntity {
 
     private Integer setCount;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "matchSet")
+    List<MatchRank> matchRankList = new ArrayList<>();
+
     public void updateRiotMatchUuid(String riotMatchUuid) {
         this.riotMatchUuid = riotMatchUuid;
     }
@@ -41,5 +47,9 @@ public class MatchSet extends BaseTimeEntity {
         matchSet.setCount = setCount;
 
         return matchSet;
+    }
+
+    public void addMatchRankList(List<MatchRank> matchRankList) {
+        this.matchRankList = matchRankList;
     }
 }
