@@ -1,13 +1,16 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardInfoDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
+import leaguehub.leaguehubbackend.dto.match.MyMatchDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
+import leaguehub.leaguehubbackend.service.match.MatchService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class ChannelBoardService {
     private final ChannelService channelService;
     private final ChannelBoardRepository channelBoardRepository;
     private final MemberService memberService;
+    private final MatchService matchService;
 
     @Transactional
     public ChannelBoardLoadDto createChannelBoard(String channelLink, ChannelBoardDto request) {
@@ -51,7 +55,9 @@ public class ChannelBoardService {
      * @return List
      */
     @Transactional
-    public List<ChannelBoardLoadDto> loadChannelBoards(String channelLink) {
+    public ChannelBoardInfoDto loadChannelBoards(String channelLink) {
+
+        MyMatchDto matchDto = matchService.getMyMatchRound(channelLink);
 
         channelService.getChannel(channelLink);
 
@@ -61,7 +67,8 @@ public class ChannelBoardService {
                 .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex()))
                 .collect(Collectors.toList());
 
-        return channelBoardLoadDtoList;
+
+        return new ChannelBoardInfoDto(matchDto.getMyMatchRound(), matchDto.getMyMatchId(), channelBoardLoadDtoList);
     }
 
     @Transactional
