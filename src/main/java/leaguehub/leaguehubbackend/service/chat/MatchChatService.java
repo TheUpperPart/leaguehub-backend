@@ -63,9 +63,7 @@ public class MatchChatService {
     }
 
 
-    public List<MatchMessage> findMatchChatHistory(String channelIdStr, String matchIdStr) {
-        Long matchId = Long.valueOf(matchIdStr);
-        Long channelId = Long.valueOf(channelIdStr);
+    public List<MatchMessage> findMatchChatHistory(Long matchId, Long channelId) {
 
         String targetMatch = String.format(REDIS_KEY_FORMAT, channelId, matchId);
 

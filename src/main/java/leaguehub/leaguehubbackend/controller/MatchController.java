@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
 import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,7 @@ public class MatchController {
     private final MatchPlayerService matchPlayerService;
     private final MatchService matchService;
     private final SimpMessagingTemplate simpMessagingTemplate;
-
+    private final MatchChatService matchChatService;
     @Operation(summary = "라운드 수(몇 강) 리스트 반환")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
@@ -125,10 +127,14 @@ public class MatchController {
             @ApiResponse(responseCode = "200", description = "매치가 조회됨", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScoreInfoDto.class))),
             @ApiResponse(responseCode = "404", description = "매치를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("/match/{matchId}/player/info")
-    public ResponseEntity loadMatchScore(@PathVariable("matchId") Long matchId) {
+    @GetMapping("/channel/{channelId}/match/{matchId}/player/info")
+    public ResponseEntity loadMatchScore(@PathVariable("matchId") Long channelId, @PathVariable("matchId") Long matchId) {
 
         MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
+
+        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelId, matchId);
+
+        matchScoreInfoDto.setMatchMessages(matchMessages);
 
         return new ResponseEntity<>(matchScoreInfoDto, OK);
     }
