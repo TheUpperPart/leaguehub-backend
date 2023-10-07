@@ -86,21 +86,7 @@ public class MatchController {
 
     }
 
-    @Operation(summary = "대회에 참여된 플레이어면 좌측 중간에 표시")
-    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "매치가 조회되었습니다. - 배열로 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchInfoDto.class))),
-            @ApiResponse(responseCode = "403", description = "플레이어가 아니면 0 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @MessageMapping("/match/{channelLink}")
-    @SendTo("/match/round")
-    public ResponseEntity getRoundLive(@PathVariable("channelLink") String channelLink) {
 
-        int myMatchRound = matchService.getMyMatchRound(channelLink);
-
-        return new ResponseEntity<>(myMatchRound, OK);
-
-    }
 
     @MessageMapping("/match/{matchId}/{matchSet}/score-update")
     public void updateMatchPlayerScore(@DestinationVariable("matchId") String matchIdStr, @DestinationVariable("matchSet") String matchSetStr) {

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardInfoDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.channel.ChannelBoardService;
@@ -112,16 +113,16 @@ public class ChannelBoardController {
         return new ResponseEntity("BoardIndex successfully updated", OK);
     }
 
-    @Operation(summary = "채널 보드 가져오기 - 채널 로드시 제목과 보드ID 가져오기 리스트로 반환")
+    @Operation(summary = "채널 보드 가져오기 - 채널 로드시 현재 라운드와 제목과 보드ID 가져오기 리스트로 반환")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelBoardLoadDto.class))),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelBoardInfoDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/channel/{channelLink}/boards")
     public ResponseEntity loadChannelBoards(@PathVariable("channelLink") String channelLink) {
 
-        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+        ChannelBoardInfoDto channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
 
         return new ResponseEntity(channelBoardLoadDtoList, OK);
     }
