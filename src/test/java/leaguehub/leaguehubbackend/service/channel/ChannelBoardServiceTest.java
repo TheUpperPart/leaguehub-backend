@@ -149,7 +149,7 @@ class ChannelBoardServiceTest {
         Optional<Channel> channel = channelRepository.findByChannelLink(channelLink);
         channelBoardService.createChannelBoard(channel.get().getChannelLink(), ChannelFixture.createChannelBoardDto());
 
-        List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
+        List<ChannelBoardLoadDto> findChannelBoards = channelBoardService.loadChannelBoards(channel.get().getChannelLink()).getChannelBoardLoadDtoList();
 
         ChannelBoardDto channelBoardDto = channelBoardService.getChannelBoard(channel.get().getChannelLink(), findChannelBoards.get(findChannelBoards.size() - 1).getBoardId());
 
@@ -241,7 +241,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 드래그앤드랍 인덱스 테스트 - 성공")
     void updateIndex() {
-        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink).getChannelBoardLoadDtoList();
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
 
@@ -264,7 +264,7 @@ class ChannelBoardServiceTest {
     @Test
     @DisplayName("게시판 드래그앤드랍 인덱스 테스트 - 실패(권한없음)")
     void updateIndex_NoAuth() {
-        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink);
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channelLink).getChannelBoardLoadDtoList();
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
 
