@@ -298,7 +298,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
-        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink()).getChannelBoardLoadDtoList();
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
 
@@ -318,7 +318,7 @@ class ChannelBoardControllerTest {
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);
         Optional<Channel> channel = channelRepository.findByChannelLink(participantChannelDto.getChannelLink());
-        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink());
+        List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink()).getChannelBoardLoadDtoList();
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
 
