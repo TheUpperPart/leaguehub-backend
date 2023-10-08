@@ -26,19 +26,19 @@ public class MatchChatService {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final ObjectMapper objectMapper;
-    private static final String REDIS_KEY_FORMAT = "channelId:%d:matchId:%d:messages";
+    private static final String REDIS_KEY_FORMAT = "channelLink:%s:matchId:%d:messages";
     private static final String PUBLISH_KEY_FORMAT = "matchId:%d:messages";
-    private static final String DELETE_CHANNEL_CHAT_FORMAT = "channelId:%d:matchId:*:messages";
+    private static final String DELETE_CHANNEL_CHAT_FORMAT = "channelLink:%s:matchId:*:messages";
 
     public void processMessage(MatchMessage message) {
 
         Long matchId = message.getMatchId();
-        Long channelId = message.getChannelId();
+        String channelLink = message.getChannelLink();
 
         message.setTimestamp(LocalDateTime.now());
 
         String messageJson = convertMessageToJson(message);
-        String redisKey = String.format(REDIS_KEY_FORMAT, channelId, matchId);
+        String redisKey = String.format(REDIS_KEY_FORMAT, channelLink, matchId);
         String publishKey = String.format(PUBLISH_KEY_FORMAT, matchId);
 
         saveMessageToRedis(redisKey, messageJson);
@@ -63,9 +63,9 @@ public class MatchChatService {
     }
 
 
-    public List<MatchMessage> findMatchChatHistory(Long matchId, Long channelId) {
+    public List<MatchMessage> findMatchChatHistory(String channelLink, Long matchId) {
 
-        String targetMatch = String.format(REDIS_KEY_FORMAT, channelId, matchId);
+        String targetMatch = String.format(REDIS_KEY_FORMAT, channelLink, matchId);
 
         List<String> messageList = stringRedisTemplate.opsForList().range(targetMatch, 0, -1);
 
@@ -82,7 +82,7 @@ public class MatchChatService {
         }
     }
     public void deleteChannelMatchChat(Channel channel) {
-        String targetChannel = String.format(DELETE_CHANNEL_CHAT_FORMAT, channel.getId());
+        String targetChannel = String.format(DELETE_CHANNEL_CHAT_FORMAT, channel.getChannelLink());
         Set<String> keys = stringRedisTemplate.keys(targetChannel);
 
         if (keys != null) {

@@ -8,11 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
-import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.chat.MatchChatService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,7 +27,7 @@ public class MatchChatController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    private static final String MATCH_CHAT_DESTINATION_FORMAT = "/match/%s/chat/history";
+    private static final String MATCH_CHAT_DESTINATION_FORMAT = "/match/%d/chat/history";
 
     @MessageMapping("/match/chat")
     public void sendMessage(@Payload MatchMessage message) {
@@ -45,10 +42,10 @@ public class MatchChatController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "매치 채팅 내역 조회성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchMessage.class))),
     })
-    @PostMapping("/api/channel/{channelId}/match/{matchId}/chat/history")
-    public void getMatchChatHistory(@PathVariable("matchId") Long channelId, @PathVariable("matchId") Long matchId) {
+    @PostMapping("/api/channelLink/{channelLink}/match/{matchId}/chat/history")
+    public void getMatchChatHistory(@PathVariable("channelLink") String channelLink, @PathVariable("matchId") Long matchId) {
 
-        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelId, matchId);
+        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelLink, matchId);
 
         String matchChat = String.format(MATCH_CHAT_DESTINATION_FORMAT, matchId);
 
