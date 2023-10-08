@@ -114,11 +114,11 @@ public class MatchController {
             @ApiResponse(responseCode = "404", description = "매치를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/channel/{channelId}/match/{matchId}/player/info")
-    public ResponseEntity loadMatchScore(@PathVariable("matchId") Long channelId, @PathVariable("matchId") Long matchId) {
+    public ResponseEntity loadMatchScore(@PathVariable("matchId") String channelLink, @PathVariable("matchId") Long matchId) {
 
         MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
 
-        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelId, matchId);
+        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelLink, matchId);
 
         matchScoreInfoDto.setMatchMessages(matchMessages);
 

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MatchMessage {
 
-    private Long channelId;
+    private String channelLink;
 
     private String content;
 
