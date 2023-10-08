@@ -108,13 +108,16 @@ public class MatchController {
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")
-    @Parameter(name = "matchId", description = "조회 대상 matchId", example = "1")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "matchId", description = "조회 대상 matchId", example = "1")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "매치가 조회됨", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchScoreInfoDto.class))),
             @ApiResponse(responseCode = "404", description = "매치를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("/channel/{channelId}/match/{matchId}/player/info")
-    public ResponseEntity loadMatchScore(@PathVariable("matchId") String channelLink, @PathVariable("matchId") Long matchId) {
+    @GetMapping("/channel/{channelLink}/match/{matchId}/player/info")
+    public ResponseEntity loadMatchScore(@PathVariable("channelLink") String channelLink, @PathVariable("matchId") Long matchId) {
 
         MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
 
