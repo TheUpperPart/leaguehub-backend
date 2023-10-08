@@ -43,13 +43,9 @@ public class MatchChatController {
             @ApiResponse(responseCode = "200", description = "매치 채팅 내역 조회성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchMessage.class))),
     })
     @PostMapping("/api/channelLink/{channelLink}/match/{matchId}/chat/history")
-    public void getMatchChatHistory(@PathVariable("channelLink") String channelLink, @PathVariable("matchId") Long matchId) {
+    public List<MatchMessage> getMatchChatHistory(@PathVariable("channelLink") String channelLink, @PathVariable("matchId") Long matchId) {
 
-        List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelLink, matchId);
-
-        String matchChat = String.format(MATCH_CHAT_DESTINATION_FORMAT, matchId);
-
-        simpMessagingTemplate.convertAndSend(matchChat, matchMessages);
+        return matchChatService.findMatchChatHistory(channelLink, matchId);
     }
 
 }
