@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
@@ -99,9 +100,14 @@ public class MatchService {
     public void matchAssignment(String channelLink, Integer matchRound) {
         Participant participant = checkHost(channelLink);
 
+        if(!participant.getChannel().getChannelStatus().equals(PROCEEDING)){
+            throw new ChannelRequestException();
+        }
+
         List<Match> matchList = findMatchList(channelLink, matchRound);
-      
-        if (!participant.getChannel().getMaxPlayer().equals(matchRound))
+
+
+        if (matchRound != 1)
             checkUpdateScore(matchList);
 
         checkPreviousMatchEnd(channelLink, matchRound);

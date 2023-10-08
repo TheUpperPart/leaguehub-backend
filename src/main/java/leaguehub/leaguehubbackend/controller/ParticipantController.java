@@ -43,10 +43,9 @@ public class ParticipantController {
             @ApiResponse(responseCode = "404", description = "게임 ID를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @GetMapping("/participant/stat")
-    public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname,
-                                        @RequestParam(value = "gamecategory") Integer category) {
+    public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname) {
 
-        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(nickname, category);
+        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(nickname, 0);
 
         return new ResponseEntity<>(userDetailDto, OK);
     }
