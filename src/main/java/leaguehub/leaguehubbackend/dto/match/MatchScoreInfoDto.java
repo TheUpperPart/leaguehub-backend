@@ -9,7 +9,11 @@ import java.util.List;
 @Data
 @Builder
 public class MatchScoreInfoDto {
-    private String requestMatchPlayerId;
+    private Long requestMatchPlayerId;
+
+    private Integer currentMatchRound;
+
+    private Integer totalMatchRound;
 
     private List<MatchPlayerInfo> matchPlayerInfos;
 

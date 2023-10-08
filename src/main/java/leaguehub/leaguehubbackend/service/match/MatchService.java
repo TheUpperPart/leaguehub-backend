@@ -434,14 +434,19 @@ public class MatchService {
                 .filter(list -> !list.isEmpty())
                 .orElseThrow(MatchNotFoundException::new);
 
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(MatchNotFoundException::new);
+
         List<MatchPlayerInfo> matchPlayerInfoList = convertMatchPlayerInfoList(matchPlayers);
 
         sortAndRankMatchPlayerInfoList(matchPlayerInfoList);
 
-        String requestMatchPlayerId = getRequestMatchPlayerId(matchPlayers);
+        Long requestMatchPlayerId = getRequestMatchPlayerId(matchPlayers);
 
         return MatchScoreInfoDto.builder()
                 .matchPlayerInfos(matchPlayerInfoList)
+                .currentMatchRound(match.getMatchCurrentSet())
+                .totalMatchRound(match.getMatchSetCount())
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
     }
@@ -468,20 +473,20 @@ public class MatchService {
         }
     }
 
-    private String getRequestMatchPlayerId(List<MatchPlayer> matchPlayers) {
+    private Long getRequestMatchPlayerId(List<MatchPlayer> matchPlayers) {
         if (memberService.checkIfMemberIsAnonymous()) {
-            return "anonymous";
+            return 0L;
         }
         return findRequestMatchPlayerId(memberService.findCurrentMember(), matchPlayers);
     }
 
-    private String findRequestMatchPlayerId(Member member, List<MatchPlayer> matchPlayers) {
+    private Long findRequestMatchPlayerId(Member member, List<MatchPlayer> matchPlayers) {
         for (MatchPlayer mp : matchPlayers) {
             if (mp.getParticipant().getMember().getId().equals(member.getId())) {
-                return mp.getId().toString();
+                return mp.getId();
             }
         }
-        return "Observer";
+        return 0L;
     }
 
     private static void updateMatchSetCount(List<Integer> roundCount, List<Match> findMatchList) {
