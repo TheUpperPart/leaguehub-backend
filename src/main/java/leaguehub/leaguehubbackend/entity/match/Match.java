@@ -53,7 +53,7 @@ public class Match extends BaseTimeEntity {
         match.matchRound = matchRound;
         match.matchName = matchName;
         match.matchPasswd = GlobalConstant.NO_DATA.getData();
-        match.matchCurrentSet = 0;
+        match.matchCurrentSet = 1;
         match.matchSetCount = 3;
         match.channel = channel;
         match.alarm = false;
