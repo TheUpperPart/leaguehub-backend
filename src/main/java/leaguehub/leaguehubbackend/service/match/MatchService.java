@@ -434,7 +434,7 @@ public class MatchService {
     }
 
 
-    public MatchScoreInfoDto getMatchScoreInfo(Long matchId) {
+    public MatchScoreInfoDto getMatchScoreInfo(String channelLink, Long matchId) {
         List<MatchPlayer> matchPlayers = Optional.ofNullable(
                         matchPlayerRepository.findMatchPlayersAndMatchAndParticipantByMatchId(matchId))
                 .filter(list -> !list.isEmpty())
@@ -447,7 +447,7 @@ public class MatchService {
 
         sortAndRankMatchPlayerInfoList(matchPlayerInfoList);
 
-        Long requestMatchPlayerId = getRequestMatchPlayerId(matchPlayers);
+        Long requestMatchPlayerId = getRequestMatchPlayerId(channelLink, matchPlayers);
 
         return MatchScoreInfoDto.builder()
                 .matchPlayerInfos(matchPlayerInfoList)
@@ -479,14 +479,21 @@ public class MatchService {
         }
     }
 
-    private Long getRequestMatchPlayerId(List<MatchPlayer> matchPlayers) {
+    private Long getRequestMatchPlayerId(String channelLink, List<MatchPlayer> matchPlayers) {
         if (memberService.checkIfMemberIsAnonymous()) {
             return 0L;
         }
-        return findRequestMatchPlayerId(memberService.findCurrentMember(), matchPlayers);
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+        
+        if (participant.getRole() == Role.HOST) {
+            return -1L;
+        }
+
+        return findRequestMatchPlayerId(member, matchPlayers);
     }
 
-    private Long findRequestMatchPlayerId(Member member, List<MatchPlayer> matchPlayers) {
+    private Long findRequestMatchPlayerId( Member member, List<MatchPlayer> matchPlayers) {
         for (MatchPlayer mp : matchPlayers) {
             if (mp.getParticipant().getMember().getId().equals(member.getId())) {
                 return mp.getId();

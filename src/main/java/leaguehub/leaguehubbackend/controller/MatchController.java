@@ -119,7 +119,7 @@ public class MatchController {
     @GetMapping("/channel/{channelLink}/match/{matchId}/player/info")
     public ResponseEntity loadMatchScore(@PathVariable("channelLink") String channelLink, @PathVariable("matchId") Long matchId) {
 
-        MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(matchId);
+        MatchScoreInfoDto matchScoreInfoDto = matchService.getMatchScoreInfo(channelLink, matchId);
 
         List<MatchMessage> matchMessages = matchChatService.findMatchChatHistory(channelLink, matchId);
 
