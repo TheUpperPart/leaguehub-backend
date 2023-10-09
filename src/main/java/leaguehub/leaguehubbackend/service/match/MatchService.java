@@ -451,8 +451,9 @@ public class MatchService {
 
         return MatchScoreInfoDto.builder()
                 .matchPlayerInfos(matchPlayerInfoList)
-                .currentMatchRound(match.getMatchCurrentSet())
-                .totalMatchRound(match.getMatchSetCount())
+                .matchRound(match.getMatchRound())
+                .matchCurrentSet(match.getMatchCurrentSet())
+                .matchSetCount(match.getMatchSetCount())
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
     }
