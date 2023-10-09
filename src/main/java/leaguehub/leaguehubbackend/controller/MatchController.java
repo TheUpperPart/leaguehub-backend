@@ -175,13 +175,32 @@ public class MatchController {
         return new ResponseEntity(gameResultList, OK);
     }
 
-    @MessageMapping("/match/{channelLink}/{matchId}/admin")
-    public void callAdmin(@DestinationVariable("channelLink") String channlLink,
+    @MessageMapping("/match/{channelLink}/{matchId}/call-admin")
+    public void callAdmin(@DestinationVariable("channelLink") String channelLink,
                           @DestinationVariable("matchId") String matchId) {
 
-        matchService.callAdmin(channlLink, Long.valueOf(matchId));
+        matchService.callAdmin(channelLink, Long.valueOf(matchId));
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchId);
+        simpMessagingTemplate.convertAndSend("/match/" + channelLink);
+    }
+
+
+    @Operation(summary = "해당 매치 알람 끄기")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+            @Parameter(name = "matchId", description = "알람을 끄는 match의 PK", example = "1, 2, 3, 4")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "권한이 관리자가 아님,채널을 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PostMapping("/match/{channelLink}/{matchId}/call-off")
+    public ResponseEntity turnOffAlarm(@PathVariable("channelLink") String channelLink,
+                                       @PathVariable("matchId") Long matchId){
+
+        matchService.turnOffAlarm(channelLink, matchId);
+
+        return new ResponseEntity(OK);
     }
 
 }
