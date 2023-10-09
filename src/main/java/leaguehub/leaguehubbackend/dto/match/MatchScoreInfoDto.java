@@ -11,9 +11,12 @@ import java.util.List;
 public class MatchScoreInfoDto {
     private Long requestMatchPlayerId;
 
-    private Integer currentMatchRound;
+    private Integer matchRound;
 
-    private Integer totalMatchRound;
+    private Integer matchCurrentSet;
+
+    private Integer matchSetCount;
+
 
     private List<MatchPlayerInfo> matchPlayerInfos;
 

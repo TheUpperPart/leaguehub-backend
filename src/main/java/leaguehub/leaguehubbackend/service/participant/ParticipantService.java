@@ -301,6 +301,11 @@ public class ParticipantService {
         playCountRuleCheck(channelRule, userGameInfo);
     }
 
+    public void checkAdminHost(String channelLink){
+        Participant participant = getParticipant(channelLink);
+        checkRoleHost(participant.getRole());
+    }
+
     private void playCountRuleCheck(ChannelRule channelRule, String userGameInfo) {
 
         if (channelRule.getPlayCount()) {
