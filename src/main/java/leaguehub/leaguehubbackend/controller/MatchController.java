@@ -172,13 +172,22 @@ public class MatchController {
         return new ResponseEntity(gameResultList, OK);
     }
 
-    @MessageMapping("/match/{channelLink}/{matchId}/admin")
-    public void callAdmin(@DestinationVariable("channelLink") String channlLink,
+    @MessageMapping("/match/{channelLink}/{matchId}/call-admin")
+    public void callAdmin(@DestinationVariable("channelLink") String channelLink,
                           @DestinationVariable("matchId") String matchId) {
 
-        matchService.callAdmin(channlLink, Long.valueOf(matchId));
+        matchService.callAdmin(channelLink, Long.valueOf(matchId));
 
         simpMessagingTemplate.convertAndSend("/match/" + matchId);
+    }
+
+    @PostMapping("/match/{channelLink}/{matchId}/call-off")
+    public ResponseEntity turnOffAlarm(@PathVariable("channelLink") String channelLink,
+                                       @PathVariable("matchId") Long matchId){
+
+        matchService.turnOffAlarm(channelLink, matchId);
+
+        return new ResponseEntity(OK);
     }
 
 }
