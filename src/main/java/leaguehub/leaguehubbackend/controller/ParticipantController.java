@@ -225,6 +225,12 @@ public class ParticipantController {
         return new ResponseEntity<>(updateCustomChannelIndexList, OK);
     }
 
+    @Operation(summary = "관리자 권한 확인", description = "관리자인지 확인하는 기능")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Admin Check"),
+            @ApiResponse(responseCode = "401", description = "해당 권한이 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @GetMapping("/channel/{channelLink}/permission")
     public ResponseEntity checkAdmin(@PathVariable("channelLink") String channelLink){
 
