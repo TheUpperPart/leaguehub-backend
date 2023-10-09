@@ -305,6 +305,8 @@ public class MatchService {
                 playerIndex++;
                 remainingPlayers--;
             }
+
+            match.updateMatchStatus(MatchStatus.PROGRESS);
         }
     }
 
