@@ -225,5 +225,13 @@ public class ParticipantController {
         return new ResponseEntity<>(updateCustomChannelIndexList, OK);
     }
 
+    @GetMapping("/channel/{channelLink}/permission")
+    public ResponseEntity checkAdmin(@PathVariable("channelLink") String channelLink){
+
+        participantService.checkAdminHost(channelLink);
+
+        return new ResponseEntity<>("Admin Check", OK);
+    }
+
 
 }
