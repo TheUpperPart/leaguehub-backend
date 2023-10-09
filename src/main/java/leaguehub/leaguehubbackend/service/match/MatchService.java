@@ -185,6 +185,15 @@ public class MatchService {
         match.updateCallAlarm();
     }
 
+    public void turnOffAlarm(String channelLink, Long matchId){
+        Participant participant = checkHost(channelLink);
+
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new MatchNotFoundException());
+
+        match.updateOffAlarm();
+    }
+
     private void findMyMatch(String channelLink, Participant participant, MyMatchDto myMatchDto) {
         if(participant.getRole().equals(PLAYER)
                 && participant.getChannel().getChannelStatus().equals(PROCEEDING)){
@@ -310,6 +319,7 @@ public class MatchService {
         matchInfoDto.setMatchRound(match.getMatchRound());
         matchInfoDto.setMatchCurrentSet(match.getMatchCurrentSet());
         matchInfoDto.setMatchSetCount(match.getMatchSetCount());
+        matchInfoDto.setAlarm(match.isAlarm());
 
         List<MatchPlayer> playerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(match.getId());
         List<MatchPlayerInfo> matchPlayerInfoList = createMatchPlayerInfoList(playerList);
@@ -365,6 +375,7 @@ public class MatchService {
                 .matchSetCount(match.getMatchSetCount())
                 .matchCurrentSet(match.getMatchCurrentSet())
                 .matchPlayerInfoList(convertMatchPlayerInfoList(matchPlayers))
+                .matchAlarm(match.isAlarm())
                 .build();
     }
 
