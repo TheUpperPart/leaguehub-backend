@@ -33,8 +33,12 @@ public class MatchInfoDto {
     @Schema(description = "매치에 속해있는 플레이어의 정보", example = "배열로 반환")
     private List<MatchPlayerInfo> matchPlayerInfoList;
 
+    @Schema(description = "매치의 알람", example = "true, false")
+    private boolean alarm;
+
     @Builder
-    public MatchInfoDto(String matchName, Long matchId, MatchStatus matchStatus, Integer matchRound, Integer matchCurrentSet, Integer matchSetCount, List<MatchPlayerInfo> matchPlayerInfoList) {
+    public MatchInfoDto(String matchName, Long matchId, MatchStatus matchStatus, Integer matchRound, Integer matchCurrentSet,
+                        Integer matchSetCount, List<MatchPlayerInfo> matchPlayerInfoList, boolean matchAlarm) {
         this.matchName = matchName;
         this.matchId = matchId;
         this.matchStatus = matchStatus;
@@ -42,5 +46,6 @@ public class MatchInfoDto {
         this.matchCurrentSet = matchCurrentSet;
         this.matchSetCount = matchSetCount;
         this.matchPlayerInfoList = matchPlayerInfoList;
+        this.alarm = matchAlarm;
     }
 }
