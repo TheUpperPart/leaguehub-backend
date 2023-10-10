@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.entity.chat.MessageType;
 import leaguehub.leaguehubbackend.exception.chat.exception.MatchChatMessageConversionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,5 +91,19 @@ public class MatchChatService {
                 stringRedisTemplate.delete(key);
             }
         }
+    }
+
+    public void processAdminAlert(String channelLink, Long matchId) {
+        MatchMessage message = MatchMessage.builder()
+                .channelLink(channelLink)
+                .content("관리자 호출")
+                .matchId(matchId)
+                .participantId(-1L)
+                .timestamp(LocalDateTime.now())
+                .type(MessageType.ALERT)
+                .build();
+
+        processMessage(message);
+
     }
 }

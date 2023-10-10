@@ -181,6 +181,8 @@ public class MatchController {
 
         matchService.callAdmin(channelLink, Long.valueOf(matchId));
 
+        matchChatService.processAdminAlert(channelLink, Long.valueOf(matchId));
+
         simpMessagingTemplate.convertAndSend("/match/" + channelLink);
     }
 
