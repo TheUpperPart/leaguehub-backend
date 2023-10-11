@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
+import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
@@ -231,9 +232,9 @@ public class ParticipantService {
 
         findParticipant.disqualificationParticipant();
         matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
-                .forEach(matchPlayer ->
-                        matchPlayer.updateMatchPlayerResultStatus
-                                (MatchPlayerResultStatus.DISQUALIFICATION));
+                .forEach(matchPlayer -> {
+                        matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
+                        matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);});
     }
 
     /**
