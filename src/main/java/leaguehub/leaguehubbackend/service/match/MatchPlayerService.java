@@ -27,7 +27,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -170,6 +169,8 @@ public class MatchPlayerService {
     public MatchInfoDto updateMatchPlayerScore(Long matchId, Integer setCount, Long endTime) {
         List<MatchPlayer> findMatchPlayerList = matchPlayerRepository.findMatchPlayersWithoutDisqualification(matchId);
 
+        if(findMatchPlayerList.size() == 0) throw new MatchNotFoundException();
+
         RiotAPIDto matchDetailFromRiot =
                 getMatchDetailFromRiot(findMatchPlayerList.get(0).getParticipant().getGameId(),
                         findMatchPlayerList, endTime);
@@ -303,6 +304,10 @@ public class MatchPlayerService {
         Long matchPlayerId = message.getMatchPlayerId();
 
         MatchPlayer matchPlayer = findMatchPlayer(matchPlayerId, matchId);
+
+        if(matchPlayer.getMatchPlayerResultStatus() != MatchPlayerResultStatus.PROGRESS) {
+            throw new MatchAlreadyUpdateException();
+        }
 
         matchPlayer.updatePlayerCheckInStatus(READY);
         matchPlayerRepository.save(matchPlayer);

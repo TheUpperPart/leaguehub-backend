@@ -23,6 +23,7 @@ public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> 
 
     @Query("select mp from MatchPlayer mp join fetch mp.participant join fetch mp.match where mp.match.id = :matchId " +
             "and mp.matchPlayerResultStatus <> leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.DISQUALIFICATION " +
+            "and mp.match.matchStatus <> leaguehub.leaguehubbackend.entity.match.MatchStatus.END " +
             "order by mp.playerScore desc, mp.participant.gameId")
     List<MatchPlayer> findMatchPlayersWithoutDisqualification(@Param("matchId") Long matchId);
 
@@ -31,7 +32,7 @@ public interface MatchPlayerRepository extends JpaRepository<MatchPlayer, Long> 
 
     List<MatchPlayer> findMatchPlayersByParticipantId(Long participantId);
 
-    Optional<MatchPlayer> findMatchPlayerByIdAndMatch_Id(Long matchPlayerId, Long matchId);
+    Optional<MatchPlayer> findMatchPlayerByIdAndMatch_Id(@Param("matchPlayerId") Long matchPlayerId, @Param("matchId") Long matchId);
 
 
 }
