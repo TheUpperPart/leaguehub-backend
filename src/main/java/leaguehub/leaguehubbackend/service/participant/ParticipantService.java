@@ -7,13 +7,16 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
+import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
@@ -214,7 +217,8 @@ public class ParticipantService {
     public void rejectedParticipantRequest(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
-
+        if(!participant.getChannel().getChannelStatus().equals(ChannelStatus.PREPARING))
+            throw new ChannelStatusAlreadyException();
 
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
@@ -228,9 +232,9 @@ public class ParticipantService {
 
         findParticipant.disqualificationParticipant();
         matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
-                .forEach(matchPlayer ->
-                        matchPlayer.updateMatchPlayerResultStatus
-                                (MatchPlayerResultStatus.DISQUALIFICATION));
+                .forEach(matchPlayer -> {
+                        matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
+                        matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);});
     }
 
     /**

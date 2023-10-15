@@ -1,5 +1,5 @@
 package leaguehub.leaguehubbackend.entity.match;
 
 public enum PlayerStatus {
-    READY, WAITING
+    READY, WAITING, DISQUALIFICATION
 }
