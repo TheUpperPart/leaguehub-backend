@@ -8,7 +8,6 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
-import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
@@ -230,12 +229,15 @@ public class ParticipantService {
     public void disqualifiedParticipant(String channelLink, Long participantId){
         Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
 
-        findParticipant.disqualificationParticipant();
-        matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
-                .forEach(matchPlayer -> {
-                        matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
-                        matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);});
+        disqualificationParticipant(findParticipant);
     }
+
+    public void selfDisqualified(String channelLink){
+        Participant participant = getParticipant(channelLink);
+
+        disqualificationParticipant(participant);
+    }
+
 
     /**
      * 사용자를 관리자로 권한을 변경한다.
@@ -441,6 +443,14 @@ public class ParticipantService {
 
         if (participant.getRequestStatus() == REJECT) throw new ParticipantRejectedRequestedException();
 
+    }
+
+    private void disqualificationParticipant(Participant participant) {
+        participant.disqualificationParticipant();
+        matchPlayerRepository.findMatchPlayersByParticipantId(participant.getId()).stream()
+                .forEach(matchPlayer -> {
+                    matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
+                    matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);});
     }
 
     public void checkDuplicateNickname(String gameId, String channelLink) {
