@@ -179,7 +179,7 @@ public class MatchService {
         createMatchSet(matchList);
     }
 
-    public void callAdmin(String channelLink, Long matchId){
+    public MatchCallAdminDto callAdmin(String channelLink, Long matchId){
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
 
@@ -189,6 +189,13 @@ public class MatchService {
                 .orElseThrow(() -> new MatchNotFoundException());
 
         match.updateCallAlarm();
+
+        MatchCallAdminDto matchCallAdminDto = new MatchCallAdminDto();
+        matchCallAdminDto.setCallName(participant.getNickname());
+        matchCallAdminDto.setMatchRound(match.getMatchRound());
+        matchCallAdminDto.setMatchName(match.getMatchName());
+
+        return matchCallAdminDto;
     }
 
     public void turnOffAlarm(String channelLink, Long matchId){

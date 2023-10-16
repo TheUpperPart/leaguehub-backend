@@ -179,11 +179,11 @@ public class MatchController {
     public void callAdmin(@DestinationVariable("channelLink") String channelLink,
                           @DestinationVariable("matchId") String matchId) {
 
-        matchService.callAdmin(channelLink, Long.valueOf(matchId));
+        MatchCallAdminDto matchCallAdminDto = matchService.callAdmin(channelLink, Long.valueOf(matchId));
 
         matchChatService.processAdminAlert(channelLink, Long.valueOf(matchId));
 
-        simpMessagingTemplate.convertAndSend("/match/" + channelLink);
+        simpMessagingTemplate.convertAndSend("/match/" + channelLink, matchCallAdminDto);
     }
 
 
