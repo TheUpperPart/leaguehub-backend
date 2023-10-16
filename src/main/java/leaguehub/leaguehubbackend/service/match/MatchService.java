@@ -15,6 +15,7 @@ import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlrea
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
@@ -179,9 +180,9 @@ public class MatchService {
         createMatchSet(matchList);
     }
 
-    public MatchCallAdminDto callAdmin(String channelLink, Long matchId){
-        Member member = memberService.findCurrentMember();
-        Participant participant = getParticipant(member.getId(), channelLink);
+    public MatchCallAdminDto callAdmin(String channelLink, Long matchId, Long participantId){
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                .orElseThrow(() -> new ParticipantNotFoundException());
 
         if(!participant.getParticipantStatus().equals(PROGRESS)) { throw new ParticipantRejectedRequestedException(); }
 

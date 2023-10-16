@@ -175,11 +175,12 @@ public class MatchController {
         return new ResponseEntity(gameResultList, OK);
     }
 
-    @MessageMapping("/match/{channelLink}/{matchId}/call-admin")
+    @MessageMapping("/match/{channelLink}/{participantId}/{matchId}/call-admin")
     public void callAdmin(@DestinationVariable("channelLink") String channelLink,
+                          @DestinationVariable("participantId") String participantId,
                           @DestinationVariable("matchId") String matchId) {
 
-        MatchCallAdminDto matchCallAdminDto = matchService.callAdmin(channelLink, Long.valueOf(matchId));
+        MatchCallAdminDto matchCallAdminDto = matchService.callAdmin(channelLink, Long.valueOf(matchId), Long.valueOf(participantId));
 
         matchChatService.processAdminAlert(channelLink, Long.valueOf(matchId));
 
