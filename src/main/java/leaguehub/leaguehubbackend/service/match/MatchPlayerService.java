@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateEx
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
+import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
@@ -309,8 +310,11 @@ public class MatchPlayerService {
             throw new MatchAlreadyUpdateException();
         }
 
+        if(matchPlayer.getMatchPlayerResultStatus() != MatchPlayerResultStatus.DISQUALIFICATION){
+            throw new InvalidParticipantAuthException();
+        }
+
         matchPlayer.updatePlayerCheckInStatus(READY);
-        matchPlayerRepository.save(matchPlayer);
     }
 
     public List<MatchSetStatusMessage> getAllPlayerStatusForMatch(Long matchId) {

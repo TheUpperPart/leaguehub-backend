@@ -149,6 +149,20 @@ public class ParticipantController {
         return new ResponseEntity<>("disqualified participant", OK);
     }
 
+    @Operation(summary = "유저 자체 기권", description = "자신이 기권처리")
+    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "기권 처리 되었습니다."),
+            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+    @PostMapping("/{channelLink}/disqualification")
+    public ResponseEntity disqualificationSelf(@PathVariable("channelLink") String channelLink){
+
+        participantService.selfDisqualified(channelLink);
+
+        return new ResponseEntity("disqualification Self", OK);
+    }
+
     @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")
     @Parameters(value = {
             @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
