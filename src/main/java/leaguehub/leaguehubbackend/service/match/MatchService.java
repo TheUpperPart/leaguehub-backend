@@ -389,7 +389,7 @@ public class MatchService {
 
 
     public List<MatchPlayerInfo> convertMatchPlayerInfoList(List<MatchPlayer> matchPlayers) {
-        return matchPlayers.stream()
+        List<MatchPlayerInfo> collect = matchPlayers.stream()
                 .map(matchPlayer -> new MatchPlayerInfo(
                         matchPlayer.getId(),
                         matchPlayer.getParticipant().getId(),
@@ -403,6 +403,13 @@ public class MatchService {
                 ))
                 .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
                 .collect(Collectors.toList());
+
+        int i = INITIAL_RANK;
+        for (MatchPlayerInfo matchPlayerInfo : collect) {
+            matchPlayerInfo.setMatchRank(i++);
+        }
+
+        return collect;
     }
 
     private Participant checkHost(String channelLink) {
