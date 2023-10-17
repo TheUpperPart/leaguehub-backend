@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.config;
+package leaguehub.leaguehubbackend.config.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,7 @@
 package leaguehub.leaguehubbackend.config;
 
+import leaguehub.leaguehubbackend.config.stomp.StompErrorHandler;
+import leaguehub.leaguehubbackend.config.stomp.StompHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
