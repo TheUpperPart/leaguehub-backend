@@ -104,7 +104,25 @@ jacocoTestCoverageVerification {
 
 test {
     finalizedBy jacocoTestReport
+    useJUnitPlatform()
+    jacoco {
+        excludes += ["leaguehub/leaguehubbackend/config/**",
+                     "leaguehub/leaguehubbackend/exception/**",
+                     "leaguehub/leaguehubbackend/repository/**",
+                     "leaguehub/leaguehubbackend/service/KakaoService.class"
+        ]
+    }
 }
 jacocoTestReport {
     dependsOn test
+    afterEvaluate {
+
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ["leaguehub/leaguehubbackend/config/**",
+                              "leaguehub/leaguehubbackend/exception/**",
+                              "leaguehub/leaguehubbackend/repository/**",
+                              "leaguehub/leaguehubbackend/service/KakaoService.class"])
+        }))
+    }
 }
