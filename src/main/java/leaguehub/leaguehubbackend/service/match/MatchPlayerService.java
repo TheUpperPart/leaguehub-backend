@@ -310,7 +310,7 @@ public class MatchPlayerService {
             throw new MatchAlreadyUpdateException();
         }
 
-        if(matchPlayer.getMatchPlayerResultStatus() != MatchPlayerResultStatus.DISQUALIFICATION){
+        if(matchPlayer.getMatchPlayerResultStatus() == MatchPlayerResultStatus.DISQUALIFICATION){
             throw new InvalidParticipantAuthException();
         }
 
