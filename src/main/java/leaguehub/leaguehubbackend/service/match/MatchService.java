@@ -397,7 +397,7 @@ public class MatchService {
 
 
     public List<MatchPlayerInfo> convertMatchPlayerInfoList(List<MatchPlayer> matchPlayers) {
-        List<MatchPlayerInfo> collect = matchPlayers.stream()
+        List<MatchPlayerInfo> matchPlayerInfoList = matchPlayers.stream()
                 .map(matchPlayer -> new MatchPlayerInfo(
                         matchPlayer.getId(),
                         matchPlayer.getParticipant().getId(),
@@ -409,15 +409,13 @@ public class MatchService {
                         matchPlayer.getParticipant().getProfileImageUrl(),
                         matchPlayer.getPlayerScore()
                 ))
-                .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed())
+                .sorted(Comparator.comparingInt(MatchPlayerInfo::getScore).reversed()
+                        .thenComparing(MatchPlayerInfo::getGameId))
                 .collect(Collectors.toList());
 
-        int i = INITIAL_RANK;
-        for (MatchPlayerInfo matchPlayerInfo : collect) {
-            matchPlayerInfo.setMatchRank(i++);
-        }
+        assignRankToMatchPlayerInfoList(matchPlayerInfoList);
 
-        return collect;
+        return matchPlayerInfoList;
     }
 
     private Participant checkHost(String channelLink) {
@@ -473,8 +471,6 @@ public class MatchService {
 
         List<MatchPlayerInfo> matchPlayerInfoList = convertMatchPlayerInfoList(matchPlayers);
 
-        sortAndRankMatchPlayerInfoList(matchPlayerInfoList);
-
         Long requestMatchPlayerId = getRequestMatchPlayerId(channelLink, matchPlayers);
 
         return MatchScoreInfoDto.builder()
@@ -484,17 +480,6 @@ public class MatchService {
                 .matchSetCount(match.getMatchSetCount())
                 .requestMatchPlayerId(requestMatchPlayerId)
                 .build();
-    }
-
-    private void sortAndRankMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
-        sortMatchPlayerInfoList(matchPlayerInfoList);
-        assignRankToMatchPlayerInfoList(matchPlayerInfoList);
-    }
-
-    private void sortMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
-        matchPlayerInfoList.sort(Comparator
-                .comparing(MatchPlayerInfo::getScore).reversed()
-                .thenComparing(MatchPlayerInfo::getGameId));
     }
 
     private void assignRankToMatchPlayerInfoList(List<MatchPlayerInfo> matchPlayerInfoList) {
