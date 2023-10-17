@@ -1,7 +1,9 @@
 package leaguehub.leaguehubbackend.dto.match;
 
 import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Data

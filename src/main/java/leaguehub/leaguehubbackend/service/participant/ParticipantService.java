@@ -7,15 +7,12 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
-import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
@@ -216,8 +213,7 @@ public class ParticipantService {
     public void rejectedParticipantRequest(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
-        if(!participant.getChannel().getChannelStatus().equals(ChannelStatus.PREPARING))
-            throw new ChannelStatusAlreadyException();
+
 
         Participant findParticipant = getFindParticipant(channelLink, participantId);
 
@@ -229,15 +225,12 @@ public class ParticipantService {
     public void disqualifiedParticipant(String channelLink, Long participantId){
         Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
 
-        disqualificationParticipant(findParticipant);
+        findParticipant.disqualificationParticipant();
+        matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
+                .forEach(matchPlayer ->
+                        matchPlayer.updateMatchPlayerResultStatus
+                                (MatchPlayerResultStatus.DISQUALIFICATION));
     }
-
-    public void selfDisqualified(String channelLink){
-        Participant participant = getParticipant(channelLink);
-
-        disqualificationParticipant(participant);
-    }
-
 
     /**
      * 사용자를 관리자로 권한을 변경한다.
@@ -443,14 +436,6 @@ public class ParticipantService {
 
         if (participant.getRequestStatus() == REJECT) throw new ParticipantRejectedRequestedException();
 
-    }
-
-    private void disqualificationParticipant(Participant participant) {
-        participant.disqualificationParticipant();
-        matchPlayerRepository.findMatchPlayersByParticipantId(participant.getId()).stream()
-                .forEach(matchPlayer -> {
-                    matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
-                    matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);});
     }
 
     public void checkDuplicateNickname(String gameId, String channelLink) {

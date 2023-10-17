@@ -7,6 +7,7 @@ import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.match.Match;
+import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -14,6 +15,7 @@ import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -56,6 +58,8 @@ class MatchServiceTest {
 
     @Autowired
     MatchService matchService;
+    @Autowired
+    private MatchPlayerRepository matchPlayerRepository;
 
 
     @AfterEach
@@ -144,6 +148,16 @@ class MatchServiceTest {
         MatchRoundListDto roundList = matchService.getRoundList(channel.getChannelLink());
 
         assertThat(roundList.getRoundList().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("DTO 변환 테스트")
+    public void convertMatchPlayerDto() {
+        List<MatchPlayer> matchPlayerList = matchPlayerRepository.findAllByMatch_IdOrderByPlayerScoreDesc(1184L);
+
+        matchService.convertMatchPlayerInfoList(matchPlayerList).stream().forEach(matchPlayerInfo ->
+                System.out.println(matchPlayerInfo.getGameId()+ " "
+                + matchPlayerInfo.getScore() + " " + matchPlayerInfo.getMatchRank()));
     }
 
 }
