@@ -109,7 +109,8 @@ test {
         excludes += ["leaguehub/leaguehubbackend/config/**",
                      "leaguehub/leaguehubbackend/exception/**",
                      "leaguehub/leaguehubbackend/repository/**",
-                     "leaguehub/leaguehubbackend/service/KakaoService.class"
+                     "leaguehub/leaguehubbackend/service/kakao/**",
+                     "leaguehub/leaguehubbackend/service/s3/**"
         ]
     }
 }
@@ -122,7 +123,8 @@ jacocoTestReport {
                     exclude: ["leaguehub/leaguehubbackend/config/**",
                               "leaguehub/leaguehubbackend/exception/**",
                               "leaguehub/leaguehubbackend/repository/**",
-                              "leaguehub/leaguehubbackend/service/KakaoService.class"])
+                              "leaguehub/leaguehubbackend/service/kakao/**",
+                              "leaguehub/leaguehubbackend/service/s3/**"])
         }))
     }
 }
