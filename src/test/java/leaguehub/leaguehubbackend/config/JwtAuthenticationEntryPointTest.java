@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import leaguehub.leaguehubbackend.config.jwt.JwtAuthenticationEntryPoint;
 import leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

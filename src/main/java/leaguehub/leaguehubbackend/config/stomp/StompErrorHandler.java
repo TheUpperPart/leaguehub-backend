@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.config;
+package leaguehub.leaguehubbackend.config.stomp;
 
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
