@@ -69,6 +69,7 @@ public class MatchServiceScoreTest {
     private Member member1;
 
     private Match savedMatch;
+    private Channel channel;
 
     @BeforeEach
     public void setUp() {
@@ -91,7 +92,7 @@ public class MatchServiceScoreTest {
         Member member4 = memberRepository.save(UserFixture.createCustomeMember("member4"));
 
         CreateChannelDto channelDto = ChannelFixture.createAllPropertiesCustomChannelDto(false, false, 2400, null, 20);
-        Channel channel = Channel.createChannel(channelDto.getTitle(),
+        channel = Channel.createChannel(channelDto.getTitle(),
                 channelDto.getGameCategory(), channelDto.getMaxPlayer(),
                 channelDto.getMatchFormat(), channelDto.getChannelImageUrl());
         ChannelRule channelRule = ChannelRule.createChannelRule(channel, channelDto.getTier(), channelDto.getTierMax(), channelDto.getTierMin(),
@@ -144,9 +145,9 @@ public class MatchServiceScoreTest {
     @DisplayName("getMatchScoreInfo 테스트 - 성공")
     public void getMatchScoreInfoSuccessTest() throws Exception {
 
-        MatchScoreInfoDto result = matchService.getMatchScoreInfo(savedMatch.getId());
+        MatchScoreInfoDto result = matchService.getMatchScoreInfo(channel.getChannelLink(), savedMatch.getId());
         assertNotNull(result);
-        assertEquals("5", result.getRequestMatchPlayerId());
+        assertEquals(-1, result.getRequestMatchPlayerId());
 
         List<MatchPlayerInfo> scoreInfos = result.getMatchPlayerInfos();
         assertNotNull(scoreInfos);
@@ -160,10 +161,10 @@ public class MatchServiceScoreTest {
 
         Long matchId = 1L;
 
-        MatchScoreInfoDto testDto = matchService.getMatchScoreInfo(matchId);
+        MatchScoreInfoDto testDto = matchService.getMatchScoreInfo(channel.getChannelLink(), savedMatch.getId());
 
         assertNotNull(testDto);
-        assertEquals("1", testDto.getRequestMatchPlayerId());
+        assertEquals(-1, testDto.getRequestMatchPlayerId());
 
         List<MatchPlayerInfo> matchPlayerInfos = testDto.getMatchPlayerInfos();
         assertNotNull(matchPlayerInfos);
@@ -184,7 +185,7 @@ public class MatchServiceScoreTest {
         Long invalidMatchId = 1234L;
 
         assertThrows(MatchNotFoundException.class, () -> {
-            matchService.getMatchScoreInfo(invalidMatchId);
+            matchService.getMatchScoreInfo("1234", invalidMatchId);
         });
     }
 
