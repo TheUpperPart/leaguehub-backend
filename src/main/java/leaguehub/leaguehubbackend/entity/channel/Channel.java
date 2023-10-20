@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.entity.channel;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
-import leaguehub.leaguehubbackend.exception.s3.exception.S3InvalidImageException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -28,16 +28,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
-
 import static leaguehub.leaguehubbackend.entity.match.MatchStatus.END;
-import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.*;
-
+import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.DISQUALIFICATION;
+import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.PROGRESS;
 import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service

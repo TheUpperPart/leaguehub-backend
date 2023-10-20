@@ -13,7 +13,6 @@ import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -158,7 +157,7 @@ public class ParticipantController {
     @PostMapping("/{channelLink}/disqualification")
     public ResponseEntity disqualificationSelf(@PathVariable("channelLink") String channelLink){
 
-        participantService.selfDisqualified(channelLink);
+//        participantService.selfDisqualified(channelLink);
 
         return new ResponseEntity("disqualification Self", OK);
     }

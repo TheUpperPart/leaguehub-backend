@@ -1,7 +1,6 @@
 package leaguehub.leaguehubbackend.exception.s3.exception;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.s3.S3ErrorCode;
 
 import static leaguehub.leaguehubbackend.exception.s3.S3ErrorCode.INVALID_S3_IMAGE;
 
