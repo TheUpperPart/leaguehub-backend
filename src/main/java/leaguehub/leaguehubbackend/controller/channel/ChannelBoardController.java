@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
+import leaguehub.leaguehubbackend.dto.channel.ChannelBoardIndexListDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardInfoDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
@@ -107,8 +108,8 @@ public class ChannelBoardController {
     })
     @PostMapping("/channel/{channelLink}/order")
     public ResponseEntity updateChannelBoardIndex(@PathVariable("channelLink") String channelLink,
-                                                  @RequestBody @Valid List<ChannelBoardLoadDto> channelBoardLoadDtoList) {
-        channelBoardService.updateChannelBoardIndex(channelLink, channelBoardLoadDtoList);
+                                                  @RequestBody @Valid ChannelBoardIndexListDto channelBoardIndexListDto) {
+        channelBoardService.updateChannelBoardIndex(channelLink, channelBoardIndexListDto.getChannelBoardLoadDtoList());
 
         return new ResponseEntity("BoardIndex successfully updated", OK);
     }
