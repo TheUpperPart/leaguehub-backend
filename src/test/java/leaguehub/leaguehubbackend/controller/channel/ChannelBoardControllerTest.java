@@ -1,10 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
@@ -301,8 +298,10 @@ class ChannelBoardControllerTest {
         List<ChannelBoardLoadDto> channelBoardLoadDtoList = channelBoardService.loadChannelBoards(channel.get().getChannelLink()).getChannelBoardLoadDtoList();
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
+        ChannelBoardIndexListDto channelBoardIndexListDto = new ChannelBoardIndexListDto();
+        channelBoardIndexListDto.setChannelBoardLoadDtoList(channelBoardLoadDtoList);
 
-        String json = objectMapper.writeValueAsString(channelBoardLoadDtoList);
+        String json = objectMapper.writeValueAsString(channelBoardIndexListDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/channel/"
                                 + channel.get().getChannelLink() + "/order")
@@ -322,7 +321,10 @@ class ChannelBoardControllerTest {
         channelBoardLoadDtoList.get(0).setBoardIndex(3);
         channelBoardLoadDtoList.get(2).setBoardIndex(1);
 
-        String json = objectMapper.writeValueAsString(channelBoardLoadDtoList);
+        ChannelBoardIndexListDto channelBoardIndexListDto = new ChannelBoardIndexListDto();
+        channelBoardIndexListDto.setChannelBoardLoadDtoList(channelBoardLoadDtoList);
+
+        String json = objectMapper.writeValueAsString(channelBoardIndexListDto);
 
         Member test = UserFixture.createCustomeMember("test231");
         memberRepository.save(test);
