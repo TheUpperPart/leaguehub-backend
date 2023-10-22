@@ -264,7 +264,7 @@ public class MatchPlayerService {
      * @param match
      */
     private void checkMatchEnd(MatchSet matchSet, Match match) {
-        if (match.getMatchSetCount() == matchSet.getSetCount()) {
+        if (match.getMatchSetCount().equals(matchSet.getSetCount())) {
             match.updateMatchStatus(MatchStatus.END);
             updateEndMatchResult(match);
         } else {
@@ -474,7 +474,7 @@ public class MatchPlayerService {
             }
         }
 
-        if (mostFirstPlayerInTieList.size() != 0) {
+        if (!mostFirstPlayerInTieList.isEmpty()) {
             return mostFirstPlayerInTieList;
         }
 

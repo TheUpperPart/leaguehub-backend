@@ -127,7 +127,7 @@ public class ChannelBoardService {
 
         channelBoardLoadDtoList.forEach(channelBoardLoadDto -> {
             channelBoards.stream()
-                    .filter(channelBoard -> channelBoard.getId() == channelBoardLoadDto.getBoardId())
+                    .filter(channelBoard -> channelBoard.getId().equals(channelBoardLoadDto.getBoardId()))
                     .findFirst()
                     .ifPresent(channelBoard -> channelBoard.updateIndex(channelBoardLoadDto.getBoardIndex()));
         });
