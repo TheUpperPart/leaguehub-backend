@@ -10,13 +10,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.dto.match.MatchSetReadyMessage;
 import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantIdDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +36,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class ParticipantController {
 
     private final ParticipantService participantService;
-
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Operation(summary = "티어 검색 (참가 x)", description = "검색 버튼을 누르면 해당 카테고리와 게임 닉네임을 가지고 티어 검색 (참가 x)")
     @Parameters(value = {
@@ -130,36 +136,22 @@ public class ParticipantController {
         return new ResponseEntity<>("reject participant", OK);
     }
 
-    @Operation(summary = "플레이어 실격처리", description = "관리자가 해당 게임 플레이어를 실격처리")
-    @Parameters(value = {
-            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "participantId", description = "해당 채널 참가자의 고유 Id", example = "1")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "실격 처리 되었습니다."),
-            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/{channelLink}/{participantId}/disqualification")
-    public ResponseEntity disqualifiedParticipant(@PathVariable("channelLink") String channelLink,
-                                              @PathVariable("participantId") Long participantId) {
+    @MessageMapping("/{channelLink}/{matchIdStr}/disqualification")
+    public void disqualifiedParticipant(@DestinationVariable("channelLink") String channelLink,
+                                        @DestinationVariable("matchIdStr") String matchIdStr,
+                                        @Payload ParticipantIdDto message) {
+        participantService.disqualifiedParticipant(channelLink, message.getParticipantId());
 
-        participantService.disqualifiedParticipant(channelLink, participantId);
-
-        return new ResponseEntity<>("disqualified participant", OK);
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
     }
 
-    @Operation(summary = "유저 자체 기권", description = "자신이 기권처리")
-    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "기권 처리 되었습니다."),
-            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/{channelLink}/disqualification")
-    public ResponseEntity disqualificationSelf(@PathVariable("channelLink") String channelLink){
+    @MessageMapping("/{channelLink}/{matchIdStr}/disqualification-self")
+    public void disqualificationSelf(@DestinationVariable("channelLink") String channelLink,
+                                     @DestinationVariable("matchIdStr") String matchIdStr,
+                                     @Payload ParticipantIdDto message){
+        participantService.selfDisqualified(channelLink, message.getParticipantId());
 
-//        participantService.selfDisqualified(channelLink);
-
-        return new ResponseEntity("disqualification Self", OK);
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
     }
 
     @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")

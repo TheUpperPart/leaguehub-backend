@@ -8,6 +8,7 @@ import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
+import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
@@ -64,7 +65,7 @@ public class ParticipantService {
 
     public int findParticipantPermission(String channelLink) {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        if(userDetails == null) return OBSERVER.getNum();
+        if (userDetails == null) return OBSERVER.getNum();
         Member member = memberService.validateMember(userDetails.getUsername());
 
 
@@ -174,14 +175,13 @@ public class ParticipantService {
      */
 
     public List<ResponseStatusPlayerDto> loadPlayers(String channelLink) {
-        
+
         return participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc
                         (channelLink, PLAYER, DONE)
                 .stream()
                 .map(participant -> mapToResponseStatusPlayerDto(participant))
                 .collect(Collectors.toList());
     }
-
 
 
     /**
@@ -222,14 +222,27 @@ public class ParticipantService {
         updateRealPlayerCount(channelLink, participant.getChannel());
     }
 
-    public void disqualifiedParticipant(String channelLink, Long participantId){
+    public void disqualifiedParticipant(String channelLink, Long participantId) {
         Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
 
+        disqualificationParticipant(findParticipant);
+    }
+
+    public void selfDisqualified(String channelLink, Long participantId){
+        //matchPlayerId -> ParticipantId로 변경해야함
+        Participant participant = participantRepository.findParticipantByIdAndChannel_ChannelLink(participantId, channelLink)
+                .orElseThrow(() -> new ParticipantNotFoundException());
+
+        disqualificationParticipant(participant);
+    }
+
+    private void disqualificationParticipant(Participant findParticipant) {
         findParticipant.disqualificationParticipant();
         matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
-                .forEach(matchPlayer ->
-                        matchPlayer.updateMatchPlayerResultStatus
-                                (MatchPlayerResultStatus.DISQUALIFICATION));
+                .forEach(matchPlayer -> {
+                            matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);
+                            matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);}
+                );
     }
 
     /**
@@ -300,7 +313,7 @@ public class ParticipantService {
         playCountRuleCheck(channelRule, userGameInfo);
     }
 
-    public void checkAdminHost(String channelLink){
+    public void checkAdminHost(String channelLink) {
         Participant participant = getParticipant(channelLink);
         checkRoleHost(participant.getRole());
     }
@@ -326,7 +339,6 @@ public class ParticipantService {
             if (userRankScore > tierMax || userRankScore < tierMin) throw new ParticipantInvalidRankException();
         }
     }
-
 
 
     private void checkRealPlayerCount(Channel channel) {
@@ -400,9 +412,9 @@ public class ParticipantService {
     }
 
 
-
     /**
      * 자기 자신이 participant를 찾을 때
+     *
      * @param channelLink
      * @return
      */
@@ -480,7 +492,6 @@ public class ParticipantService {
 
         return summonerDetail;
     }
-
 
 
     /**
