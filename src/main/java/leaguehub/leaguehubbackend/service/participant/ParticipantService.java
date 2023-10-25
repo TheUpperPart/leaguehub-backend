@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.member.BaseRole.GUEST;
 import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.*;
 import static leaguehub.leaguehubbackend.entity.participant.Role.*;
@@ -143,6 +144,7 @@ public class ParticipantService {
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, NO_REQUEST);
 
         return findParticipants.stream()
+                .filter(participant -> participant.getMember().getBaseRole() == USER)
                 .map(participant -> mapToResponseStatusPlayerDto(participant))
                 .collect(Collectors.toList());
     }
@@ -240,6 +242,8 @@ public class ParticipantService {
      */
     public void updateHostRole(String channelLink, Long participantId) {
         Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
+        if(findParticipant.getMember().getBaseRole() == GUEST)
+            throw new InvalidParticipantAuthException();
 
         findParticipant.updateHostRole();
     }
