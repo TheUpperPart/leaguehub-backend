@@ -140,7 +140,7 @@ public class ParticipantController {
     public void disqualifiedParticipant(@DestinationVariable("channelLink") String channelLink,
                                         @DestinationVariable("matchIdStr") String matchIdStr,
                                         @Payload ParticipantIdDto message) {
-        participantService.disqualifiedParticipant(channelLink, message.getParticipantId());
+        participantService.disqualifiedParticipant(channelLink, message.getParticipantId(), message.getAccessToken());
 
         simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
     }
@@ -149,7 +149,7 @@ public class ParticipantController {
     public void disqualificationSelf(@DestinationVariable("channelLink") String channelLink,
                                      @DestinationVariable("matchIdStr") String matchIdStr,
                                      @Payload ParticipantIdDto message){
-        participantService.selfDisqualified(channelLink, message.getParticipantId());
+        participantService.selfDisqualified(channelLink, message.getAccessToken());
 
         simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
     }
