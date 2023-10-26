@@ -1,10 +1,7 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantSummonerDetail;
-import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
+ import leaguehub.leaguehubbackend.dto.participant.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
@@ -29,6 +26,7 @@ import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.DISQUALIFICATION;
 import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.*;
 import static leaguehub.leaguehubbackend.entity.participant.Role.*;
@@ -227,20 +226,36 @@ public class ParticipantService {
         updateRealPlayerCount(channelLink, participant.getChannel());
     }
 
-    public void disqualifiedParticipant(String channelLink, Long participantId, String accessToken) {
-        Participant myParticipant = findParticipantAccessToken(channelLink, accessToken);
-        checkRole(myParticipant.getRole(), HOST);
+    public ParticipantIdResponseDto disqualifiedParticipant(String channelLink, ParticipantIdDto message) {
+        if(message.getRole() == HOST.getNum()){
+            return disqualifiedToHost(channelLink, message);
+        }
 
-        Participant findParticipant = getFindParticipant(channelLink, participantId);
+        if(message.getRole() == PLAYER.getNum()){
+            return selfDisqualified(channelLink, message);
+        }
 
-        disqualificationParticipant(findParticipant);
+        throw new InvalidParticipantAuthException();
     }
 
-    public void selfDisqualified(String channelLink, String accessToken){
-        Participant myParticipant = findParticipantAccessToken(channelLink, accessToken);
+    private ParticipantIdResponseDto disqualifiedToHost(String channelLink, ParticipantIdDto message) {
+        Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
+        checkRole(myParticipant.getRole(), HOST);
+
+        Participant findParticipant = getFindParticipant(channelLink, message.getParticipantId());
+
+        disqualificationParticipant(findParticipant);
+
+        return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
+    }
+
+    private ParticipantIdResponseDto selfDisqualified(String channelLink, ParticipantIdDto message) {
+        Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
         checkRole(myParticipant.getRole(), PLAYER);
 
         disqualificationParticipant(myParticipant);
+
+        return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
     }
 
     private void disqualificationParticipant(Participant findParticipant) {

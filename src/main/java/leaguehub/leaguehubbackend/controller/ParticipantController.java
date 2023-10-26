@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.match.MatchSetReadyMessage;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantIdDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
+import leaguehub.leaguehubbackend.dto.participant.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -136,23 +133,16 @@ public class ParticipantController {
         return new ResponseEntity<>("reject participant", OK);
     }
 
+    //실격, 기권에 대한 웹소켓
     @MessageMapping("/{channelLink}/{matchIdStr}/disqualification")
     public void disqualifiedParticipant(@DestinationVariable("channelLink") String channelLink,
                                         @DestinationVariable("matchIdStr") String matchIdStr,
                                         @Payload ParticipantIdDto message) {
-        participantService.disqualifiedParticipant(channelLink, message.getParticipantId(), message.getAccessToken());
+        ParticipantIdResponseDto participantIdResponseDto = participantService.disqualifiedParticipant(channelLink, message);
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, participantIdResponseDto);
     }
 
-    @MessageMapping("/{channelLink}/{matchIdStr}/disqualification-self")
-    public void disqualificationSelf(@DestinationVariable("channelLink") String channelLink,
-                                     @DestinationVariable("matchIdStr") String matchIdStr,
-                                     @Payload ParticipantIdDto message){
-        participantService.selfDisqualified(channelLink, message.getAccessToken());
-
-        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message.getMatchPlayerId());
-    }
 
     @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")
     @Parameters(value = {

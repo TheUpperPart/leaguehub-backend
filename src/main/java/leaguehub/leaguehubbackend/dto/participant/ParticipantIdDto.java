@@ -11,4 +11,7 @@ public class ParticipantIdDto {
     private Long participantId;
 
     private Long matchPlayerId;
+
+    //관리자: 0, 플레이어: 1, 관전자: 2
+    private int role;
 }
