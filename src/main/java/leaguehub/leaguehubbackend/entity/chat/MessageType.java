@@ -1,7 +1,8 @@
 package leaguehub.leaguehubbackend.entity.chat;
 
 public enum MessageType {
-    TEXT,
-    ALERT
+    USER,
+    ALERT,
+    ADMIN
 
 }
