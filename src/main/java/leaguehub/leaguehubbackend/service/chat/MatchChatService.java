@@ -81,6 +81,7 @@ public class MatchChatService {
                 message.setAdminName(member.getNickname() + "(관리자)");
             }
         }
+        message.setAccessToken(null);
     }
 
     public List<MatchMessage> findMatchChatHistory(String channelLink, Long matchId) {
