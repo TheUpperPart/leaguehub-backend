@@ -3,10 +3,14 @@ package leaguehub.leaguehubbackend.service.chat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.chat.MessageType;
+import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.chat.exception.MatchChatMessageConversionException;
+import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,6 +28,10 @@ public class MatchChatService {
 
     private final StringRedisTemplate stringRedisTemplate;
 
+    private final JwtService jwtService;
+
+    private final MemberRepository memberRepository;
+
     private final ObjectMapper objectMapper;
     private static final String REDIS_KEY_FORMAT = "channelLink:%s:matchId:%d:messages";
     private static final String PUBLISH_KEY_FORMAT = "matchId:%d:messages";
@@ -35,6 +43,8 @@ public class MatchChatService {
         String channelLink = message.getChannelLink();
 
         message.setTimestamp(LocalDateTime.now());
+
+        setAdminNameIfAdmin(message);
 
         String messageJson = convertMessageToJson(message);
         String redisKey = String.format(REDIS_KEY_FORMAT, channelLink, matchId);
@@ -61,6 +71,17 @@ public class MatchChatService {
         stringRedisTemplate.convertAndSend(key, messageJson);
     }
 
+    private void setAdminNameIfAdmin(MatchMessage message) {
+        MessageType messageType = message.getType();
+        if (messageType == MessageType.ADMIN) {
+            String personalId = String.valueOf(jwtService.extractPersonalId(message.getAccessToken()));
+            Optional<Member> memberOpt = memberRepository.findMemberByPersonalId(personalId);
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                message.setAdminName(member.getNickname() + "(관리자)");
+            }
+        }
+    }
 
     public List<MatchMessage> findMatchChatHistory(String channelLink, Long matchId) {
 
@@ -80,6 +101,7 @@ public class MatchChatService {
             throw new MatchChatMessageConversionException();
         }
     }
+
     public void deleteChannelMatchChat(Channel channel) {
         String targetChannel = String.format(DELETE_CHANNEL_CHAT_FORMAT, channel.getChannelLink());
         Set<String> keys = stringRedisTemplate.keys(targetChannel);
