@@ -1,30 +1,32 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantSummonerDetail;
-import leaguehub.leaguehubbackend.dto.participant.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.dto.participant.ResponseUserGameInfoDto;
+ import leaguehub.leaguehubbackend.dto.participant.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus;
+import leaguehub.leaguehubbackend.entity.match.PlayerStatus;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.GameTier;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.participant.exception.*;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
+import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.DISQUALIFICATION;
 import static leaguehub.leaguehubbackend.entity.member.BaseRole.GUEST;
 import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 import static leaguehub.leaguehubbackend.entity.participant.RequestStatus.*;
@@ -61,11 +64,13 @@ public class ParticipantService {
     private String riot_api_key;
     private final ChannelRuleRepository channelRuleRepository;
     private final MatchPlayerRepository matchPlayerRepository;
+    private final JwtService jwtService;
+    private final MemberRepository memberRepository;
 
 
     public int findParticipantPermission(String channelLink) {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
-        if(userDetails == null) return OBSERVER.getNum();
+        if (userDetails == null) return OBSERVER.getNum();
         Member member = memberService.validateMember(userDetails.getUsername());
 
 
@@ -139,7 +144,7 @@ public class ParticipantService {
     public List<ResponseStatusPlayerDto> loadObserverPlayerList(String channelLink) {
         Participant findParticipant = getParticipant(channelLink);
 
-        checkRoleHost(findParticipant.getRole());
+        checkRole(findParticipant.getRole(), HOST);
 
         List<Participant> findParticipants = participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, OBSERVER, NO_REQUEST);
 
@@ -157,7 +162,7 @@ public class ParticipantService {
      */
     public List<ResponseStatusPlayerDto> loadRequestStatusPlayerList(String channelLink) {
         Participant findParticipant = getParticipant(channelLink);
-        checkRoleHost(findParticipant.getRole());
+        checkRole(findParticipant.getRole(), HOST);
 
         List<Participant> findParticipants =
                 participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc
@@ -176,14 +181,13 @@ public class ParticipantService {
      */
 
     public List<ResponseStatusPlayerDto> loadPlayers(String channelLink) {
-        
+
         return participantRepository.findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc
                         (channelLink, PLAYER, DONE)
                 .stream()
                 .map(participant -> mapToResponseStatusPlayerDto(participant))
                 .collect(Collectors.toList());
     }
-
 
 
     /**
@@ -194,7 +198,7 @@ public class ParticipantService {
      */
     public void approveParticipantRequest(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
-        checkRoleHost(participant.getRole());
+        checkRole(participant.getRole(), HOST);
 
         checkRealPlayerCount(participant.getChannel());
 
@@ -214,7 +218,7 @@ public class ParticipantService {
      */
     public void rejectedParticipantRequest(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
-        checkRoleHost(participant.getRole());
+        checkRole(participant.getRole(), HOST);
 
 
         Participant findParticipant = getFindParticipant(channelLink, participantId);
@@ -224,14 +228,45 @@ public class ParticipantService {
         updateRealPlayerCount(channelLink, participant.getChannel());
     }
 
-    public void disqualifiedParticipant(String channelLink, Long participantId){
-        Participant findParticipant = checkHostAndGetParticipant(channelLink, participantId);
+    public ParticipantIdResponseDto disqualifiedParticipant(String channelLink, ParticipantIdDto message) {
+        if(message.getRole() == HOST.getNum()){
+            return disqualifiedToHost(channelLink, message);
+        }
 
+        if(message.getRole() == PLAYER.getNum()){
+            return selfDisqualified(channelLink, message);
+        }
+
+        throw new InvalidParticipantAuthException();
+    }
+
+    private ParticipantIdResponseDto disqualifiedToHost(String channelLink, ParticipantIdDto message) {
+        Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
+        checkRole(myParticipant.getRole(), HOST);
+
+        Participant findParticipant = getFindParticipant(channelLink, message.getParticipantId());
+
+        disqualificationParticipant(findParticipant);
+
+        return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
+    }
+
+    private ParticipantIdResponseDto selfDisqualified(String channelLink, ParticipantIdDto message) {
+        Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
+        checkRole(myParticipant.getRole(), PLAYER);
+
+        disqualificationParticipant(myParticipant);
+
+        return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
+    }
+
+    private void disqualificationParticipant(Participant findParticipant) {
         findParticipant.disqualificationParticipant();
         matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
-                .forEach(matchPlayer ->
-                        matchPlayer.updateMatchPlayerResultStatus
-                                (MatchPlayerResultStatus.DISQUALIFICATION));
+                .forEach(matchPlayer -> {
+                            matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);
+                            matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);}
+                );
     }
 
     /**
@@ -304,9 +339,9 @@ public class ParticipantService {
         playCountRuleCheck(channelRule, userGameInfo);
     }
 
-    public void checkAdminHost(String channelLink){
+    public void checkAdminHost(String channelLink) {
         Participant participant = getParticipant(channelLink);
-        checkRoleHost(participant.getRole());
+        checkRole(participant.getRole(), HOST);
     }
 
     private void playCountRuleCheck(ChannelRule channelRule, String userGameInfo) {
@@ -319,6 +354,13 @@ public class ParticipantService {
         }
     }
 
+    private Participant findParticipantAccessToken(String channelLink, String accessToken) {
+        String personalId = jwtService.extractPersonalId(accessToken)
+                .orElseThrow(() -> new AuthInvalidTokenException());
+        Member member = memberRepository.findMemberByPersonalId(personalId).get();
+        Participant myParticipant = getParticipant(channelLink, member);
+        return myParticipant;
+    }
 
     private static void rankRuleCheck(ChannelRule channelRule, GameTier tier) {
 
@@ -330,7 +372,6 @@ public class ParticipantService {
             if (userRankScore > tierMax || userRankScore < tierMin) throw new ParticipantInvalidRankException();
         }
     }
-
 
 
     private void checkRealPlayerCount(Channel channel) {
@@ -398,15 +439,15 @@ public class ParticipantService {
 
     private Participant checkHostAndGetParticipant(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
-        checkRoleHost(participant.getRole());
+        checkRole(participant.getRole(), HOST);
 
         return getFindParticipant(channelLink, participantId);
     }
 
 
-
     /**
      * 자기 자신이 participant를 찾을 때
+     *
      * @param channelLink
      * @return
      */
@@ -484,7 +525,6 @@ public class ParticipantService {
 
         return summonerDetail;
     }
-
 
 
     /**
@@ -595,8 +635,8 @@ public class ParticipantService {
         return userGameInfoDto;
     }
 
-    private void checkRoleHost(Role role) {
-        if (role != Role.HOST) {
+    private void checkRole(Role myRole, Role checkRole) {
+        if (myRole != checkRole) {
             throw new InvalidParticipantAuthException();
         }
     }

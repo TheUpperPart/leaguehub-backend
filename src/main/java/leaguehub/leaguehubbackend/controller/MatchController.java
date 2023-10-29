@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
 import leaguehub.leaguehubbackend.dto.match.*;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
@@ -101,9 +102,9 @@ public class MatchController {
     @MessageMapping("/match/{matchId}/checkIn")
     public void checkIn(@DestinationVariable("matchId") String matchIdStr, @Payload MatchSetReadyMessage message) {
 
-        matchPlayerService.markPlayerAsReady(message, matchIdStr);
+        ParticipantIdResponseDto participantIdResponseDto = matchPlayerService.markPlayerAsReady(message, matchIdStr);
 
-        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, message);
+        simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, participantIdResponseDto);
     }
 
     @Operation(summary = "현재 진행중인 매치의 정보 조회.")

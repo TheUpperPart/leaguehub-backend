@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.service.match;
 
 import leaguehub.leaguehubbackend.dto.match.*;
+import leaguehub.leaguehubbackend.dto.participant.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.entity.match.*;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
@@ -33,8 +34,7 @@ import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.ADVANCE;
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.DROPOUT;
-import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.READY;
-import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.WAITING;
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -299,7 +299,7 @@ public class MatchPlayerService {
     }
 
     @Transactional
-    public void markPlayerAsReady(MatchSetReadyMessage message, String matchIdStr) {
+    public ParticipantIdResponseDto markPlayerAsReady(MatchSetReadyMessage message, String matchIdStr) {
 
         Long matchId = Long.valueOf(matchIdStr);
         Long matchPlayerId = message.getMatchPlayerId();
@@ -315,6 +315,8 @@ public class MatchPlayerService {
         }
 
         matchPlayer.updatePlayerCheckInStatus(READY);
+
+        return new ParticipantIdResponseDto(message.getMatchPlayerId(), READY.getStatus());
     }
 
     public List<MatchSetStatusMessage> getAllPlayerStatusForMatch(Long matchId) {
