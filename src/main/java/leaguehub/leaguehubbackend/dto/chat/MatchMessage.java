@@ -22,6 +22,10 @@ public class MatchMessage {
 
     private Long participantId;
 
+    private String adminName;
+
+    private String accessToken;
+
     private LocalDateTime timestamp;
 
     private MessageType type;
