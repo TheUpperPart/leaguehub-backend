@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.dto.chat;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import leaguehub.leaguehubbackend.entity.chat.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MatchMessage {
 
     private String channelLink;

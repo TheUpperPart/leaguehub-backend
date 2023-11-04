@@ -37,8 +37,7 @@ public class MatchChatService {
 
     private final MemberRepository memberRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(
-            JsonInclude.Include.NON_NULL);
+    private final ObjectMapper objectMapper;
 
     public void processMessage(MatchMessage message) {
         Long matchId = message.getMatchId();
@@ -82,7 +81,7 @@ public class MatchChatService {
                 Member member = memberOpt.get();
                 message.setAdminName(member.getNickname() + "(관리자)");
             } else {
-                message.setAdminName("(관리자)");
+                message.setAdminName("알 수 없는 관리자");
             }
         }
         message.setAccessToken(null);
