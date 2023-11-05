@@ -155,9 +155,9 @@ public class MatchController {
     @GetMapping("match/{channelLink}/count")
     public ResponseEntity getMatchRoundCount(@PathVariable("channelLink") String channelLink) {
 
-        List<Integer> matchsetCountList = matchService.getMatchSetCount(channelLink);
+        MatchSetCountDto matchSetCountDto = matchService.getMatchSetCount(channelLink);
 
-        return new ResponseEntity(matchsetCountList, OK);
+        return new ResponseEntity(matchSetCountDto, OK);
     }
 
     @Operation(summary = "해당 채널 매치의 결과 - 이전 경기 결과를 가져옴(Mongo 형식) 매치 세트 결과를 다 가져온다.")
