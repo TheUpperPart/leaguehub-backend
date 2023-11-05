@@ -164,12 +164,15 @@ public class MatchService {
         updateMatchSetCount(roundCount, findMatchList);
     }
 
-    public List<Integer> getMatchSetCount(String channelLink){
+    public MatchSetCountDto getMatchSetCount(String channelLink){
 
         List<Match> matchList = matchRepository.findAllByChannel_ChannelLinkOrderByMatchRoundDesc(channelLink);
         List<Integer> matchSetCountList = getMatchSetCountList(matchList);
 
-        return matchSetCountList;
+        MatchSetCountDto matchSetCountDto = new MatchSetCountDto();
+        matchSetCountDto.setMatchSetCountList(matchSetCountList);
+
+        return matchSetCountDto;
     }
 
     public void processMatchSet(String channelLink){
