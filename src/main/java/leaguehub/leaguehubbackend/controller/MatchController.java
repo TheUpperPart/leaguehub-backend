@@ -139,9 +139,9 @@ public class MatchController {
     })
     @PostMapping("/match/{channelLink}/count")
     public ResponseEntity setMatchRoundCount(@PathVariable("channelLink") String channelLink,
-                                             @RequestBody List<Integer> roundCountList) {
+                                             @RequestBody MatchSetCountDto matchSetCountDto) {
 
-        matchService.setMatchSetCount(channelLink, roundCountList);
+        matchService.setMatchSetCount(channelLink, matchSetCountDto.getMatchSetCountList());
 
         return new ResponseEntity("경기 횟수가 배정되었습니다.", OK);
     }
