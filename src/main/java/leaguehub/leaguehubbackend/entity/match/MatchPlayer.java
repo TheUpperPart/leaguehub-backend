@@ -53,6 +53,10 @@ public class MatchPlayer extends BaseTimeEntity {
         this.playerStatus = playerStatus;
     }
 
+    public void updateMatchPlayerScoreDisqualified(){
+        this.playerScore = -1;
+    }
+
     public void updateMatchPlayerResultStatus(MatchPlayerResultStatus matchPlayerResultStatus) {
         this.matchPlayerResultStatus = matchPlayerResultStatus;
     }
