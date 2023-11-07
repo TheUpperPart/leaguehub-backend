@@ -25,10 +25,6 @@ public class MatchChatController {
 
     private final MatchChatService matchChatService;
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
-
-    private static final String MATCH_CHAT_DESTINATION_FORMAT = "/match/%d/chat/history";
-
     @MessageMapping("/match/chat")
     public void sendMessage(@Payload MatchMessage message) {
         matchChatService.processMessage(message);

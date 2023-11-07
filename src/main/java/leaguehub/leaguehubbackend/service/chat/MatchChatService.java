@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.service.chat;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
@@ -26,6 +27,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MatchChatService {
 
+    private static final String REDIS_KEY_FORMAT = "channelLink:%s:matchId:%d:messages";
+    private static final String PUBLISH_KEY_FORMAT = "matchId:%d:messages";
+    private static final String DELETE_CHANNEL_CHAT_FORMAT = "channelLink:%s:matchId:*:messages";
+
     private final StringRedisTemplate stringRedisTemplate;
 
     private final JwtService jwtService;
@@ -33,12 +38,8 @@ public class MatchChatService {
     private final MemberRepository memberRepository;
 
     private final ObjectMapper objectMapper;
-    private static final String REDIS_KEY_FORMAT = "channelLink:%s:matchId:%d:messages";
-    private static final String PUBLISH_KEY_FORMAT = "matchId:%d:messages";
-    private static final String DELETE_CHANNEL_CHAT_FORMAT = "channelLink:%s:matchId:*:messages";
 
     public void processMessage(MatchMessage message) {
-
         Long matchId = message.getMatchId();
         String channelLink = message.getChannelLink();
 
@@ -79,6 +80,8 @@ public class MatchChatService {
             if (memberOpt.isPresent()) {
                 Member member = memberOpt.get();
                 message.setAdminName(member.getNickname() + "(관리자)");
+            } else {
+                message.setAdminName("알 수 없는 관리자");
             }
         }
         message.setAccessToken(null);
