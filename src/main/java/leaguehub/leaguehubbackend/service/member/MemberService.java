@@ -131,8 +131,14 @@ public class MemberService {
     @Transactional
     public LoginMemberResponse findOrSaveMember(KakaoUserDto kakaoUserDto) {
         Member member = memberRepository.findMemberByPersonalId(String.valueOf(kakaoUserDto.getId()))
+                .map(existingMember -> updateProfileUrl(existingMember, kakaoUserDto))
                 .orElseGet(() -> saveMember(kakaoUserDto).orElseThrow(GlobalServerErrorException::new));
         return createLoginResponse(member);
+    }
+
+    private Member updateProfileUrl(Member member, KakaoUserDto kakaoUserDto) {
+        member.updateProfileImageUrl(kakaoUserDto.getKakaoAccount().getProfile().getThumbnailImageUrl());
+        return member;
     }
 
     public LoginMemberResponse createLoginResponse(Member member) {

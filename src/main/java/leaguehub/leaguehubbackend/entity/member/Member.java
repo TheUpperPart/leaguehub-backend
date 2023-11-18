@@ -68,4 +68,5 @@ public class Member extends BaseTimeEntity {
         this.emailUserVerified = false;
     }
     public void updateNickname(String newNickname) { this.nickname = newNickname; }
+    public void updateProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
 }
