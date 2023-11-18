@@ -46,7 +46,7 @@ public class ChannelInfoController {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelInfoDto.class))),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("/channel/{channelLink/main}")
+    @GetMapping("/channel/{channelLink}/main")
     public ResponseEntity getChannelInfo(@PathVariable("channelLink") String channelLink) {
 
         ChannelInfoDto channelInfoDto = channelInfoService.getChannelInfoDto(channelLink);
