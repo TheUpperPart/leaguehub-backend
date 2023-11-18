@@ -1,11 +1,13 @@
 package leaguehub.leaguehubbackend.dto.notice;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class TftNotice {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Notice {
 
     private String noticeLink;
 
