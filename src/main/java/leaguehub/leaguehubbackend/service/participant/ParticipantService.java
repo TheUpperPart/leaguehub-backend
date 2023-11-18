@@ -262,10 +262,12 @@ public class ParticipantService {
 
     private void disqualificationParticipant(Participant findParticipant) {
         findParticipant.disqualificationParticipant();
-        matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId()).stream()
+        matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId())
                 .forEach(matchPlayer -> {
                             matchPlayer.updatePlayerCheckInStatus(PlayerStatus.DISQUALIFICATION);
-                            matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);}
+                            matchPlayer.updateMatchPlayerResultStatus(MatchPlayerResultStatus.DISQUALIFICATION);
+                            matchPlayer.updateMatchPlayerScoreDisqualified();
+                }
                 );
     }
 
