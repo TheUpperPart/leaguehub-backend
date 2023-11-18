@@ -22,22 +22,22 @@ public class ChannelInfoService {
     private final MemberService memberService;
 
 
-
     public ChannelInfoDto getChannelInfoDto(String channelLink) {
 
         ChannelInfo channelInfo = validateChannelBoard(channelLink);
+        String channelTitle = channelInfo.getChannel().getTitle();
 
-        return new ChannelInfoDto(channelInfo.getChannelRuleInfo(), channelInfo.getChannelTimeInfo(), channelInfo.getChannelPrizeInfo());
+        return new ChannelInfoDto(channelTitle, channelInfo.getChannelContentInfo(), channelInfo.getChannelRuleInfo(), channelInfo.getChannelTimeInfo(), channelInfo.getChannelPrizeInfo());
     }
 
-    public void updateChannelInfo(String channelLink, ChannelInfoDto channelInfoDto){
+    public void updateChannelInfo(String channelLink, ChannelInfoDto channelInfoDto) {
         Member member = memberService.findCurrentMember();
         Participant participant = channelService.getParticipant(member.getId(), channelLink);
         channelService.checkRoleHost(participant.getRole());
 
         ChannelInfo findChannelInfo = validateChannelBoard(channelLink);
 
-        findChannelInfo.updateChannelBoard(channelInfoDto.getChannelTimeInfo(), channelInfoDto.getChannelRuleInfo(), channelInfoDto.getChannelPrizeInfo());
+        findChannelInfo.updateChannelBoard(channelInfoDto.getChannelContentInfo(), channelInfoDto.getChannelTimeInfo(), channelInfoDto.getChannelRuleInfo(), channelInfoDto.getChannelPrizeInfo());
     }
 
 

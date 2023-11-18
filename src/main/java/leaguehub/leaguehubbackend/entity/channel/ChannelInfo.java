@@ -18,6 +18,9 @@ public class ChannelInfo extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
+    private String channelContentInfo;
+
+    @Column(nullable = false)
     private String channelRuleInfo;
 
     @Column(nullable = false)
@@ -32,6 +35,7 @@ public class ChannelInfo extends BaseTimeEntity {
 
     public static ChannelInfo createChannelInfo(Channel channel){
         ChannelInfo channelInfo = new ChannelInfo();
+        channelInfo.channelContentInfo = "대회의 소제목을 입력해주세요";
         channelInfo.channelTimeInfo = "대회 진행 시간을 입력해주세요";
         channelInfo.channelRuleInfo = "대회 참가 조건을 입력해주세요";
         channelInfo.channelPrizeInfo ="대회 상품 & 상금을 입력해주세요";
@@ -40,7 +44,9 @@ public class ChannelInfo extends BaseTimeEntity {
         return channelInfo;
     }
 
-    public ChannelInfo updateChannelBoard(String channelTimeInfo, String channelRuleInfo, String channelPrizeInfo){
+
+    public ChannelInfo updateChannelBoard(String channelContentInfo, String channelTimeInfo, String channelRuleInfo, String channelPrizeInfo){
+        this.channelContentInfo = channelContentInfo;
         this.channelPrizeInfo = channelPrizeInfo;
         this.channelTimeInfo = channelTimeInfo;
         this.channelRuleInfo = channelRuleInfo;
