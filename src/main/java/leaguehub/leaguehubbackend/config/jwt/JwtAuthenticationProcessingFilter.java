@@ -46,7 +46,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/invalidPage.html",
             "/ws/**",
             "/app/**",
-            "/api/notice/tft"
+            "/api/notice/**"
     );
     private static final List<String> NO_AUTH_URLS = Arrays.asList(
             "/api/match/*/player/info"
