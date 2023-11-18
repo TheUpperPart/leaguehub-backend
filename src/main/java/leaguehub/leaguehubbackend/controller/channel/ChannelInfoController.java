@@ -35,6 +35,8 @@ public class ChannelInfoController {
     public ResponseEntity updateChannelInfo(@PathVariable("channelLink") String channelLink,
                                             @RequestBody @Valid ChannelInfoDto channelInfoDto) {
 
+        channelInfoService.updateChannelInfo(channelLink, channelInfoDto);
+
         return new ResponseEntity("수정이 완료되었습니다.",OK);
     }
 

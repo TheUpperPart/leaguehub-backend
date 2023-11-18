@@ -4,8 +4,11 @@ package leaguehub.leaguehubbackend.service.channel;
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.dto.channel.ChannelInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.ChannelInfo;
+import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
+import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ public class ChannelInfoService {
 
     private final ChannelInfoRepository channelInfoRepository;
     private final ChannelService channelService;
+    private final MemberService memberService;
+
 
 
     public ChannelInfoDto getChannelInfoDto(String channelLink) {
@@ -23,6 +28,16 @@ public class ChannelInfoService {
         ChannelInfo channelInfo = validateChannelBoard(channelLink);
 
         return new ChannelInfoDto(channelInfo.getChannelRuleInfo(), channelInfo.getChannelTimeInfo(), channelInfo.getChannelPrizeInfo());
+    }
+
+    public void updateChannelInfo(String channelLink, ChannelInfoDto channelInfoDto){
+        Member member = memberService.findCurrentMember();
+        Participant participant = channelService.getParticipant(member.getId(), channelLink);
+        channelService.checkRoleHost(participant.getRole());
+
+        ChannelInfo findChannelInfo = validateChannelBoard(channelLink);
+
+        findChannelInfo.updateChannelBoard(channelInfoDto.getChannelTimeInfo(), channelInfoDto.getChannelRuleInfo(), channelInfoDto.getChannelPrizeInfo());
     }
 
 
