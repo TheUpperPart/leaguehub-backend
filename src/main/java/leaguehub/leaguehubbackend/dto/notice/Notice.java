@@ -1,3 +1,5 @@
+package leaguehub.leaguehubbackend.dto.notice;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
