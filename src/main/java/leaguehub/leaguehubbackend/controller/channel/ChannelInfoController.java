@@ -28,7 +28,7 @@ public class ChannelInfoController {
     @Operation(summary = "채널 상품, 참가조건, 경기시간 정보 수정하기")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelInfoDto.class))),
+            @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
     @PostMapping("/channel/{channelLink}/main")
