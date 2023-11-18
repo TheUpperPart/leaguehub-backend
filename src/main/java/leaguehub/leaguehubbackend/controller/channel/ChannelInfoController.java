@@ -51,6 +51,6 @@ public class ChannelInfoController {
 
         ChannelInfoDto channelInfoDto = channelInfoService.getChannelInfoDto(channelLink);
 
-        return new ResponseEntity(OK);
+        return new ResponseEntity(channelInfoDto, OK);
     }
 }
