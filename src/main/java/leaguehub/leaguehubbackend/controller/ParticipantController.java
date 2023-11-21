@@ -44,10 +44,10 @@ public class ParticipantController {
             @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseUserGameInfoDto.class))),
             @ApiResponse(responseCode = "404", description = "게임 ID를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @GetMapping("/participant/stat")
-    public ResponseEntity getUserDetail(@RequestParam(value = "gameid") String nickname) {
+    @GetMapping("/participant/stat/{gameId}/{gameTag}")
+    public ResponseEntity getUserDetail(@PathVariable("gameId") String gameId, @PathVariable("gameTag") String gameTag) {
 
-        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(nickname, 0);
+        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(gameId + "#" + gameTag, 0);
 
         return new ResponseEntity<>(userDetailDto, OK);
     }
