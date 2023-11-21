@@ -9,6 +9,7 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 
 
@@ -164,6 +166,10 @@ public class ChannelService {
         checkRoleHost(participant.getRole());
 
         Channel channel = participant.getChannel();
+
+        if(channel.getChannelStatus().equals(PROCEEDING))
+            throw new ChannelStatusAlreadyException();
+
         channel.updateChannelStatus(ChannelStatus.convertStatus(status));
 
         if (status == 2) {
