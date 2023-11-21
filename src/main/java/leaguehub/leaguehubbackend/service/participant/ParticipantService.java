@@ -518,6 +518,8 @@ public class ParticipantService {
         String gameId = nickname.split("#")[0];
         String gameTag = nickname.split("#")[1];
 
+
+
         JSONObject userAccount = webClient.get()
                 .uri(pUuidURL + gameId + "/" + gameTag + riot_api_key)
                 .retrieve()
