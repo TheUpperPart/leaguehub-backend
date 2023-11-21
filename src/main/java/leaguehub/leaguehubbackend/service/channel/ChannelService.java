@@ -4,10 +4,7 @@ import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
-import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
+import leaguehub.leaguehubbackend.entity.channel.*;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.entity.participant.Role;
@@ -15,6 +12,7 @@ import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundExc
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
+import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
@@ -45,6 +43,7 @@ public class ChannelService {
     private final MatchService matchService;
     private final ChannelRuleRepository channelRuleRepository;
     private final MatchChatService matchChatService;
+    private final ChannelInfoRepository channelInfoRepository;
 
     @Transactional
     public ParticipantChannelDto createChannel(CreateChannelDto createChannelDto) {
@@ -67,6 +66,7 @@ public class ChannelService {
 
         channelRuleRepository.save(channelRule);
         channelBoardRepository.saveAll(ChannelBoard.createDefaultBoard(channel));
+        channelInfoRepository.save(ChannelInfo.createChannelInfo(channel));
 
         Participant participant = Participant.createHostChannel(member, channel);
         participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
