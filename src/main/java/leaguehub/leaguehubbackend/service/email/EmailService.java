@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -29,6 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -57,7 +59,9 @@ public class EmailService {
 
         Member member = memberService.findCurrentMember();
 
-        removeExistingEmailAuth(member);
+        if (member.getEmailAuth() != null) {
+            removeExistingEmailAuth(member);
+        }
 
         String uniqueToken = generateUniqueTokenForUser(email);
 
@@ -69,9 +73,16 @@ public class EmailService {
     }
 
     private void validateEmail(String email) {
-        if (!isValidEmailFormat(email)) throw new InvalidEmailAddressException();
-        if (memberRepository.findMemberByEmail(email).isPresent()) throw new DuplicateEmailException();
+        if (!isValidEmailFormat(email)) {
+            throw new InvalidEmailAddressException();
+        }
+
+        Optional<Member> memberOptional = memberRepository.findMemberByEmail(email);
+        if (memberOptional.isPresent() && memberOptional.get().isEmailUserVerified()) {
+            throw new DuplicateEmailException();
+        }
     }
+
 
     public void sendConfirmationEmail(EmailAuth emailAuth, String uniqueToken) {
         try {
@@ -84,6 +95,7 @@ public class EmailService {
             throw new GlobalServerErrorException();
         }
     }
+
     private String generateConfirmationLink(String uniqueToken) {
         return "http://" + leagueHubAddress + "/api/member/oauth/email?token=" + uniqueToken;
     }
@@ -101,7 +113,8 @@ public class EmailService {
 
     private void sendEmail(String to, String subject, String content) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                "UTF-8");
 
         helper.setTo(to);
         helper.setSubject(subject);
@@ -121,11 +134,10 @@ public class EmailService {
 
         return emailAuth;
     }
+
     private void removeExistingEmailAuth(Member member) {
-        if (member.isEmailUserVerified() && member.getEmailAuth() != null) {
-            emailAuthRepository.delete(member.getEmailAuth());
-            member.assignEmailAuth(null);
-        }
+        emailAuthRepository.delete(member.getEmailAuth());
+        member.assignEmailAuth(null);
     }
 
     public String generateUniqueTokenForUser(String email) {
@@ -133,6 +145,7 @@ public class EmailService {
                 .withSubject(email)
                 .sign(Algorithm.HMAC256(secretKey));
     }
+
     public boolean isValidEmailFormat(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pat = Pattern.compile(emailRegex);
@@ -149,6 +162,7 @@ public class EmailService {
             return null;
         }
     }
+
     @Transactional
     public boolean confirmUserEmail(String token) {
         try {
