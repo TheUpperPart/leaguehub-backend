@@ -60,20 +60,24 @@ public class MatchPlayerService {
      * @return puuid
      */
     public String getSummonerPuuid(String name) {
-        String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
+        String gameId = name.split("#")[0];
+        String gameTag = name.split("#")[1];
 
+        String summonerPuuidUrl = "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/";
 
-        JSONObject summonerDetail = webClient.get()
-                .uri(summonerUrl + name + riot_api_key_1)
+        JSONObject userAccount = webClient.get()
+                .uri(summonerPuuidUrl + gameId + "/" + gameTag + riot_api_key_1)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new ParticipantGameIdNotFoundException()))
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new GlobalServerErrorException()))
+                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new GlobalServerErrorException()))
                 .bodyToMono(JSONObject.class)
                 .block();
 
-        String puuid = Objects.requireNonNull(summonerDetail).get("puuid").toString();
+
+        String puuid =  userAccount.get("puuid").toString();
 
         return puuid;
+
     }
 
     /**

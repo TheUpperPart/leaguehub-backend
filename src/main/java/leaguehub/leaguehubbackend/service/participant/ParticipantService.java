@@ -509,23 +509,46 @@ public class ParticipantService {
     }
 
     /**
-     * 닉네임으로 고유id 추출
-     *
-     * @param nickname
-     * @return id
+     * 닉네임 + 태크로 고유 puuid 추출
+     * 받은 nickname으로 split 나누기
      */
-    public JSONObject getSummonerId(String nickname) {
-        String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-name/";
+    public String getSummonerPUuid(String nickname){
+        String pUuidURL = "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/";
 
-        JSONObject summonerDetail = webClient.get()
-                .uri(summonerUrl + nickname + riot_api_key)
+        String gameId = nickname.split("#")[0];
+        String gameTag = nickname.split("#")[1];
+
+
+
+        JSONObject userAccount = webClient.get()
+                .uri(pUuidURL + gameId + "/" + gameTag + riot_api_key)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new ParticipantGameIdNotFoundException()))
                 .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new GlobalServerErrorException()))
                 .bodyToMono(JSONObject.class)
                 .block();
 
-        return summonerDetail;
+        return userAccount.get("puuid").toString();
+    }
+
+    /**
+     * 고유 puuid로 유저의 정보 추출
+     *
+     * @param nickname
+     * @return id
+     */
+    public JSONObject getSummonerId(String nickname) {
+        String puuid = getSummonerPUuid(nickname);
+
+        String summonerUrl = "https://kr.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/";
+
+        return webClient.get()
+                .uri(summonerUrl + puuid + riot_api_key)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new ParticipantGameIdNotFoundException()))
+                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new GlobalServerErrorException()))
+                .bodyToMono(JSONObject.class)
+                .block();
     }
 
 

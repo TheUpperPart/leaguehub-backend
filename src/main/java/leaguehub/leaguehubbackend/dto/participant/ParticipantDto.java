@@ -10,7 +10,7 @@ public class ParticipantDto {
 
 
     @NotBlank
-    @Schema(description = "참가하려는 게임 닉네임", example = "칸영기")
+    @Schema(description = "참가하려는 게임 닉네임과 태그", example = "칸영기#KR1")
     private String gameId;
 
     @NotBlank
