@@ -105,4 +105,8 @@ public class Channel extends BaseTimeEntity {
     public void updateChannelStatus(ChannelStatus channelStatus) {
         this.channelStatus = channelStatus;
     }
+
+    public void updateChannelLiveRound(Integer liveRound){
+        this.liveRound = liveRound;
+    }
 }
