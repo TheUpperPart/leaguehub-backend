@@ -457,6 +457,12 @@ public class MatchService {
                     .filter(match -> !match.getMatchStatus().equals(END))
                     .findAny()
                     .ifPresent(match -> { throw new MatchNotFoundException(); });
+
+            List<Match> presentMatch = findMatchList(channelLink, matchRound);
+            presentMatch.stream()
+                    .filter(match -> match.getMatchStatus().equals(PROGRESS))
+                    .findAny()
+                    .ifPresent(match -> { throw new MatchNotFoundException(); });
         }
     }
 
