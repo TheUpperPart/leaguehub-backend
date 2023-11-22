@@ -114,6 +114,7 @@ public class MatchService {
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
         assignSubMatches(matchList, playerList);
+        participant.getChannel().updateChannelLiveRound(matchRound);
     }
 
 

@@ -270,6 +270,7 @@ public class MatchPlayerService {
     private void checkMatchEnd(MatchSet matchSet, Match match) {
         if (match.getMatchSetCount().equals(matchSet.getSetCount())) {
             match.updateMatchStatus(MatchStatus.END);
+            match.getChannel().updateChannelLiveRound(0);
             updateEndMatchResult(match);
         } else {
             match.updateCurrentMatchSet(matchSet.getSetCount() + 1);
