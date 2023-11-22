@@ -38,6 +38,8 @@ public class Channel extends BaseTimeEntity {
     @Column(unique = true)
     private String channelLink;
 
+    private int liveRound;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MatchFormat matchFormat;
@@ -61,6 +63,7 @@ public class Channel extends BaseTimeEntity {
         channel.matchFormat = MatchFormat.getByNumber(matchFormat);
         channel.channelLink = channel.createParticipationLink(uuid);
         channel.channelImageUrl = channel.validateChannelImageUrl(channelImageUrl);
+        channel.liveRound = 0;
 
         return channel;
     }
