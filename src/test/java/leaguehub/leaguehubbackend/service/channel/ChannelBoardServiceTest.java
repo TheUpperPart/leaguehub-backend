@@ -55,11 +55,10 @@ class ChannelBoardServiceTest {
     ParticipantRepository participantRepository;
     @Autowired
     ChannelRuleRepository channelRuleRepository;
-
+    Member member;
     private String channelLink;
 
     Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
-        Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
         Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));
@@ -106,7 +105,7 @@ class ChannelBoardServiceTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(UserFixture.createMember());
+        member = memberRepository.save(UserFixture.createMember());
         UserFixture.setUpAuth();
         CreateChannelDto createChannelDto = ChannelFixture.createChannelDto();
         ParticipantChannelDto participantChannelDto = channelService.createChannel(createChannelDto);

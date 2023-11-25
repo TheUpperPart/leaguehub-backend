@@ -61,16 +61,15 @@ class ChannelBoardControllerTest {
     MockMvc mockMvc;
     @Autowired
     private ChannelRuleRepository channelRuleRepository;
+    Member member;
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(UserFixture.createMember());
+        member = memberRepository.save(UserFixture.createMember());
         UserFixture.setUpAuth();
-
     }
 
     Channel createCustomChannel(Boolean tier, Boolean playCount, Integer tierMax, Integer tierMin, int playCountMin) throws Exception {
-        Member member = memberRepository.save(UserFixture.createMember());
         Member ironMember = memberRepository.save(UserFixture.createCustomeMember("썹맹구"));
         Member unrankedMember = memberRepository.save(UserFixture.createCustomeMember("서초임"));
         Member platinumMember = memberRepository.save(UserFixture.createCustomeMember("손성한"));

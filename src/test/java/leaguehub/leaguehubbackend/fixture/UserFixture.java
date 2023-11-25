@@ -21,7 +21,7 @@ public class UserFixture {
                 .emailAuth(new EmailAuth("id@example.com", "authToken"))
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
-
+        member.verifyEmail();
         return member;
     }
 
