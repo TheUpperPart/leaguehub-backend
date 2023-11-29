@@ -21,7 +21,7 @@ public enum ParticipantExceptionCode implements ExceptionCode {
     PARTICIPANT_ALREADY_REQUESTED(BAD_REQUEST, "PA-C-010", "이미 참가요청 되었습니다."),
     PARTICIPANT_REJECTED_REQUESTED(BAD_REQUEST, "PA-C-011", "거절된 사용자입니다."),
     PARTICIPANT_DUPLICATED_GAME_ID(BAD_REQUEST, "PA-C-012", "해당 게임아이디는 이미 존재합니다."),
-    PARTICIPANT_NOT_GAME_HOST(BAD_REQUEST, "PA-C-013", "해당 채널 관리자가 아닙니다."),
+    PARTICIPANT_NOT_GAME_HOST(UNAUTHORIZED, "PA-C-013", "해당 채널 관리자가 아닙니다."),
     PARTICIPANT_REAL_PLAYER_IS_MAX(BAD_REQUEST, "PA-C-014", "플레이어의 수가 최대입니다."),
     PARTICIPANT_NOT_FOUNT(NOT_FOUND, "PA-C-015", "참가자를 찾을 수 없습니다.");
 

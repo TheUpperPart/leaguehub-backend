@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.*;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.service.channel.ChannelDeleteService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
@@ -113,6 +117,18 @@ public class ChannelController {
         return new ResponseEntity("Channel Status Successfully updated", OK);
     }
 
+    @Operation(summary = "채널 삭제 - 준비 중 상태의 채널만 삭제 가능")
+    @Parameters(value = {
+            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
+    }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "채널 링크가 올바르지 않음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelNotFoundException.class))),
+            @ApiResponse(responseCode = "400", description = "채널 경기가 준비중이 아님", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelStatusAlreadyException.class))),
+            @ApiResponse(responseCode = "401", description = "해당 채널의 호스트가 아님", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantNotGameHostException.class))),
+            @ApiResponse(responseCode = "401", description = "해당 채널의 참가자가 아님", content = @Content(mediaType = "application/json", schema = @Schema(implementation = InvalidParticipantAuthException.class)))
+    })
     @DeleteMapping("/channel/{channelLink}")
     public ResponseEntity deleteChannel(@PathVariable("channelLink") String channelLink) {
 
