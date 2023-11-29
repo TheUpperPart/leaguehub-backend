@@ -5,10 +5,13 @@ import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
+import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
+import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
@@ -100,9 +103,9 @@ class ChannelDeleteServiceTest {
 
         // Participant 생성 및 저장
         Participant participant1 = participantRepository.save(Participant.createHostChannel(member1, channel));
-        Participant participant2 = participantRepository.save(Participant.createHostChannel(member2, channel));
-        Participant participant3 = participantRepository.save(Participant.createHostChannel(member3, channel));
-        Participant participant4 = participantRepository.save(Participant.createHostChannel(member4, channel));
+        Participant participant2 = participantRepository.save(Participant.participateChannel(member2, channel));
+        Participant participant3 = participantRepository.save(Participant.participateChannel(member3, channel));
+        Participant participant4 = participantRepository.save(Participant.participateChannel(member4, channel));
 
         // Match 생성 및 저장
         Integer matchRound = 1;
@@ -136,5 +139,32 @@ class ChannelDeleteServiceTest {
 
         Assertions.assertThatThrownBy(() -> channelRepository.findByChannelLink(channel.getChannelLink()).get())
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void deleteChannel_fail_not_auth() {
+        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+                .username("member2")
+                .password("member2")
+                .roles("USER")
+                .build();
+
+        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetailsUser, null
+                , authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Assertions.assertThatThrownBy(() -> channelDeleteService.deleteChannel(channel.getChannelLink()))
+                .isInstanceOf(ParticipantNotGameHostException.class);
+    }
+
+    @Test
+    void deleteChannel_fail() {
+        channel.updateChannelStatus(ChannelStatus.PROCEEDING);
+
+        Assertions.assertThatThrownBy(() -> channelDeleteService.deleteChannel(channel.getChannelLink()))
+                .isInstanceOf(ChannelStatusAlreadyException.class);
     }
 }
