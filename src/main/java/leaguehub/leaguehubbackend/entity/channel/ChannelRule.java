@@ -91,4 +91,8 @@ public class ChannelRule extends BaseTimeEntity {
             throw new ChannelRequestException();
         }
     }
+
+    public void deleteChannel() {
+        this.channel = null;
+    }
 }

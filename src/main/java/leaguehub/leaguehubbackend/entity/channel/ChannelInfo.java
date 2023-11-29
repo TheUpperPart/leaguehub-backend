@@ -54,6 +54,7 @@ public class ChannelInfo extends BaseTimeEntity {
         return this;
     }
 
-
-
+    public void deleteChannel() {
+        this.channel = null;
+    }
 }
