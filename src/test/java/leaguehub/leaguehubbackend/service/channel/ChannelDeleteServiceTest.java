@@ -18,6 +18,7 @@ import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @SpringBootTest
@@ -126,5 +129,12 @@ class ChannelDeleteServiceTest {
     @Test
     void deleteChannel() {
         channelDeleteService.deleteChannel(channel.getChannelLink());
+
+        List<Participant> allByMemberId = participantRepository.findAllByMemberId(member1.getId());
+
+        Assertions.assertThat(allByMemberId.size()).isEqualTo(0);
+
+        Assertions.assertThatThrownBy(() -> channelRepository.findByChannelLink(channel.getChannelLink()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
