@@ -21,6 +21,8 @@ public interface ChannelBoardRepository extends JpaRepository<ChannelBoard, Long
 
     List<ChannelBoard> findAllByChannelAndIndexGreaterThan(Channel channel, int deleteIndex);
 
+    List<ChannelBoard> findChannelBoardsByChannel_ChannelLink(String channelLink);
+
     @Query("SELECT MAX(b.index) FROM ChannelBoard b WHERE b.channel = :channel")
     Integer findMaxIndexByChannel(@Param("channel") Channel channel);
 }

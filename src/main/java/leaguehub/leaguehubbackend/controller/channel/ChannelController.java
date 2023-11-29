@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.dto.channel.*;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.service.channel.ChannelDeleteService;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import leaguehub.leaguehubbackend.service.participant.ParticipantService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class ChannelController {
 
     private final ChannelService channelService;
     private final ParticipantService participantService;
+    private final ChannelDeleteService channelDeleteService;
 
     @Operation(summary = "채널 생성")
     @ApiResponses(value = {
@@ -109,5 +111,13 @@ public class ChannelController {
                                               @RequestParam("status") Integer status) {
         channelService.updateChannelStatus(channelLink, status);
         return new ResponseEntity("Channel Status Successfully updated", OK);
+    }
+
+    @DeleteMapping("/channel/{channelLink}")
+    public ResponseEntity deleteChannel(@PathVariable("channelLink") String channelLink) {
+
+        channelDeleteService.deleteChannel(channelLink);
+
+        return new ResponseEntity(OK);
     }
 }
