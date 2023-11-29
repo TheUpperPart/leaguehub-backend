@@ -57,7 +57,6 @@ public class ChannelBoardService {
     @Transactional
     public ChannelBoardInfoDto loadChannelBoards(String channelLink) {
 
-        MyMatchDto matchDto = matchService.getMyMatchRound(channelLink);
 
         channelService.getChannel(channelLink);
 
@@ -67,6 +66,7 @@ public class ChannelBoardService {
                 .map(channelBoard -> new ChannelBoardLoadDto(channelBoard.getId(), channelBoard.getTitle(), channelBoard.getIndex()))
                 .collect(Collectors.toList());
 
+        MyMatchDto matchDto = matchService.getMyMatchRound(channelLink);
 
         return new ChannelBoardInfoDto(matchDto.getMyMatchRound(), matchDto.getMyMatchId(), channelBoardLoadDtoList);
     }
