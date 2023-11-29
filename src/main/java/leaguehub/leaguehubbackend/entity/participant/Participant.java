@@ -143,4 +143,9 @@ public class Participant extends BaseTimeEntity {
     }
 
     public void updateNickname(String newNickname) { this.nickname = newNickname; }
+
+    public void deleteChannelAndMember() {
+        this.channel = null;
+        this.member = null;
+    }
 }
