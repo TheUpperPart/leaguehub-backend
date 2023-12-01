@@ -45,7 +45,6 @@ public class ChannelDeleteService {
     private final ChannelInfoRepository channelInfoRepository;
     private final MatchRepository matchRepository;
 
-    @Transactional
     public void deleteChannel(String channelLink) {
         Member member = memberService.findCurrentMember();
         Participant participant = getParticipant(member.getId(), channelLink);
