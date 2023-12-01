@@ -29,7 +29,7 @@ public class MatchSet extends BaseTimeEntity {
 
     private Integer setCount;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "matchSet")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "matchSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<MatchRank> matchRankList = new ArrayList<>();
 
     public void updateRiotMatchUuid(String riotMatchUuid) {
@@ -51,5 +51,10 @@ public class MatchSet extends BaseTimeEntity {
 
     public void addMatchRankList(List<MatchRank> matchRankList) {
         this.matchRankList = matchRankList;
+    }
+
+    public void deleteMatchAndMatchRankList() {
+        this.match = null;
+        this.matchRankList.clear();
     }
 }

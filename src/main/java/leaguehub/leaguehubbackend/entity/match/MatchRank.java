@@ -32,4 +32,8 @@ public class MatchRank extends BaseTimeEntity {
 
         return matchRank;
     }
+
+    public void deleteMatchSet() {
+        this.matchSet = null;
+    }
 }

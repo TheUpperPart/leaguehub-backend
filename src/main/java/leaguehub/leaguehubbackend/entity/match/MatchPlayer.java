@@ -60,4 +60,9 @@ public class MatchPlayer extends BaseTimeEntity {
     public void updateMatchPlayerResultStatus(MatchPlayerResultStatus matchPlayerResultStatus) {
         this.matchPlayerResultStatus = matchPlayerResultStatus;
     }
+
+    public void deleteParticipantAndMatch() {
+        this.participant = null;
+        this.match = null;
+    }
 }

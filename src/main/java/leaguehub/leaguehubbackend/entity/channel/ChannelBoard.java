@@ -81,4 +81,8 @@ public class ChannelBoard extends BaseTimeEntity {
         this.index = updateIndex;
     }
 
+    public void deleteChannel() {
+        this.channel = null;
+    }
+
 }

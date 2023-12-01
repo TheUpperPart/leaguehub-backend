@@ -75,5 +75,7 @@ public class Match extends BaseTimeEntity {
 
     public void updateOffAlarm(){ this.alarm = false; }
 
-
+    public void deleteChannel() {
+        this.channel = null;
+    }
 }
