@@ -76,7 +76,9 @@ public class MatchService {
      * @return 2 4 8 16 32 64
      */
     public MatchRoundListDto getRoundList(String channelLink) {
-        Channel findChannel = getChannel(channelLink);
+        Member member = memberService.findCurrentMember();
+        Participant participant = getParticipant(member.getId(), channelLink);
+        Channel findChannel = participant.getChannel();
 
         int maxPlayers = findChannel.getMaxPlayer();
         List<Integer> roundList = calculateRoundList(maxPlayers);
@@ -86,6 +88,9 @@ public class MatchService {
         roundListDto.setRoundList(roundList);
 
         findLiveRound(channelLink, roundList, roundListDto);
+
+        if(participant.getRole().equals(Role.HOST))
+            roundListDto.setLiveRound(findChannel.getLiveRound());
 
         return roundListDto;
     }
@@ -114,6 +119,7 @@ public class MatchService {
         List<Participant> playerList = getParticipantList(channelLink, matchRound);
 
         assignSubMatches(matchList, playerList);
+        participant.getChannel().updateChannelLiveRound(matchRound);
     }
 
 
@@ -460,7 +466,7 @@ public class MatchService {
 
             List<Match> presentMatch = findMatchList(channelLink, matchRound);
             presentMatch.stream()
-                    .filter(match -> match.getMatchStatus().equals(PROGRESS))
+                    .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                     .findAny()
                     .ifPresent(match -> { throw new MatchNotFoundException(); });
         }
