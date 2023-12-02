@@ -42,9 +42,9 @@ public class EmailController {
     @GetMapping("/member/oauth/email")
     public String confirmUserEmail(@RequestParam("token") String token) {
         if (emailService.confirmUserEmail(token)) {
-            return "redirect:/verifiedPage.html";
+            return "redirect:/leaguehub.co.kr/";
         } else {
-            return "redirect:/invalidPage.html";
+            return "redirect:/leaguehub.co.kr/";
         }
     }
 }
