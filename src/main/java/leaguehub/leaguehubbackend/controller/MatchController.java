@@ -37,7 +37,7 @@ public class MatchController {
     private final MatchService matchService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final MatchChatService matchChatService;
-    @Operation(summary = "라운드 수(몇 강) 리스트 반환")
+    @Operation(summary = "라운드 수(몇 강) 리스트 반환 - 사용자")
     @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "라운드(몇 강) 리스트 반환", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MatchRoundListDto.class))),
