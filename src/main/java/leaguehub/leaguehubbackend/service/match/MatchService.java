@@ -261,7 +261,7 @@ public class MatchService {
                     matchList.stream()
                             .filter(match -> match.getMatchStatus().equals(MatchStatus.PROGRESS))
                             .findFirst()
-                            .ifPresent(match -> roundListDto.setLiveRound(match.getChannel().getLiveRound()));
+                            .ifPresent(match -> roundListDto.setLiveRound(match.getMatchRound()));
                 }
         );
     }
