@@ -72,17 +72,32 @@ public class EmailService {
         return email;
     }
 
+    public void removeUnverifiedEmail(String email, Member member) {
+        EmailAuth emailAuth = member.getEmailAuth();
+        if (emailAuth != null) {
+            emailAuthRepository.delete(emailAuth);
+            member.assignEmailAuth(null);
+            memberRepository.save(member);
+        }
+    }
+
     private void validateEmail(String email) {
         if (!isValidEmailFormat(email)) {
             throw new InvalidEmailAddressException();
         }
 
         Optional<Member> memberOptional = memberRepository.findMemberByEmail(email);
-        if (memberOptional.isPresent() && memberOptional.get().isEmailUserVerified()) {
-            throw new DuplicateEmailException();
+
+        if (memberOptional.isPresent()) {
+            Member member = memberOptional.get();
+            if (!member.isEmailUserVerified()) {
+                removeUnverifiedEmail(email, member);
+            }
+            if (member.isEmailUserVerified()) {
+                throw new DuplicateEmailException();
+            }
         }
     }
-
 
     public void sendConfirmationEmail(EmailAuth emailAuth, String uniqueToken) {
         try {
