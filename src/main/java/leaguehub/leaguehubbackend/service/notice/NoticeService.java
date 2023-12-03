@@ -33,8 +33,8 @@ public class NoticeService {
 
     public List<Notice> getNotice(String target) throws NoticeUnsupportedException {
         return switch (target) {
-            case "tft" -> scrapeNotices(TFT_URL, TFT_SELECTOR, TFT_TITLE_SELECTOR, null, null);
-            case "lol" -> scrapeNotices(LOL_URL, LOL_SELECTOR, LOL_TITLE_SELECTOR, null, null);
+            case "tft" -> scrapeRiotNotice(TFT_URL, TFT_SELECTOR, TFT_TITLE_SELECTOR);
+            case "lol" -> scrapeRiotNotice(LOL_URL, LOL_SELECTOR, LOL_TITLE_SELECTOR);
             case "fc" -> scrapeNotices(FC_URL, FC_SELECTOR, FC_TITLE_SELECTOR, 4, 9);
             case "hos" -> scrapeNotices(HOS_URL, HOS_SELECTOR, null, 1, 6);
             case "main" -> getLeagueHubNotice();
@@ -57,10 +57,38 @@ public class NoticeService {
                     .map(newsItem ->
                             createNoticeFromElement(newsItem, titleSelector))
                     .collect(Collectors.toList());
-
         } catch (Exception e) {
             throw new WebScrapingException();
         }
+    }
+
+    private List<Notice> scrapeRiotNotice(String url, String itemSelector, String titleSelector) {
+        List<Notice> notices = new ArrayList<>();
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Elements newsItems = doc.select(
+                    "#gatsby-focus-wrapper > div > div.style__Wrapper-sc-1ynvx8h-0.style__ResponsiveWrapper-sc-1ynvx8h-6.bNRNtU.dzWqHp > div > div.style__Wrapper-sc-106zuld-0.style__ResponsiveWrapper-sc-106zuld-4.enQqER.jYHLfd.style__List-sc-1ynvx8h-3.qfKFn > div > ol > li");
+
+            for (Element item : newsItems) {
+                String newsLink = item.select("a").attr("abs:href");
+                String title = item.select(itemSelector).text();
+                String metaData = item.select(
+                                titleSelector)
+                        .text();
+
+                Notice notice = Notice.builder()
+                        .noticeLink(newsLink)
+                        .noticeTitle(title)
+                        .noticeInfo(metaData)
+                        .build();
+
+                notices.add(notice);
+            }
+        } catch (Exception e) {
+            throw new WebScrapingException();
+        }
+        return notices;
     }
 
     private Notice createNoticeFromElement(Element element, String titleSelector) {
