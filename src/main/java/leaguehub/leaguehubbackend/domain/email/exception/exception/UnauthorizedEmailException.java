@@ -1,10 +1,10 @@
-package leaguehub.leaguehubbackend.exception.email.exception;
+package leaguehub.leaguehubbackend.domain.email.exception.exception;
 
-import leaguehub.leaguehubbackend.exception.email.EmailExceptionCode;
+import leaguehub.leaguehubbackend.domain.email.exception.EmailExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import org.springframework.security.core.AuthenticationException;
 
-import static leaguehub.leaguehubbackend.exception.email.EmailExceptionCode.UNAUTHORIZED_EMAIL_EXCEPTION;
+import static leaguehub.leaguehubbackend.domain.email.exception.EmailExceptionCode.UNAUTHORIZED_EMAIL_EXCEPTION;
 
 
 public class UnauthorizedEmailException extends AuthenticationException {

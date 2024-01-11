@@ -1,8 +1,8 @@
-package leaguehub.leaguehubbackend.exception.email;
+package leaguehub.leaguehubbackend.domain.email.exception;
 
-import leaguehub.leaguehubbackend.exception.email.exception.DuplicateEmailException;
-import leaguehub.leaguehubbackend.exception.email.exception.InvalidEmailAddressException;
-import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.DuplicateEmailException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.InvalidEmailAddressException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;

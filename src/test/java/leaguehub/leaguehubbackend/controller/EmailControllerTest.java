@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import leaguehub.leaguehubbackend.dto.email.EmailDto;
-import leaguehub.leaguehubbackend.service.email.EmailService;
+import leaguehub.leaguehubbackend.domain.email.dto.EmailDto;
+import leaguehub.leaguehubbackend.domain.email.service.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

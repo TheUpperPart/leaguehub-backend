@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.entity.email;
+package leaguehub.leaguehubbackend.domain.email.entity;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.entity.BaseTimeEntity;

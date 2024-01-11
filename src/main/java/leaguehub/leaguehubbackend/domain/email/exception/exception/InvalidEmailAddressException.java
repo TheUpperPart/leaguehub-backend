@@ -1,9 +1,9 @@
-package leaguehub.leaguehubbackend.exception.email.exception;
+package leaguehub.leaguehubbackend.domain.email.exception.exception;
 
-import leaguehub.leaguehubbackend.exception.email.EmailExceptionCode;
+import leaguehub.leaguehubbackend.domain.email.exception.EmailExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 
-import static leaguehub.leaguehubbackend.exception.email.EmailExceptionCode.INVALID_EMAIL_ADDRESS;
+import static leaguehub.leaguehubbackend.domain.email.exception.EmailExceptionCode.INVALID_EMAIL_ADDRESS;
 
 
 public class InvalidEmailAddressException extends IllegalArgumentException  {

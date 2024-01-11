@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.controller;
+package leaguehub.leaguehubbackend.domain.email.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import leaguehub.leaguehubbackend.dto.email.EmailDto;
+import leaguehub.leaguehubbackend.domain.email.dto.EmailDto;
+import leaguehub.leaguehubbackend.domain.email.service.EmailService;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.service.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

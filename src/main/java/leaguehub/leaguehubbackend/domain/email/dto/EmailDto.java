@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.dto.email;
+package leaguehub.leaguehubbackend.domain.email.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

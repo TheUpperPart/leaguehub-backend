@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.repository.member;
 
-import leaguehub.leaguehubbackend.entity.email.EmailAuth;
+import leaguehub.leaguehubbackend.domain.email.entity.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

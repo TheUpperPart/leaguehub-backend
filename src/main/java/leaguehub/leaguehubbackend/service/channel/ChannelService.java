@@ -12,7 +12,7 @@ import leaguehub.leaguehubbackend.entity.channel.*;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;

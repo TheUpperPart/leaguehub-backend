@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.fixture;
 
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.entity.email.EmailAuth;
+import leaguehub.leaguehubbackend.domain.email.entity.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.LoginProvider;
 import leaguehub.leaguehubbackend.entity.member.Member;

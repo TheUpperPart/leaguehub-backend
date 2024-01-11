@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.exception.email;
+package leaguehub.leaguehubbackend.domain.email.exception;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import lombok.Getter;

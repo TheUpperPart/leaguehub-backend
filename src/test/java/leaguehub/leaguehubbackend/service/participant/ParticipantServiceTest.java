@@ -15,7 +15,7 @@ import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus;
 import leaguehub.leaguehubbackend.domain.participant.entity.Role;
-import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.*;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;

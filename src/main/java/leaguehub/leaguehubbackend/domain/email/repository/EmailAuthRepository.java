@@ -1,6 +1,6 @@
-package leaguehub.leaguehubbackend.repository.email;
+package leaguehub.leaguehubbackend.domain.email.repository;
 
-import leaguehub.leaguehubbackend.entity.email.EmailAuth;
+import leaguehub.leaguehubbackend.domain.email.entity.EmailAuth;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

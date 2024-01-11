@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.domain.participant.service;
 
+import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.domain.match.entity.PlayerStatus;
 import leaguehub.leaguehubbackend.domain.match.repository.MatchPlayerRepository;
@@ -15,7 +16,6 @@ import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
-import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;

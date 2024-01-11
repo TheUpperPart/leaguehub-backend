@@ -1,17 +1,17 @@
-package leaguehub.leaguehubbackend.service.email;
+package leaguehub.leaguehubbackend.domain.email.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.entity.email.EmailAuth;
+import leaguehub.leaguehubbackend.domain.email.entity.EmailAuth;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.DuplicateEmailException;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.InvalidEmailAddressException;
+import leaguehub.leaguehubbackend.domain.email.repository.EmailAuthRepository;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.email.exception.DuplicateEmailException;
-import leaguehub.leaguehubbackend.exception.email.exception.InvalidEmailAddressException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.repository.email.EmailAuthRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
