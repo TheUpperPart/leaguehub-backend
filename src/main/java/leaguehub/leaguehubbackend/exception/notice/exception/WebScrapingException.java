@@ -1,9 +1,9 @@
 package leaguehub.leaguehubbackend.exception.notice.exception;
 
-import static leaguehub.leaguehubbackend.exception.notice.NoticeExceptionCode.WEB_SCRAPING_ERROR;
-
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.exception.ResourceNotFoundException;
+
+import static leaguehub.leaguehubbackend.exception.notice.NoticeExceptionCode.WEB_SCRAPING_ERROR;
 
 public class WebScrapingException extends ResourceNotFoundException {
 

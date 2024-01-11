@@ -1,17 +1,15 @@
 package leaguehub.leaguehubbackend.service.channel;
 
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
 import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotGameHostException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
@@ -20,7 +18,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc

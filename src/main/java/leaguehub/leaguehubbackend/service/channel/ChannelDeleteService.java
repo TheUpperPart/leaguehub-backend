@@ -1,5 +1,9 @@
 package leaguehub.leaguehubbackend.service.channel;
 
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotGameHostException;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
@@ -7,11 +11,8 @@ import leaguehub.leaguehubbackend.entity.match.Match;
 import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchSet;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
@@ -19,7 +20,6 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static leaguehub.leaguehubbackend.domain.participant.entity.Role.HOST;
 import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PREPARING;
-import static leaguehub.leaguehubbackend.entity.participant.Role.HOST;
 
 @RequiredArgsConstructor
 @Transactional

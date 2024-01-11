@@ -1,9 +1,9 @@
 package leaguehub.leaguehubbackend.exception.notice.exception;
 
-import static leaguehub.leaguehubbackend.exception.notice.NoticeExceptionCode.NOTICE_UNSUPPORTED;
-
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.exception.ResourceNotFoundException;
+
+import static leaguehub.leaguehubbackend.exception.notice.NoticeExceptionCode.NOTICE_UNSUPPORTED;
 
 public class NoticeUnsupportedException extends ResourceNotFoundException {
 

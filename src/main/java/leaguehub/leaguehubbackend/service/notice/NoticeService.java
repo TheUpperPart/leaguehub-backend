@@ -1,19 +1,20 @@
 package leaguehub.leaguehubbackend.service.notice;
 
+import leaguehub.leaguehubbackend.dto.notice.Notice;
+import leaguehub.leaguehubbackend.exception.notice.exception.NoticeUnsupportedException;
+import leaguehub.leaguehubbackend.exception.notice.exception.WebScrapingException;
+import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import leaguehub.leaguehubbackend.dto.notice.Notice;
-import leaguehub.leaguehubbackend.exception.notice.exception.NoticeUnsupportedException;
-import leaguehub.leaguehubbackend.exception.notice.exception.WebScrapingException;
-import lombok.RequiredArgsConstructor;
-import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 
 @Service

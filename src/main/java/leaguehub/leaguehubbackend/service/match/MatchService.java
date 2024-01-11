@@ -1,5 +1,11 @@
 package leaguehub.leaguehubbackend.service.match;
 
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.entity.Role;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotFoundException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantRejectedRequestedException;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.dto.match.*;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.match.Match;
@@ -7,21 +13,15 @@ import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.match.MatchSet;
 import leaguehub.leaguehubbackend.entity.match.MatchStatus;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotEnoughPlayerException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
-import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotFoundException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchSetRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,12 +31,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.DISQUALIFICATION;
+import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.PROGRESS;
+import static leaguehub.leaguehubbackend.domain.participant.entity.Role.PLAYER;
 import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 import static leaguehub.leaguehubbackend.entity.match.MatchStatus.END;
-import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.DISQUALIFICATION;
-import static leaguehub.leaguehubbackend.entity.participant.ParticipantStatus.PROGRESS;
-import static leaguehub.leaguehubbackend.entity.participant.Role.PLAYER;
 
 @Service
 @Transactional

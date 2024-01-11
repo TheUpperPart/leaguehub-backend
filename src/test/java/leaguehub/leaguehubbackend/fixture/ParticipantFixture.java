@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.participant.ParticipantDto;
+import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
 
 public class ParticipantFixture {
 

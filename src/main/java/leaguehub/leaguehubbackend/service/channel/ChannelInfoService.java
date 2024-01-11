@@ -2,10 +2,10 @@ package leaguehub.leaguehubbackend.service.channel;
 
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.dto.channel.ChannelInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.ChannelInfo;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
 import leaguehub.leaguehubbackend.service.member.MemberService;

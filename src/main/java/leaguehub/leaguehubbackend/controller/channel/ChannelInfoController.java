@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelInfoDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.channel.ChannelInfoService;

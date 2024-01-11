@@ -1,5 +1,6 @@
 package leaguehub.leaguehubbackend.service.channel;
 
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardInfoDto;
 import leaguehub.leaguehubbackend.dto.channel.ChannelBoardLoadDto;
@@ -7,7 +8,6 @@ import leaguehub.leaguehubbackend.dto.match.MyMatchDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelBoardNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.service.match.MatchService;

@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import leaguehub.leaguehubbackend.entity.email.EmailAuth;
 import leaguehub.leaguehubbackend.entity.member.BaseRole;
 import leaguehub.leaguehubbackend.entity.member.Member;
@@ -29,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Slf4j

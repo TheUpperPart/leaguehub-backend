@@ -1,5 +1,8 @@
 package leaguehub.leaguehubbackend.entity.participant;
 
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus;
+import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
@@ -10,7 +13,7 @@ import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

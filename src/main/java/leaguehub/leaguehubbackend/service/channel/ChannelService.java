@@ -1,22 +1,22 @@
 package leaguehub.leaguehubbackend.service.channel;
 
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.entity.Role;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.dto.channel.ChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.*;
 import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.entity.participant.Role;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.exception.email.exception.UnauthorizedEmailException;
-import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.service.match.MatchService;
 import leaguehub.leaguehubbackend.service.member.MemberService;

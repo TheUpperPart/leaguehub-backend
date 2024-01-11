@@ -5,7 +5,7 @@ import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
-import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;

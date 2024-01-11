@@ -1,15 +1,15 @@
 package leaguehub.leaguehubbackend.service.match;
 
+import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.dto.match.*;
-import leaguehub.leaguehubbackend.dto.participant.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.entity.match.*;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchAlreadyUpdateException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchPlayerNotFoundException;
 import leaguehub.leaguehubbackend.exception.match.exception.MatchResultIdNotFoundException;
-import leaguehub.leaguehubbackend.exception.participant.exception.InvalidParticipantAuthException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantGameIdNotFoundException;
 import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRankRepository;
 import leaguehub.leaguehubbackend.repository.match.MatchRepository;
@@ -34,7 +34,8 @@ import java.util.stream.IntStream;
 
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.ADVANCE;
 import static leaguehub.leaguehubbackend.entity.match.MatchPlayerResultStatus.DROPOUT;
-import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.*;
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.READY;
+import static leaguehub.leaguehubbackend.entity.match.PlayerStatus.WAITING;
 
 @Service
 @RequiredArgsConstructor

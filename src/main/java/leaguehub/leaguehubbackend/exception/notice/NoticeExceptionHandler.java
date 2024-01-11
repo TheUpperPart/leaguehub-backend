@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.exception.notice;
 
 import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
-import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.exception.notice.exception.NoticeUnsupportedException;
 import leaguehub.leaguehubbackend.exception.notice.exception.WebScrapingException;
 import lombok.RequiredArgsConstructor;
