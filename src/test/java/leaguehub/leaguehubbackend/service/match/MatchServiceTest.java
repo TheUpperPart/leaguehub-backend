@@ -1,13 +1,14 @@
 package leaguehub.leaguehubbackend.service.match;
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.domain.match.service.MatchService;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.match.MatchRoundListDto;
+import leaguehub.leaguehubbackend.domain.match.dto.MatchRoundListDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
+import leaguehub.leaguehubbackend.domain.match.entity.Match;
+import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayer;
 import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
@@ -15,8 +16,8 @@ import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchRepository;
+import leaguehub.leaguehubbackend.domain.match.repository.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.domain.match.repository.MatchRepository;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import org.junit.jupiter.api.AfterEach;

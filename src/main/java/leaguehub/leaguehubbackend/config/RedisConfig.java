@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.config;
 
-import leaguehub.leaguehubbackend.dto.chat.MatchMessage;
-import leaguehub.leaguehubbackend.service.chat.MatchChatSubscriber;
+import leaguehub.leaguehubbackend.domain.match.dto.MatchMessage;
+import leaguehub.leaguehubbackend.domain.match.service.chat.MatchChatSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

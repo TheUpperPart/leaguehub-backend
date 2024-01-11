@@ -2,23 +2,18 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchRepository;
-import leaguehub.leaguehubbackend.service.match.MatchPlayerService;
+import leaguehub.leaguehubbackend.domain.match.repository.MatchRepository;
+import leaguehub.leaguehubbackend.domain.match.service.MatchPlayerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
