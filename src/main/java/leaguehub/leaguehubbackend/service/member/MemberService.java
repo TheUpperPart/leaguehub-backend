@@ -17,6 +17,7 @@ import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNot
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
+import leaguehub.leaguehubbackend.service.redis.RedisService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -41,12 +42,10 @@ public class MemberService {
 
     private final JwtService jwtService;
 
+    private final RedisService redisService;
+
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
-    }
-
-    public Optional<Member> findMemberByRefreshToken(String refreshToken) {
-        return memberRepository.findByRefreshToken(refreshToken);
     }
 
     @Transactional
@@ -77,7 +76,7 @@ public class MemberService {
 
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
-            member.updateRefreshToken(null);
+            redisService.deleteRefreshToken(member.getPersonalId());
             SecurityContextHolder.clearContext();
             memberRepository.save(member);
         }

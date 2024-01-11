@@ -4,7 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.exception.chat.exception.MatchChatMessageConversionException;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidRefreshToken;
+import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
 import leaguehub.leaguehubbackend.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.service.redis.RedisService;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 
@@ -53,11 +55,12 @@ public class JwtService {
     /**
      * Refresh 토큰 생성 메소드
      */
-    public String createRefreshToken() {
+    public String createRefreshToken(String personalId) {
         Date now = new Date();
         return JWT.create()
                 .withSubject("RefreshToken")
                 .withClaim("uuid", UUID.randomUUID().toString())
+                .withClaim("personalId", personalId)
                 .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
@@ -108,7 +111,7 @@ public class JwtService {
      */
     public LoginMemberResponse createTokens(String personalId) {
         String accessToken = createAccessToken(personalId);
-        String refreshToken = createRefreshToken();
+        String refreshToken = createRefreshToken(personalId);
         updateRefreshToken(personalId, refreshToken);
         LoginMemberResponse tokenDto = LoginMemberResponse.builder()
                 .accessToken(accessToken)
@@ -159,6 +162,32 @@ public class JwtService {
             log.error("토큰의 만료일을 판단하는 중 오류가 발생했습니다. {}", e.getMessage());
             return false;
         }
+    }
+
+    public LoginMemberResponse refreshAccessToken(HttpServletRequest request) {
+        String refreshToken = extractRefreshToken(request)
+                .orElseThrow(() -> {
+                    log.info("요청에 리프레쉬토큰이 없습니다.");
+                    return new AuthTokenNotFoundException();
+                });
+
+        String personalId = extractPersonalId(refreshToken)
+                .orElseThrow(() -> {
+                    log.info("개인 ID를 찾을 수 없습니다.");
+                    return new MemberNotFoundException();
+                });
+
+        String redisRefreshToken = redisService.getRefreshToken(personalId);
+
+        return refreshTokens(refreshToken, redisRefreshToken, personalId);
+    }
+
+    public LoginMemberResponse refreshTokens(String clientRefreshToken, String redisRefreshToken, String personalId) {
+        if (!clientRefreshToken.equals(redisRefreshToken)) {
+            throw new AuthInvalidRefreshToken();
+        }
+
+        return createTokens(personalId);
     }
 
 }
