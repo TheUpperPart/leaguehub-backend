@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.domain.channel.dto.ChannelInfoDto;
 import leaguehub.leaguehubbackend.domain.channel.service.ChannelInfoService;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

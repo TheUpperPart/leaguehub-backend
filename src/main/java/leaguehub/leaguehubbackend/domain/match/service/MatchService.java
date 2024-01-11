@@ -36,7 +36,7 @@ import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantSt
 import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.PROGRESS;
 import static leaguehub.leaguehubbackend.domain.participant.entity.Role.PLAYER;
 import static leaguehub.leaguehubbackend.domain.channel.entity.ChannelStatus.PROCEEDING;
-import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
+import static leaguehub.leaguehubbackend.global.audit.GlobalConstant.NO_DATA;
 
 @Service
 @Transactional

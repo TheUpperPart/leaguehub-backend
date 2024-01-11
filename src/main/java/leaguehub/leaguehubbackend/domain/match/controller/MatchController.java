@@ -13,7 +13,7 @@ import leaguehub.leaguehubbackend.domain.match.service.MatchPlayerService;
 import leaguehub.leaguehubbackend.domain.match.service.MatchService;
 import leaguehub.leaguehubbackend.domain.match.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

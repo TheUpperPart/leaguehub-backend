@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.domain.match.exception.exception;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.domain.match.exception.MatchExceptionCode.MATCH_NOT_FOUND;
 import static leaguehub.leaguehubbackend.domain.match.exception.MatchExceptionCode.MATCH_RESULT_NOT_FOUNT;

@@ -13,7 +13,7 @@ import leaguehub.leaguehubbackend.domain.channel.dto.ChannelBoardIndexListDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ChannelBoardInfoDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ChannelBoardLoadDto;
 import leaguehub.leaguehubbackend.domain.channel.service.ChannelBoardService;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -4,7 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import leaguehub.leaguehubbackend.config.jwt.JwtAuthenticationProcessingFilter;
+import leaguehub.leaguehubbackend.global.config.jwt.JwtAuthenticationProcessingFilter;
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthExpiredTokenException;
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthMemberNotFoundException;

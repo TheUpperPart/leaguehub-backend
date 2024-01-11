@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.domain.member.exception.member.exception;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.exception.ResourceNotFoundException;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.exception.ResourceNotFoundException;
 
 import static leaguehub.leaguehubbackend.domain.member.exception.member.MemberExceptionCode.MEMBER_NOT_FOUND;
 

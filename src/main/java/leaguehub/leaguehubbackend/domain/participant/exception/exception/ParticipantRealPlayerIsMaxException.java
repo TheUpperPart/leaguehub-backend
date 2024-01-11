@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.domain.participant.exception.exception;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.domain.participant.exception.ParticipantExceptionCode.PARTICIPANT_REAL_PLAYER_IS_MAX;
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.domain.member.service.KakaoService;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.domain.member.exception.kakao.exception.KakaoInvalidCodeException;
 import leaguehub.leaguehubbackend.fixture.KakaoTokenResponseDtoFixture;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;

@@ -25,7 +25,7 @@ import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepositor
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.domain.member.service.MemberService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
+import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

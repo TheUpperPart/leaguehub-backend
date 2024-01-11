@@ -13,7 +13,7 @@ import leaguehub.leaguehubbackend.domain.match.repository.MatchSetRepository;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantGameIdNotFoundException;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;

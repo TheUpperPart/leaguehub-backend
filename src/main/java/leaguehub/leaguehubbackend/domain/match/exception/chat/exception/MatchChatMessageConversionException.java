@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.domain.match.exception.chat.exception;
 
 import leaguehub.leaguehubbackend.domain.match.exception.chat.ChatExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.domain.match.exception.chat.ChatExceptionCode.MATCH_CHAT_CONVERSION_EXCEPTION;
 

@@ -13,7 +13,7 @@ import leaguehub.leaguehubbackend.domain.member.entity.BaseRole;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.member.service.MemberService;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

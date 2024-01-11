@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.domain.member.exception.kakao;
 
 import leaguehub.leaguehubbackend.domain.member.exception.kakao.exception.KakaoInvalidCodeException;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

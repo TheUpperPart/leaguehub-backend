@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.domain.match.entity;
 
 import jakarta.persistence.*;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
-import leaguehub.leaguehubbackend.entity.BaseTimeEntity;
+import leaguehub.leaguehubbackend.global.audit.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

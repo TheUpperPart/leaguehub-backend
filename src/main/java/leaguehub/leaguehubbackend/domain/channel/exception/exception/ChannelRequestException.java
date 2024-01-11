@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.domain.channel.exception.exception;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.domain.channel.exception.ChannelExceptionCode.INVALID_REQUEST_CHANNEL;
 

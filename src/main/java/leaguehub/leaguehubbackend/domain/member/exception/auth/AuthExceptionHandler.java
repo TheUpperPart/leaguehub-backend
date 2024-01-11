@@ -4,8 +4,8 @@ import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthExp
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidRefreshToken;
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthTokenNotFoundException;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

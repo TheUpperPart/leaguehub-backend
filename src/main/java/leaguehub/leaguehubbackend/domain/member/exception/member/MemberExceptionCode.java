@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.domain.member.exception.member;
 
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

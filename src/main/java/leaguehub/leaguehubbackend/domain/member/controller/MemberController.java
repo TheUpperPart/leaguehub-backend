@@ -13,7 +13,7 @@ import leaguehub.leaguehubbackend.domain.member.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.domain.member.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.domain.member.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.domain.member.service.MemberService;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

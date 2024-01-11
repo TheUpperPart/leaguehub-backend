@@ -6,7 +6,7 @@ import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
-import leaguehub.leaguehubbackend.entity.constant.GlobalConstant;
+import leaguehub.leaguehubbackend.global.audit.GlobalConstant;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;

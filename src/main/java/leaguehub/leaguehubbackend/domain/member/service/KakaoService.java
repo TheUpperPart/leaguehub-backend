@@ -5,7 +5,7 @@ import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoTokenRequestDto;
 import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoTokenResponseDto;
 import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.domain.member.exception.kakao.exception.KakaoInvalidCodeException;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;

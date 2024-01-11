@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.domain.member.exception.kakao.exception;
 
 import leaguehub.leaguehubbackend.domain.member.exception.kakao.KakaoExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 
 import static leaguehub.leaguehubbackend.domain.member.exception.kakao.KakaoExceptionCode.INVALID_KAKAO_CODE;
 

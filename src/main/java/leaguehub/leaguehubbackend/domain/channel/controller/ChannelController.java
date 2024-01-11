@@ -16,7 +16,7 @@ import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

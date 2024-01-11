@@ -19,11 +19,11 @@ import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepos
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
+import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.json.simple.JSONArray;

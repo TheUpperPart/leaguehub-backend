@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.domain.member.exception.auth.exception;
 
 import leaguehub.leaguehubbackend.domain.member.exception.auth.AuthExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
 import org.springframework.security.core.AuthenticationException;
 
 public class AuthInvalidTokenException extends AuthenticationException {

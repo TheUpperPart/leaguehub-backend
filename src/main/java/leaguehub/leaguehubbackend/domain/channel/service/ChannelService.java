@@ -20,7 +20,7 @@ import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
-import leaguehub.leaguehubbackend.util.SecurityUtils;
+import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

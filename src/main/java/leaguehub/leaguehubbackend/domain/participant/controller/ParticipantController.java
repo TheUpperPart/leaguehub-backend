@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.domain.participant.dto.*;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

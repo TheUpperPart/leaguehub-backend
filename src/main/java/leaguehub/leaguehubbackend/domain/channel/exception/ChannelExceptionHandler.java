@@ -4,8 +4,8 @@ import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelBoar
 import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.exception.global.ExceptionCode;
-import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionCode;
+import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
