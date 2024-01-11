@@ -1,8 +1,10 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

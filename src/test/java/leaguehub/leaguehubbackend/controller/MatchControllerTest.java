@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import leaguehub.leaguehubbackend.domain.match.repository.MatchRepository;
 import leaguehub.leaguehubbackend.domain.match.service.MatchPlayerService;
 import org.junit.jupiter.api.DisplayName;

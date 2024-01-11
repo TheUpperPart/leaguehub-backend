@@ -18,11 +18,11 @@ import leaguehub.leaguehubbackend.domain.participant.exception.exception.Invalid
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelRequestException;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelStatusAlreadyException;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,7 @@ import static leaguehub.leaguehubbackend.domain.match.entity.MatchStatus.END;
 import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.DISQUALIFICATION;
 import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.PROGRESS;
 import static leaguehub.leaguehubbackend.domain.participant.entity.Role.PLAYER;
-import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
+import static leaguehub.leaguehubbackend.domain.channel.entity.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.entity.constant.GlobalConstant.NO_DATA;
 
 @Service

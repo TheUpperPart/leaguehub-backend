@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import leaguehub.leaguehubbackend.domain.participant.dto.*;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

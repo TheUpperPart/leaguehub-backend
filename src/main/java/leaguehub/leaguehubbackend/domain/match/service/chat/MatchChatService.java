@@ -9,7 +9,7 @@ import leaguehub.leaguehubbackend.domain.match.exception.chat.exception.MatchCha
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.member.service.JwtService;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
