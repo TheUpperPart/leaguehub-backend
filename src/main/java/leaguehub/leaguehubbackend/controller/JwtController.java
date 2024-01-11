@@ -16,6 +16,7 @@ import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundExce
 import leaguehub.leaguehubbackend.exception.global.ExceptionResponse;
 import leaguehub.leaguehubbackend.service.jwt.JwtService;
 import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,8 @@ public class JwtController {
 
     private final JwtService jwtService;
 
+    private final RedisService redisService;
+
     @Operation(summary = "토큰 재발급", description = "refreshToken을 사용해서 accessToken 과 refreshToken 재발급")
     @SecurityRequirements
     @ApiResponses(value = {
@@ -46,29 +49,9 @@ public class JwtController {
     })
     @PostMapping("/member/token")
     public ResponseEntity<LoginMemberResponse> refreshAccessToken(HttpServletRequest request) {
-
-        Optional<String> optionalToken = jwtService.extractRefreshToken(request);
-
-        String refreshToken = optionalToken.orElseThrow(() -> {
-            log.info("요청헤더에 refreshToken 없음: ");
-            return new AuthTokenNotFoundException();
-        });
-
-        Optional<Member> memberOpt;
-        if (jwtService.isTokenValid(refreshToken)) {
-            memberOpt = memberService.findMemberByRefreshToken(refreshToken);
-        } else {
-            log.info("유효하지 않은 토큰: " + refreshToken);
-            throw new AuthInvalidTokenException();
-        }
-
-        Member member = memberOpt.orElseThrow(() -> {
-            log.info("해당 refreshToken을 가지고 있는 멤버 없음: " + refreshToken);
-            return new AuthInvalidRefreshToken();
-        });
-
-        LoginMemberResponse loginMemberResponse = jwtService.createTokens(member.getPersonalId());
-
+        LoginMemberResponse loginMemberResponse = jwtService.refreshAccessToken(request);
+        
         return ResponseEntity.ok(loginMemberResponse);
     }
+
 }
