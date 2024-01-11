@@ -1,7 +1,7 @@
 package leaguehub.leaguehubbackend.exception.global;
 
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
+import leaguehub.leaguehubbackend.domain.member.exception.kakao.exception.KakaoInvalidCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

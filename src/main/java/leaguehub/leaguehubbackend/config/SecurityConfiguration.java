@@ -2,8 +2,8 @@ package leaguehub.leaguehubbackend.config;
 
 import leaguehub.leaguehubbackend.config.jwt.JwtAuthenticationEntryPoint;
 import leaguehub.leaguehubbackend.config.jwt.JwtAuthenticationProcessingFilter;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

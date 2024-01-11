@@ -4,6 +4,12 @@ import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedE
 import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.domain.match.entity.PlayerStatus;
 import leaguehub.leaguehubbackend.domain.match.repository.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.domain.member.entity.BaseRole;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import leaguehub.leaguehubbackend.domain.participant.dto.*;
 import leaguehub.leaguehubbackend.domain.participant.entity.GameTier;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
@@ -13,16 +19,10 @@ import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepos
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.member.BaseRole;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
 import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
-import leaguehub.leaguehubbackend.service.member.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,10 +42,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.domain.match.entity.PlayerStatus.DISQUALIFICATION;
+import static leaguehub.leaguehubbackend.domain.member.entity.BaseRole.GUEST;
+import static leaguehub.leaguehubbackend.domain.member.entity.BaseRole.USER;
 import static leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus.*;
 import static leaguehub.leaguehubbackend.domain.participant.entity.Role.*;
-import static leaguehub.leaguehubbackend.entity.member.BaseRole.GUEST;
-import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
 
 
 @Service

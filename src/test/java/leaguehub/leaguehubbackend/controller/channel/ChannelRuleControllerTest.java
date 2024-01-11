@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.controller.channel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import leaguehub.leaguehubbackend.domain.channel.controller.ChannelController;
 import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
 import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
@@ -8,9 +9,9 @@ import leaguehub.leaguehubbackend.entity.channel.Channel;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.service.channel.ChannelService;
-import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

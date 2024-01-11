@@ -10,6 +10,8 @@ import leaguehub.leaguehubbackend.domain.match.exception.exception.MatchNotFound
 import leaguehub.leaguehubbackend.domain.match.repository.MatchPlayerRepository;
 import leaguehub.leaguehubbackend.domain.match.repository.MatchRepository;
 import leaguehub.leaguehubbackend.domain.match.repository.MatchSetRepository;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
@@ -17,12 +19,10 @@ import leaguehub.leaguehubbackend.domain.participant.exception.exception.Partici
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.member.Member;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelRequestException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

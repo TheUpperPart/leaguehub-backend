@@ -2,7 +2,7 @@ package leaguehub.leaguehubbackend.config.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.AuthExceptionCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.*;
+import static leaguehub.leaguehubbackend.domain.member.exception.auth.AuthExceptionCode.*;
 
 
 @Component

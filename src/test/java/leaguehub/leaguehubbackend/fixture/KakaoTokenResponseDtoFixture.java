@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
+import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoTokenResponseDto;
 
 public class KakaoTokenResponseDtoFixture {
     public static KakaoTokenResponseDto createKakaoTokenResponseDto() {

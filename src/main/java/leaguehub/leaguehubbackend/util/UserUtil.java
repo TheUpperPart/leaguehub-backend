@@ -1,10 +1,10 @@
 package leaguehub.leaguehubbackend.util;
 
-import leaguehub.leaguehubbackend.entity.member.BaseRole;
-import leaguehub.leaguehubbackend.entity.member.LoginProvider;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
+import leaguehub.leaguehubbackend.domain.member.entity.BaseRole;
+import leaguehub.leaguehubbackend.domain.member.entity.LoginProvider;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

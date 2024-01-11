@@ -1,7 +1,8 @@
 package leaguehub.leaguehubbackend.service.jwt;
 
-import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

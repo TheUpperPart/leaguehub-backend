@@ -5,10 +5,10 @@ import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.dto.channel.ChannelInfoDto;
 import leaguehub.leaguehubbackend.entity.channel.ChannelInfo;
-import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.repository.channel.ChannelInfoRepository;
-import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,10 +1,10 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.domain.member.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.domain.email.entity.EmailAuth;
-import leaguehub.leaguehubbackend.entity.member.BaseRole;
-import leaguehub.leaguehubbackend.entity.member.LoginProvider;
-import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.domain.member.entity.BaseRole;
+import leaguehub.leaguehubbackend.domain.member.entity.LoginProvider;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;

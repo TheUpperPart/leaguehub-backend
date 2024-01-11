@@ -9,7 +9,7 @@ import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
 import leaguehub.leaguehubbackend.entity.channel.*;
-import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelNotFoundException;
 import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
 import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
@@ -19,7 +19,7 @@ import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
 import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
 import leaguehub.leaguehubbackend.domain.match.service.chat.MatchChatService;
 import leaguehub.leaguehubbackend.domain.match.service.MatchService;
-import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import leaguehub.leaguehubbackend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static leaguehub.leaguehubbackend.entity.channel.ChannelStatus.PROCEEDING;
-import static leaguehub.leaguehubbackend.entity.member.BaseRole.USER;
+import static leaguehub.leaguehubbackend.domain.member.entity.BaseRole.USER;
 
 
 @Service

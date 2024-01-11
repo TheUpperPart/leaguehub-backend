@@ -1,9 +1,9 @@
 package leaguehub.leaguehubbackend.config.stomp;
 
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthExpiredTokenException;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthTokenNotFoundException;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

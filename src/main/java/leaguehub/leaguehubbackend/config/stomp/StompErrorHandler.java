@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.config.stomp;
 
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthExpiredTokenException;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthInvalidTokenException;
-import leaguehub.leaguehubbackend.exception.auth.exception.AuthTokenNotFoundException;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthExpiredTokenException;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthInvalidTokenException;
+import leaguehub.leaguehubbackend.domain.member.exception.auth.exception.AuthTokenNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -10,7 +10,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
-import static leaguehub.leaguehubbackend.exception.auth.AuthExceptionCode.*;
+import static leaguehub.leaguehubbackend.domain.member.exception.auth.AuthExceptionCode.*;
 import static leaguehub.leaguehubbackend.exception.global.GlobalErrorCode.SERVER_ERROR;
 
 @Component
