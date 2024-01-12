@@ -3,13 +3,13 @@ package leaguehub.leaguehubbackend.domain.match.service.chat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import leaguehub.leaguehubbackend.domain.match.dto.MatchMessage;
 import leaguehub.leaguehubbackend.domain.match.entity.MessageType;
 import leaguehub.leaguehubbackend.domain.match.exception.chat.exception.MatchChatMessageConversionException;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.member.service.JwtService;
-import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;

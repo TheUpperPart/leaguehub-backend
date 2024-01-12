@@ -1,8 +1,8 @@
 package leaguehub.leaguehubbackend.domain.match.entity;
 
 import jakarta.persistence.*;
-import leaguehub.leaguehubbackend.global.audit.BaseTimeEntity;
 import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.global.audit.BaseTimeEntity;
 import leaguehub.leaguehubbackend.global.audit.GlobalConstant;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,5 +1,11 @@
 package leaguehub.leaguehubbackend.domain.participant.service;
 
+import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
 import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayerResultStatus;
 import leaguehub.leaguehubbackend.domain.match.entity.PlayerStatus;
@@ -16,13 +22,7 @@ import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.*;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
-import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
-import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
 import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
-import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
 import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

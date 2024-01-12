@@ -4,7 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import leaguehub.leaguehubbackend.domain.member.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.domain.member.exception.member.exception.MemberNotFoundException;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.global.redis.service.RedisService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class JwtService {
 
     private final MemberRepository memberRepository;
 
+    private final RedisService redisService;
 
     /**
      * AccessToken 생성 메소드
@@ -132,11 +135,9 @@ public class JwtService {
     public void updateRefreshToken(String personalId, String refreshToken) {
         memberRepository.findMemberByPersonalId(personalId)
                 .ifPresentOrElse(
-                        member -> {
-                            member.updateRefreshToken(refreshToken);
-                            memberRepository.save(member);
-                        },
-                        () -> new Exception("일치하는 회원이 없습니다.")
+                        member -> redisService.saveRefreshToken(personalId, refreshToken),
+                        () -> {
+                            throw new MemberNotFoundException();}
                 );
     }
     /**

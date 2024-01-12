@@ -1,5 +1,10 @@
 package leaguehub.leaguehubbackend.domain.match.service;
 
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelNotFoundException;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelRequestException;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelStatusAlreadyException;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import leaguehub.leaguehubbackend.domain.match.dto.*;
 import leaguehub.leaguehubbackend.domain.match.entity.Match;
 import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayer;
@@ -18,11 +23,6 @@ import leaguehub.leaguehubbackend.domain.participant.exception.exception.Invalid
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantRejectedRequestedException;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
-import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
-import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelNotFoundException;
-import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelRequestException;
-import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +31,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static leaguehub.leaguehubbackend.domain.channel.entity.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.domain.match.entity.MatchStatus.END;
 import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.DISQUALIFICATION;
 import static leaguehub.leaguehubbackend.domain.participant.entity.ParticipantStatus.PROGRESS;
 import static leaguehub.leaguehubbackend.domain.participant.entity.Role.PLAYER;
-import static leaguehub.leaguehubbackend.domain.channel.entity.ChannelStatus.PROCEEDING;
 import static leaguehub.leaguehubbackend.global.audit.GlobalConstant.NO_DATA;
 
 @Service

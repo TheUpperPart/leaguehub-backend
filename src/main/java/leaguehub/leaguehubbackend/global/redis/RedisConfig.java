@@ -1,4 +1,4 @@
-package leaguehub.leaguehubbackend.global.config;
+package leaguehub.leaguehubbackend.global.redis;
 
 import leaguehub.leaguehubbackend.domain.match.dto.MatchMessage;
 import leaguehub.leaguehubbackend.domain.match.service.chat.MatchChatSubscriber;
@@ -32,6 +32,14 @@ public class RedisConfig {
         template.setConnectionFactory(factory);
         return template;
     }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        return template;
+    }
+
     @Bean
     public MessageListenerAdapter messageListener(MatchChatSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber);
