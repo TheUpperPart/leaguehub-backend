@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.member.ProfileDto;
+import leaguehub.leaguehubbackend.domain.member.dto.member.ProfileDto;
 
 public class ProfileFixture {
     public static ProfileDto createProfile() {

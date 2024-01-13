@@ -2,10 +2,11 @@ package leaguehub.leaguehubbackend.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import leaguehub.leaguehubbackend.dto.kakao.KakaoTokenResponseDto;
-import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
-import leaguehub.leaguehubbackend.exception.global.exception.GlobalServerErrorException;
-import leaguehub.leaguehubbackend.exception.kakao.exception.KakaoInvalidCodeException;
+import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoTokenResponseDto;
+import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoUserDto;
+import leaguehub.leaguehubbackend.domain.member.service.KakaoService;
+import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.domain.member.exception.kakao.exception.KakaoInvalidCodeException;
 import leaguehub.leaguehubbackend.fixture.KakaoTokenResponseDtoFixture;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
 import okhttp3.mockwebserver.MockResponse;

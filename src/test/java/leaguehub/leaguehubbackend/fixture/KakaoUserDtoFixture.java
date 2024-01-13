@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.kakao.KakaoUserDto;
+import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoUserDto;
 
 public class KakaoUserDtoFixture {
     public static KakaoUserDto createKakaoUserDto() {

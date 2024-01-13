@@ -1,10 +1,10 @@
 package leaguehub.leaguehubbackend.controller;
 
-import leaguehub.leaguehubbackend.dto.member.LoginMemberResponse;
-import leaguehub.leaguehubbackend.entity.member.Member;
+import leaguehub.leaguehubbackend.domain.member.dto.member.LoginMemberResponse;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
-import leaguehub.leaguehubbackend.service.jwt.JwtService;
-import leaguehub.leaguehubbackend.service.member.MemberService;
+import leaguehub.leaguehubbackend.domain.member.service.JwtService;
+import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

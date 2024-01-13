@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.match.MatchPlayerInfo;
+import leaguehub.leaguehubbackend.domain.match.dto.MatchPlayerInfo;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,26 +1,27 @@
 package leaguehub.leaguehubbackend.service.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
-import leaguehub.leaguehubbackend.entity.channel.ChannelBoard;
-import leaguehub.leaguehubbackend.entity.channel.ChannelRule;
-import leaguehub.leaguehubbackend.entity.channel.ChannelStatus;
-import leaguehub.leaguehubbackend.entity.match.Match;
-import leaguehub.leaguehubbackend.entity.match.MatchPlayer;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
-import leaguehub.leaguehubbackend.exception.channel.exception.ChannelStatusAlreadyException;
-import leaguehub.leaguehubbackend.exception.participant.exception.ParticipantNotGameHostException;
+import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelStatus;
+import leaguehub.leaguehubbackend.domain.channel.service.ChannelBoardService;
+import leaguehub.leaguehubbackend.domain.channel.service.ChannelDeleteService;
+import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
+import leaguehub.leaguehubbackend.domain.match.entity.Match;
+import leaguehub.leaguehubbackend.domain.match.entity.MatchPlayer;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.channel.exception.exception.ChannelStatusAlreadyException;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotGameHostException;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
-import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchPlayerRepository;
-import leaguehub.leaguehubbackend.repository.match.MatchRepository;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelBoardRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.domain.match.repository.MatchPlayerRepository;
+import leaguehub.leaguehubbackend.domain.match.repository.MatchRepository;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -1,15 +1,18 @@
 package leaguehub.leaguehubbackend.entity.channel;
 
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.entity.member.Member;
-import leaguehub.leaguehubbackend.entity.participant.Participant;
+import leaguehub.leaguehubbackend.domain.channel.dto.ChannelBoardDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelBoard;
+import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
-import leaguehub.leaguehubbackend.repository.channel.ChannelBoardRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRepository;
-import leaguehub.leaguehubbackend.repository.channel.ChannelRuleRepository;
-import leaguehub.leaguehubbackend.repository.member.MemberRepository;
-import leaguehub.leaguehubbackend.repository.particiapnt.ParticipantRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelBoardRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
+import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,10 +1,10 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.channel.ChannelBoardDto;
-import leaguehub.leaguehubbackend.dto.channel.ChannelRuleDto;
-import leaguehub.leaguehubbackend.dto.channel.CreateChannelDto;
-import leaguehub.leaguehubbackend.dto.channel.UpdateChannelDto;
-import leaguehub.leaguehubbackend.entity.channel.Channel;
+import leaguehub.leaguehubbackend.domain.channel.dto.ChannelBoardDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.ChannelRuleDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.dto.UpdateChannelDto;
+import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 
 public class ChannelFixture {
 

@@ -1,6 +1,6 @@
 package leaguehub.leaguehubbackend.fixture;
 
-import leaguehub.leaguehubbackend.dto.member.MypageResponseDto;
+import leaguehub.leaguehubbackend.domain.member.dto.member.MypageResponseDto;
 
 public class MypageResponseFixture {
     public static MypageResponseDto createMypageResponse() {
