@@ -28,8 +28,6 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
-    private String refreshToken;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "email_auth_id", referencedColumnName = "email_id")
     private EmailAuth emailAuth;
@@ -42,9 +40,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private BaseRole baseRole;
 
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
     public void updateRole(BaseRole role) { this.baseRole = role; }
 
     public static Member kakaoUserToMember(KakaoUserDto kakaoUserDto) {
