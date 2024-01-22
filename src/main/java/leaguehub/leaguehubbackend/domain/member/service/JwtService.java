@@ -111,7 +111,7 @@ public class JwtService {
     public LoginMemberResponse createTokens(String personalId) {
         String accessToken = createAccessToken(personalId);
         String refreshToken = createRefreshToken(personalId);
-        updateRefreshToken(personalId, refreshToken);
+
         LoginMemberResponse tokenDto = LoginMemberResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -185,8 +185,9 @@ public class JwtService {
         if (!clientRefreshToken.equals(redisRefreshToken)) {
             throw new AuthInvalidRefreshToken();
         }
-
-        return createTokens(personalId);
+        LoginMemberResponse loginMemberResponse = createTokens(personalId);
+        updateRefreshToken(personalId, loginMemberResponse.getRefreshToken());
+        return loginMemberResponse;
     }
 
 }

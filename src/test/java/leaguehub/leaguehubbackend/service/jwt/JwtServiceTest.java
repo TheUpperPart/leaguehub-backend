@@ -1,5 +1,11 @@
 package leaguehub.leaguehubbackend.service.jwt;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 import leaguehub.leaguehubbackend.domain.member.dto.member.LoginMemberResponse;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.member.service.JwtService;
@@ -14,10 +20,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -68,7 +70,7 @@ public class JwtServiceTest {
     @Test
     @DisplayName("토큰들 생성시 personalId가 주어졌을 때 로그인 response는 토큰들을 가지고 있어야함")
     public void whenCreateTokens_givenPersonalId_thenLoginMemberResponseShouldContainTokens() {
-        String personalId = "testPersonalId";
+        String personalId = "id";
         LoginMemberResponse loginMemberResponse = jwtService.createTokens(personalId);
 
         assertNotNull(loginMemberResponse.getAccessToken());
