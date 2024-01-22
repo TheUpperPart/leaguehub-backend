@@ -17,7 +17,7 @@ public class UserFixture {
     public static Member createMember() {
         Member member = Member.builder()
                 .personalId("id").profileImageUrl("url")
-                .nickname("id").refreshToken("refreshToken")
+                .nickname("id")
                 .emailAuth(new EmailAuth("id@example.com", "authToken"))
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
@@ -28,7 +28,7 @@ public class UserFixture {
     public static Member createGuestMember() {
         Member member = Member.builder()
                 .personalId("Guest").profileImageUrl("urlGuest")
-                .nickname("nickNameGuest").refreshToken("refreshTokenGuest")
+                .nickname("nickNameGuest")
                 .emailAuth(new EmailAuth("idGuest@example.com", "authToken"))
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.GUEST)
                 .build();
@@ -39,7 +39,7 @@ public class UserFixture {
     public static Member createCustomeMember(String name){
         Member member = Member.builder()
                 .personalId(name).profileImageUrl("url")
-                .nickname(name).refreshToken("refreshToken")
+                .nickname(name)
                 .loginProvider(LoginProvider.KAKAO).baseRole(BaseRole.USER)
                 .build();
 
