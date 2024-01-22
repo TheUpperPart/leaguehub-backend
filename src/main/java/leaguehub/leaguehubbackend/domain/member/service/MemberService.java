@@ -16,6 +16,7 @@ import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotFoundException;
 import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.global.exception.global.exception.GlobalServerErrorException;
+import leaguehub.leaguehubbackend.global.redis.service.RedisService;
 import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -40,12 +41,10 @@ public class MemberService {
 
     private final JwtService jwtService;
 
+    private final RedisService redisService;
+
     public Optional<Member> findMemberByPersonalId(String personalId) {
         return memberRepository.findMemberByPersonalId(personalId);
-    }
-
-    public Optional<Member> findMemberByRefreshToken(String refreshToken) {
-        return memberRepository.findByRefreshToken(refreshToken);
     }
 
     @Transactional
@@ -76,7 +75,7 @@ public class MemberService {
 
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
-            member.updateRefreshToken(null);
+            redisService.deleteRefreshToken(member.getPersonalId());
             SecurityContextHolder.clearContext();
             memberRepository.save(member);
         }

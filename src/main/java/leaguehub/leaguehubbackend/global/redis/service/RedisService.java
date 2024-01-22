@@ -22,4 +22,8 @@ public class RedisService {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return valueOperations.get(personalId);
     }
+
+    public void deleteRefreshToken(String personalId) {
+        redisTemplate.delete(personalId);
+    }
 }
