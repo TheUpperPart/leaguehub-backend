@@ -1,19 +1,30 @@
 package leaguehub.leaguehubbackend.service.member;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Optional;
 import leaguehub.leaguehubbackend.domain.member.dto.kakao.KakaoUserDto;
 import leaguehub.leaguehubbackend.domain.member.dto.member.MypageResponseDto;
 import leaguehub.leaguehubbackend.domain.member.dto.member.NicknameRequestDto;
 import leaguehub.leaguehubbackend.domain.member.dto.member.ProfileDto;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.member.exception.member.exception.MemberNotFoundException;
+import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
 import leaguehub.leaguehubbackend.domain.member.service.MemberService;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotFoundException;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.fixture.KakaoUserDtoFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
-import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
-import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,15 +41,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -86,18 +88,6 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("리프레시 토큰으로 멤버 찾기")
-    void findMemberByRefreshToken() {
-
-        when(memberRepository.findByRefreshToken("refreshToken")).thenReturn(Optional.of(expectedMember));
-
-        Optional<Member> actualMember = memberService.findMemberByRefreshToken("refreshToken");
-
-        assertTrue(actualMember.isPresent());
-        assertEquals(expectedMember, actualMember.get());
-    }
-
-    @Test
     @DisplayName("새로운 멤버 저장")
     void saveMember() {
 
@@ -110,7 +100,6 @@ class MemberServiceTest {
         assertTrue(actualMember.isPresent());
         assertEquals(expectedMember.getId(), actualMember.get().getId());
         assertEquals(expectedMember.getPersonalId(), actualMember.get().getPersonalId());
-        assertEquals(expectedMember.getRefreshToken(), actualMember.get().getRefreshToken());
         assertEquals(expectedMember.getLoginProvider(), actualMember.get().getLoginProvider());
 
     }
