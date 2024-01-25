@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.domain.participant.controller.ParticipantController;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
@@ -50,8 +49,6 @@ class ParticipantControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    ParticipantController participantController;
 
     @Autowired
     ParticipantService participantService;
