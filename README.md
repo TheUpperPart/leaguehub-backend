@@ -96,9 +96,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `관리자 - 대회 관리 페이지`
 
-![123123](https://github.com/hennible0612/leaguehub-backend/assets/48763809/8cc8eb4b-b5ac-48aa-95de-2b4fae047b5a) | 
-![11110](https://github.com/hennible0612/leaguehub-backend/assets/48763809/338a557c-119c-4bea-b871-9d8e8763a600) |
---- | --- |
+| ![123123](https://github.com/hennible0612/leaguehub-backend/assets/48763809/8cc8eb4b-b5ac-48aa-95de-2b4fae047b5a) | ![11110](https://github.com/hennible0612/leaguehub-backend/assets/48763809/338a557c-119c-4bea-b871-9d8e8763a600) |
+|---|---|
 
 
 ❶ 채널의 홈 화면에서 대회의 정보를 수정
@@ -106,9 +105,9 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 ❷ 대회 관리에서 대회 설정(대회 시작, 경기 배정, 채널 정보 수정) 및 대회 알림 확인
 
 ### `리그허브 공지사항`
-![Untitled](https://github.com/hennible0612/leaguehub-backend/assets/48763809/b1dc83bd-f16f-46e9-a375-723851c126ff) | 
-![124124](https://github.com/hennible0612/leaguehub-backend/assets/48763809/abd8156b-9143-48d0-a51e-f096bdd200a1) |
- --- | --- |
+| ![Untitled](https://github.com/hennible0612/leaguehub-backend/assets/48763809/b1dc83bd-f16f-46e9-a375-723851c126ff) | ![124124](https://github.com/hennible0612/leaguehub-backend/assets/48763809/abd8156b-9143-48d0-a51e-f096bdd200a1) |
+|---|---|
+
 
 
 ❶ 게임의 패치노트 확인
