@@ -2,9 +2,11 @@
 
 ## LeagueHub
 
-# 사이트
+## 바로가기 및 시연
 
 ### [LeagueHub 사이트](https://leaguehub.co.kr/)
+
+### [LeagueHub 노션 바로가기](https://hyeonjun0530.notion.site/League-Hub-850d21e06cb844eea424eae8f7b3bc24?pvs=4)
 
 ### Github
 
@@ -39,8 +41,7 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 # **서비스 소개(Solution)**
 
 ---
-
-![사진](https://cdn.discordapp.com/attachments/1184714823334899802/1184714848790118410/Untitled.png?ex=658cfaae&is=657a85ae&hm=afff0a59176af671262489e9dc5a6a49c1103be5388e7eb29ea033004b0c97d7&)
+![124124](https://github.com/hennible0612/leaguehub-backend/assets/48763809/aaed7471-874f-43bd-83ee-22553885e19d)
 
 ### 기대효과
 
@@ -71,7 +72,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ## `로그인`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184715594935836692/Untitled.png?ex=658cfb60&is=657a8660&hm=6de52465319c6b639bbf4b009d206fa9802ebb8e1473d0647c4d5f42fdeeb65c&)
+![1241254](https://github.com/hennible0612/leaguehub-backend/assets/48763809/386ecf46-1a09-485b-babd-3e09466ba2b7)
+
 
 ❶ 카카오를 이용한 로그인
 
@@ -81,7 +83,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `메인페이지(관리자, 사용자)`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184715869683716126/Untitled.png?ex=658cfba2&is=657a86a2&hm=2fd513731ece8c68bd67d9f4890d3e90130a8a1e3918460e251892956f44e386&)
+![124124](https://github.com/hennible0612/leaguehub-backend/assets/48763809/85f5031d-af86-41c9-83e8-071d48921a50)
+
 
 ❶ 대회(채널) 참가
 
@@ -93,8 +96,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `관리자 - 대회 관리 페이지`
 
-
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184715919516246036/Untitled.png?ex=658cfbae&is=657a86ae&hm=79b30a872a331607d02d20d169c21b3e051895e821cce233a7fd3021040b32a6&) | ![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717842508165161/Untitled.png?ex=658cfd78&is=657a8878&hm=a862efa705b689b3e8ba3609b58974c64389e2356d62161f2eefe1c7440c5b08&) |
+![123123](https://github.com/hennible0612/leaguehub-backend/assets/48763809/8cc8eb4b-b5ac-48aa-95de-2b4fae047b5a) | 
+![11110](https://github.com/hennible0612/leaguehub-backend/assets/48763809/338a557c-119c-4bea-b871-9d8e8763a600) |
 --- | --- |
 
 
@@ -103,8 +106,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 ❷ 대회 관리에서 대회 설정(대회 시작, 경기 배정, 채널 정보 수정) 및 대회 알림 확인
 
 ### `리그허브 공지사항`
-
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717859117613156/Untitled.png?ex=658cfd7c&is=657a887c&hm=39797c2371581dcafe6d7cb8c48530766a0f007c55581a9e5efdc72634cc48b3&) | ![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717877429944432/Untitled.png?ex=658cfd80&is=657a8880&hm=6582866a10337d17501a728ffb540177efe47e8d16de90fde8e7ee294c8171c0&) |
+![Untitled](https://github.com/hennible0612/leaguehub-backend/assets/48763809/b1dc83bd-f16f-46e9-a375-723851c126ff) | 
+![124124](https://github.com/hennible0612/leaguehub-backend/assets/48763809/abd8156b-9143-48d0-a51e-f096bdd200a1) |
  --- | --- |
 
 
@@ -112,7 +115,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `채널 추가하기`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717911043096626/Untitled.png?ex=658cfd88&is=657a8888&hm=9f2f190c0a20a78cf4dc7159432c78ca73feb26143eb974dbcedf67f44dcee64&)
+![888](https://github.com/hennible0612/leaguehub-backend/assets/48763809/ff0b1f4a-e822-456c-b932-39df737e8140)
+
 
 ❶ 대회 개최를 이용하여 자신의 채널 생성
 
@@ -121,7 +125,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `채널 생성하기`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717952868700170/Untitled.png?ex=658cfd92&is=657a8892&hm=288772e38098be3edfb4023f242870e07a3a54162171d16d753c20cf0e4c6d03&)
+![777](https://github.com/hennible0612/leaguehub-backend/assets/48763809/3b74e827-9187-4180-9cc8-f3703579320b)
+
 
 ❶ 예시 폼을 작성하여 채널을 생성
 
@@ -129,7 +134,8 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `채널 참가하기`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184717980647571456/Untitled.png?ex=658cfd99&is=657a8899&hm=33bedd6f42f73d6adb50da94d994bdcf67bab754fd5013e14e633650238c2522&)
+![666](https://github.com/hennible0612/leaguehub-backend/assets/48763809/9ffb2e96-b2fb-46aa-b714-e0fc49ade500)
+
 
 ❶ 참여 코드를 입력하여 채널 참여
 
@@ -137,7 +143,7 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `관리자 - 경기 페이지`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184718125632065576/image.png?ex=658cfdbc&is=657a88bc&hm=4430460ce1e3709b63ec55fc28c0978621edc80b848f65d0c53fb024a75a9731&)
+![555](https://github.com/hennible0612/leaguehub-backend/assets/48763809/947717d9-5582-48cf-b6fc-40e9372e89ba)
 
 ❶ 실격 처리 버튼을 이용하여 해당 대회 참가자 실격
 
@@ -148,7 +154,7 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `사용자 - 경기 페이지`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184718186025848854/Untitled.png?ex=658cfdca&is=657a88ca&hm=8291fb976ce8545f81ab888eba7be11f5518c87cacc5109aceb83a63013c6185&)
+![444](https://github.com/hennible0612/leaguehub-backend/assets/48763809/5cfa95b9-4a48-4d42-a1c9-fe476798b8ce)
 
 ❶ 준비 버튼을 통한 준비(체크 박스) 체크
 
@@ -162,19 +168,19 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### `사용자 - 채널 공지 페이지`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184718878824218624/Untitled.png?ex=658cfe6f&is=657a896f&hm=5a3edf90e907621f2f3e1d2061ec0bc3307c7053f51a47387450601c5441d662&)
+![333](https://github.com/hennible0612/leaguehub-backend/assets/48763809/e6d18b3e-0fb2-4bee-b1ba-e216de72daec)
 
 ❶ 참여자 규칙 탭을 통하여 해당 대회의 규칙 확인 가능
 
 ### `관리자 - 채널 공지 페이지`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184718944834170890/image.png?ex=658cfe7f&is=657a897f&hm=9be65caa612a1bbd0b476a47ac3edf2992b2bf4881fa459702a571a2216a16c3&)
+![222](https://github.com/hennible0612/leaguehub-backend/assets/48763809/a6006cb4-8cd2-47d3-aa56-fa81eacf142f)
 
 ❶ 공지 삭제, 수정을 통한 관리
 
 ### `대진표`
 
-![Untitled](https://cdn.discordapp.com/attachments/1184714823334899802/1184719012924489808/Untitled.png?ex=658cfe8f&is=657a898f&hm=5b8735b44cb249d59479e289536da8e7d44201a29bb98bd83f5b8552d811a4a5&)
+![111](https://github.com/hennible0612/leaguehub-backend/assets/48763809/eb6f25f7-058f-44f6-81da-0f8b2aaedf48)
 
 ❶ 대진표를 통하여 참여자 확인
 
@@ -186,7 +192,7 @@ E-스포츠 대회의 세계는 다양한 규모의 대회가 존재합니다. �
 
 ### 시스템 아키텍처
 
-![Architecure.png](https://cdn.discordapp.com/attachments/1184714823334899802/1184719086706499614/Architecure.png?ex=658cfea1&is=657a89a1&hm=1a3b0b0da38483820655247909b90a2e1e0fbc79770c121f3e5f9623bf710ab0&)
+![Architecure](https://github.com/hennible0612/leaguehub-backend/assets/48763809/d0621460-3578-4d4a-96c9-863738401c86)
 
 ### Frontend
 
