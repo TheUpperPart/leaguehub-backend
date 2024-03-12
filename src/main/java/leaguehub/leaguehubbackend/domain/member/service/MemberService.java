@@ -141,6 +141,9 @@ public class MemberService {
 
     public LoginMemberResponse createLoginResponse(Member member) {
         LoginMemberResponse loginMemberResponse = jwtService.createTokens(String.valueOf(member.getPersonalId()));
+
+        jwtService.updateRefreshToken(member.getPersonalId(), loginMemberResponse.getRefreshToken());
+
         loginMemberResponse.setVerifiedUser(member.getBaseRole() != BaseRole.GUEST);
         return loginMemberResponse;
     }

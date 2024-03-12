@@ -1,6 +1,16 @@
 package leaguehub.leaguehubbackend.controller;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import leaguehub.leaguehubbackend.domain.email.dto.EmailDto;
 import leaguehub.leaguehubbackend.domain.email.service.EmailService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +29,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -81,7 +84,7 @@ public class EmailControllerTest {
 
         mockMvc.perform(get("/api/member/oauth/email?token=" + validToken))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/verifiedPage.html"));
+                .andExpect(redirectedUrl("/mypage"));
     }
 
     @Test
@@ -91,6 +94,6 @@ public class EmailControllerTest {
 
         mockMvc.perform(get("/api/member/oauth/email?token=" + invalidToken))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/invalidPage.html"));
+                .andExpect(redirectedUrl("/"));
     }
 }
