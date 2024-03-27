@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseUserGameInfoDto;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class ParticipantQueryController {
 
     private final ParticipantService participantService;
+    private final ParticipantQueryService participantQueryService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     /*
@@ -51,7 +53,7 @@ public class ParticipantQueryController {
     @GetMapping("/participant/stat/{gameId}/{gameTag}")
     public ResponseEntity getTFTRanked(@PathVariable("gameId") String gameId, @PathVariable("gameTag") String gameTag){
 
-        ResponseUserGameInfoDto userDetailDto = participantService.selectGameCategory(gameId + "#" + gameTag, 0);
+        ResponseUserGameInfoDto userDetailDto = participantQueryService.selectGameCategory(gameId + "#" + gameTag, 0);
 
         return new ResponseEntity<>(userDetailDto, OK);
     }
@@ -66,7 +68,7 @@ public class ParticipantQueryController {
     @GetMapping("/{channelLink}/players")
     public ResponseEntity getPlayers(@PathVariable("channelLink") String channelLink){
 
-        List<ResponseStatusPlayerDto> players = participantService.loadPlayers(channelLink);
+        List<ResponseStatusPlayerDto> players = participantQueryService.loadPlayers(channelLink);
 
         return new ResponseEntity<>(players, OK);
     }
@@ -80,7 +82,7 @@ public class ParticipantQueryController {
     @GetMapping("/{channelLink}/player/requests")
     public ResponseEntity getRequestPlayers(@PathVariable("channelLink") String channelLink){
 
-        List<ResponseStatusPlayerDto> responsePlayers = participantService.loadRequestStatusPlayerList(channelLink);
+        List<ResponseStatusPlayerDto> responsePlayers = participantQueryService.loadRequestStatusPlayerList(channelLink);
 
         return new ResponseEntity<>(responsePlayers, OK);
     }
@@ -94,7 +96,7 @@ public class ParticipantQueryController {
     @GetMapping("/{channelLink}/observers")
     public ResponseEntity getObserverPlayer(@PathVariable("channelLink") String channelLink){
 
-        List<ResponseStatusPlayerDto> responsePlayers = participantService.loadObserverPlayerList(channelLink);
+        List<ResponseStatusPlayerDto> responsePlayers = participantQueryService.loadObserverPlayerList(channelLink);
 
         return new ResponseEntity<>(responsePlayers, OK);
     }

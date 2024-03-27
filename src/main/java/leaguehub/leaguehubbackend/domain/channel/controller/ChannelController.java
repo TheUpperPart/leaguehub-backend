@@ -15,6 +15,7 @@ import leaguehub.leaguehubbackend.domain.channel.service.ChannelDeleteService;
 import leaguehub.leaguehubbackend.domain.channel.service.ChannelService;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.InvalidParticipantAuthException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.ParticipantNotGameHostException;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class ChannelController {
     private final ChannelService channelService;
     private final ParticipantService participantService;
     private final ChannelDeleteService channelDeleteService;
+    private final ParticipantQueryService participantQueryService;
 
     @Operation(summary = "채널 생성")
     @ApiResponses(value = {
@@ -62,11 +64,11 @@ public class ChannelController {
 
         ResponseChannelDto responseChannelDto = ResponseChannelDto.builder()
                 .gameCategory(channelInfo.getGameCategory().getNum())
-                .hostName(participantService.findChannelHost(channelLink))
+                .hostName(participantQueryService.findChannelHost(channelLink))
                 .participateNum(channelInfo.getRealPlayer())
                 .maxPlayer(channelInfo.getMaxPlayer())
                 .leagueTitle(channelInfo.getTitle())
-                .permission(participantService.findParticipantPermission(channelLink))
+                .permission(participantQueryService.findParticipantPermission(channelLink))
                 .build();
 
         return new ResponseEntity(responseChannelDto, OK);

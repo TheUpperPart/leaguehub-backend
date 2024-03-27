@@ -2,6 +2,7 @@ package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
@@ -75,6 +76,8 @@ class ParticipantServiceTest {
     ParticipantWebClientService participantWebClientService;
     @Autowired
     ParticipantManagementService participantManagementService;
+    @Autowired
+    ParticipantQueryService participantQueryService;
 
     Member getMemberId() throws Exception {
 
@@ -394,7 +397,7 @@ class ParticipantServiceTest {
 
 
         //when
-        List<ResponseStatusPlayerDto> requestPlayerDto = participantService.loadPlayers(channel.getChannelLink());
+        List<ResponseStatusPlayerDto> requestPlayerDto = participantQueryService.loadPlayers(channel.getChannelLink());
 
         //then
         assertThat(part2.getNickname()).isEqualTo(requestPlayerDto.get(0).getNickname());
@@ -425,7 +428,7 @@ class ParticipantServiceTest {
         dummy2.updateParticipantStatus("DummyGameId2", "iron III", "DummyNickname2", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
-        assertThatThrownBy(() -> participantService.loadRequestStatusPlayerList(channel.getChannelLink()))
+        assertThatThrownBy(() -> participantQueryService.loadRequestStatusPlayerList(channel.getChannelLink()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
@@ -445,7 +448,7 @@ class ParticipantServiceTest {
         dummy1.updateParticipantStatus("DummyGameId1", "platinum III", "DummyNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
-        List<ResponseStatusPlayerDto> DtoList = participantService.loadRequestStatusPlayerList(channel.getChannelLink());
+        List<ResponseStatusPlayerDto> DtoList = participantQueryService.loadRequestStatusPlayerList(channel.getChannelLink());
 
 
         //then
@@ -578,7 +581,7 @@ class ParticipantServiceTest {
 
 
         //when
-        List<ResponseStatusPlayerDto> DtoList = participantService.loadObserverPlayerList(channel.getChannelLink());
+        List<ResponseStatusPlayerDto> DtoList = participantQueryService.loadObserverPlayerList(channel.getChannelLink());
 
         //then
         assertThat(dummy1.getId()).isEqualTo(DtoList.get(0).getPk());
@@ -608,7 +611,7 @@ class ParticipantServiceTest {
         Participant dummy2 = participantRepository.save(Participant.participateChannel(dummyMember2, channel));
 
         //when
-        assertThatThrownBy(() -> participantService.loadObserverPlayerList(channel.getChannelLink()))
+        assertThatThrownBy(() -> participantQueryService.loadObserverPlayerList(channel.getChannelLink()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
