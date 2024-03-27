@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantRoleAndPermissionService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class ParticipantQueryController {
     private final ParticipantService participantService;
     private final ParticipantQueryService participantQueryService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
     /*
     * 참가 x인 티어 검색
@@ -110,7 +112,7 @@ public class ParticipantQueryController {
     @GetMapping("/channel/{channelLink}/permission")
     public ResponseEntity checkHost(@PathVariable("channelLink") String channelLink){
 
-        participantService.checkAdminHost(channelLink);
+        participantRoleAndPermissionService.checkAdminHost(channelLink);
 
         return new ResponseEntity<>("Admin Check", OK);
     }

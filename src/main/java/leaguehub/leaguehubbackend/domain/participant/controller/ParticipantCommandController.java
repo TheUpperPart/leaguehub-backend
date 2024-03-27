@@ -14,6 +14,7 @@ import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantRoleAndPermissionService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +40,10 @@ public class ParticipantCommandController {
     *
      */
 
-    //실격, 기권에 대한 웹소켓???
-    //disqualifiedParticipant
     private final ParticipantService participantService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ParticipantManagementService participantManagementService;
+    private final ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
 
     @Operation(summary = "경기에 참가요청(TFT 만)", description = "관전자가 게임에 참가 요청")
@@ -74,7 +74,7 @@ public class ParticipantCommandController {
     public ResponseEntity approveParticipantRequest(@PathVariable("channelLink") String channelLink,
                                                     @PathVariable("participantId") Long participantId){
 
-        participantService.approveParticipantRequest(channelLink, participantId);
+        participantRoleAndPermissionService.approveParticipantRequest(channelLink, participantId);
 
         return new ResponseEntity<>("approve participant", OK);
     }
@@ -92,7 +92,7 @@ public class ParticipantCommandController {
     public ResponseEntity rejectParticipantRequest(@PathVariable("channelLink") String channelLink,
                                                    @PathVariable("participantId") Long participantId){
 
-        participantService.rejectedParticipantRequest(channelLink, participantId);
+        participantRoleAndPermissionService.rejectedParticipantRequest(channelLink, participantId);
 
         return new ResponseEntity<>("reject participant", OK);
     }
@@ -110,7 +110,7 @@ public class ParticipantCommandController {
     public ResponseEntity updateHostParticipant(@PathVariable("channelLink") String channelLink,
                                                 @PathVariable("participantId") Long participantId){
 
-        participantService.updateHostRole(channelLink, participantId);
+        participantRoleAndPermissionService.updateHostRole(channelLink, participantId);
 
         return new ResponseEntity<>("update HOST", OK);
     }
@@ -151,7 +151,7 @@ public class ParticipantCommandController {
     @PostMapping("/channels/order")
     public ResponseEntity updateCustomChannelIndex(@RequestBody List<ParticipantChannelDto> participantChannelDtoList){
 
-        List<ParticipantChannelDto> updateCustomChannelIndexList = participantService.updateCustomChannelIndex(participantChannelDtoList);
+        List<ParticipantChannelDto> updateCustomChannelIndexList = participantManagementService.updateCustomChannelIndex(participantChannelDtoList);
 
         return new ResponseEntity<>(updateCustomChannelIndexList, OK);
     }

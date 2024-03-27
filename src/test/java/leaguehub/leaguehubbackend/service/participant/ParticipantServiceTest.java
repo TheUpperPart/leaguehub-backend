@@ -1,33 +1,30 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
-import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
-import leaguehub.leaguehubbackend.domain.participant.dto.ResponseStatusPlayerDto;
-import leaguehub.leaguehubbackend.domain.participant.dto.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.domain.channel.entity.Channel;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelBoard;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
 import leaguehub.leaguehubbackend.domain.channel.entity.GameCategory;
-import leaguehub.leaguehubbackend.domain.member.entity.Member;
-import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
-import leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus;
-import leaguehub.leaguehubbackend.domain.participant.entity.Role;
-import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
-import leaguehub.leaguehubbackend.domain.participant.exception.exception.*;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantWebClientService;
-import leaguehub.leaguehubbackend.fixture.ChannelFixture;
-import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelBoardRepository;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRepository;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelRuleRepository;
+import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
+import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.member.repository.MemberRepository;
-import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
 import leaguehub.leaguehubbackend.domain.member.service.MemberService;
+import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
+import leaguehub.leaguehubbackend.domain.participant.dto.ResponseStatusPlayerDto;
+import leaguehub.leaguehubbackend.domain.participant.dto.ResponseUserGameInfoDto;
+import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus;
+import leaguehub.leaguehubbackend.domain.participant.entity.Role;
+import leaguehub.leaguehubbackend.domain.participant.exception.exception.*;
+import leaguehub.leaguehubbackend.domain.participant.repository.ParticipantRepository;
+import leaguehub.leaguehubbackend.domain.participant.service.*;
+import leaguehub.leaguehubbackend.fixture.ChannelFixture;
+import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.global.util.SecurityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -78,6 +75,8 @@ class ParticipantServiceTest {
     ParticipantManagementService participantManagementService;
     @Autowired
     ParticipantQueryService participantQueryService;
+    @Autowired
+    ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
     Member getMemberId() throws Exception {
 
@@ -471,7 +470,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         //when
-        participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId());
+        participantRoleAndPermissionService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
         Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
         Optional<Channel> channel1 = channelRepository.findByChannelLink(channel.getChannelLink());
@@ -493,7 +492,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
-        assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+        assertThatThrownBy(() -> participantRoleAndPermissionService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
@@ -507,7 +506,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
         //when
-        participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
+        participantRoleAndPermissionService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
         Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
 
@@ -527,7 +526,7 @@ class ParticipantServiceTest {
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
 
-        assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+        assertThatThrownBy(() -> participantRoleAndPermissionService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
 
@@ -543,7 +542,7 @@ class ParticipantServiceTest {
         dummy1.approveParticipantMatch();
 
         //when
-        participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
+        participantRoleAndPermissionService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId());
 
         Participant updateDummy = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
 
@@ -562,7 +561,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
-        assertThatThrownBy(() -> participantService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+        assertThatThrownBy(() -> participantRoleAndPermissionService.rejectedParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
@@ -630,8 +629,8 @@ class ParticipantServiceTest {
         dummy1.updateParticipantStatus("DummyGameId1", "platinum", "DummyNickname1", "xKzO3XyPc7DLH5n6P-XC8z0DvQqhmZy8y8JZZxjXSSvPQ5qXqohUw1sehtNdSYIpsH0ckWagN5wnOQ");
 
         //when
-        participantService.updateHostRole(channel.getChannelLink(), dummy1.getId());
-        participantService.updateHostRole(channel.getChannelLink(), dummy2.getId());
+        participantRoleAndPermissionService.updateHostRole(channel.getChannelLink(), dummy1.getId());
+        participantRoleAndPermissionService.updateHostRole(channel.getChannelLink(), dummy2.getId());
 
         Participant updateDummy1 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy1.getId(), channel.getChannelLink()).get();
         Participant updateDummy2 = participantRepository.findParticipantByIdAndChannel_ChannelLink(dummy2.getId(), channel.getChannelLink()).get();
@@ -655,7 +654,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
         Participant dummy1 = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
 
-        assertThatThrownBy(() -> participantService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
+        assertThatThrownBy(() -> participantRoleAndPermissionService.updateHostRole(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(InvalidParticipantAuthException.class);
 
     }
@@ -675,11 +674,11 @@ class ParticipantServiceTest {
         }
 
         Participant dummy = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
-        participantService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
+        participantRoleAndPermissionService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
 
         Participant dummy1 = getParticipant("DummyName2", channel, "DummyGameId2", "DummyNickname2");
 
-        assertThatThrownBy(() -> participantService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
+        assertThatThrownBy(() -> participantRoleAndPermissionService.approveParticipantRequest(channel.getChannelLink(), dummy1.getId()))
                 .isInstanceOf(ParticipantRealPlayerIsMaxException.class);
 
     }
@@ -784,7 +783,7 @@ class ParticipantServiceTest {
                 })
                 .collect(Collectors.toList());
 
-        participantService.updateCustomChannelIndex(participantChannelDtos);
+        participantManagementService.updateCustomChannelIndex(participantChannelDtos);
 
         List<Participant> all = participantRepository.findAllByMemberIdOrderByIndex(findMember.getId());
         assertThat(all.get(0).getIndex()).isEqualTo(0);

@@ -46,7 +46,6 @@ public class ParticipantManagementService {
     private final ParticipantService participantService;
     private final JwtService jwtService;
     private final ParticipantWebClientService participantWebClientService;
-    private final ParticipantRuleValidationService participantRuleValidationService;
 
     /**
      * 사용자가 지정한 Channel을 참가
@@ -84,7 +83,7 @@ public class ParticipantManagementService {
     public void leaveChannel(String channelLink) {
         Member member = memberService.findCurrentMember();
 
-        Participant participant = participantService.getParticipant(channelLink, member);
+        Participant participant = getParticipant(channelLink, member);
 
         participantRepository.deleteById(participant.getId());
 
@@ -117,8 +116,6 @@ public class ParticipantManagementService {
     }
 
 
-//    participateMatch
-
     /**
      * 관전자인 사용자가 해당 채널의 경기에 참가
      *
@@ -143,6 +140,25 @@ public class ParticipantManagementService {
         checkRule(channelRule, userGameInfo, tier);
 
         participant.updateParticipantStatus(responseDto.getGameId(), tier.toString(), responseDto.getNickname(), puuid);
+    }
+
+    /**
+     * 참여 채널의 순서를 커스텀
+     * @param participantChannelDtoList
+     * @return
+     */
+    public List<ParticipantChannelDto> updateCustomChannelIndex(List<ParticipantChannelDto> participantChannelDtoList) {
+        Member member = memberService.findCurrentMember();
+
+        List<Participant> allByMemberId = participantRepository.findAllByMemberId(member.getId());
+
+        participantChannelDtoList.forEach(participantChannelDto -> {
+            allByMemberId.stream()
+                    .filter(participant -> participant.getChannel().getChannelLink().equals(participantChannelDto.getChannelLink()))
+                    .forEach(participant -> participant.updateCustomChannelIndex(participantChannelDto.getCustomChannelIndex()));
+        });
+
+        return channelService.findParticipantChannelList();
     }
 
 
@@ -224,7 +240,7 @@ public class ParticipantManagementService {
         String personalId = jwtService.extractPersonalId(accessToken)
                 .orElseThrow(() -> new AuthInvalidTokenException());
         Member member = memberRepository.findMemberByPersonalId(personalId).get();
-        Participant myParticipant = participantService.getParticipant(channelLink, member);
+        Participant myParticipant = getParticipant(channelLink, member);
         return myParticipant;
     }
 
@@ -288,5 +304,18 @@ public class ParticipantManagementService {
                 throw new ParticipantInvalidPlayCountException();
         }
     }
+
+    /**
+     * channelLink와 member로 해당 채널에서의 참가자 찾기 -
+     * @param channelLink
+     * @param member
+     * @return
+     */
+    private Participant getParticipant(String channelLink, Member member) {
+        Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
+                .orElseThrow(ParticipantNotFoundException::new);
+        return participant;
+    }
+
 
 }
