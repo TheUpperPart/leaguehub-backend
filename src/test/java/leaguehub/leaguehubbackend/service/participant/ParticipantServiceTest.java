@@ -17,6 +17,7 @@ import leaguehub.leaguehubbackend.domain.participant.entity.RequestStatus;
 import leaguehub.leaguehubbackend.domain.participant.entity.Role;
 import leaguehub.leaguehubbackend.domain.email.exception.exception.UnauthorizedEmailException;
 import leaguehub.leaguehubbackend.domain.participant.exception.exception.*;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantWebClientService;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
 import leaguehub.leaguehubbackend.domain.channel.repository.ChannelBoardRepository;
@@ -68,6 +69,9 @@ class ParticipantServiceTest {
     ParticipantRepository participantRepository;
     @Autowired
     ChannelRuleRepository channelRuleRepository;
+
+    @Autowired
+    ParticipantWebClientService participantWebClientService;
 
     Member getMemberId() throws Exception {
 
@@ -140,9 +144,9 @@ class ParticipantServiceTest {
     @DisplayName("티어, 플레이 횟수 검색 테스트 - 성공")
     void getDetailSuccessTest() throws Exception {
 
-        ResponseUserGameInfoDto testDto1 = participantService.getTierAndPlayCount("손성한");
-        ResponseUserGameInfoDto testDto2 = participantService.getTierAndPlayCount("서초임");
-        ResponseUserGameInfoDto testDto3 = participantService.getTierAndPlayCount("채수채수밭");
+        ResponseUserGameInfoDto testDto1 = participantWebClientService.getTierAndPlayCount("손성한");
+        ResponseUserGameInfoDto testDto2 = participantWebClientService.getTierAndPlayCount("서초임");
+        ResponseUserGameInfoDto testDto3 = participantWebClientService.getTierAndPlayCount("채수채수밭");
 
 
         assertThat(testDto2.getTier()).isEqualTo("UNRANKED");
@@ -156,7 +160,7 @@ class ParticipantServiceTest {
     @DisplayName("티어, 플레이 횟수 검색 테스트 - 실패")
     void getDetailFailTest() throws Exception {
 
-        assertThatThrownBy(() -> participantService.getTierAndPlayCount("saovkovsk"))
+        assertThatThrownBy(() -> participantWebClientService.getTierAndPlayCount("saovkovsk"))
                 .isInstanceOf(ParticipantGameIdNotFoundException.class);
     }
 
