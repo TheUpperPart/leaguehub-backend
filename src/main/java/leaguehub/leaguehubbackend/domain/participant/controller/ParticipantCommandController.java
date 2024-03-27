@@ -13,6 +13,7 @@ import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class ParticipantCommandController {
     //disqualifiedParticipant
     private final ParticipantService participantService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ParticipantManagementService participantManagementService;
 
 
     @Operation(summary = "경기에 참가요청(TFT 만)", description = "관전자가 게임에 참가 요청")
@@ -53,7 +55,7 @@ public class ParticipantCommandController {
     @PostMapping("/{channelLink}/participant")
     public ResponseEntity participateMatch(@PathVariable("channelLink") String channelLink, @RequestBody @Valid ParticipantDto responseDto){
 
-        participantService.participateMatch(responseDto, channelLink);
+        participantManagementService.participateMatch(responseDto, channelLink);
 
         return new ResponseEntity<>("Update Participant ROLE", OK);
     }
@@ -122,7 +124,7 @@ public class ParticipantCommandController {
     @PostMapping("/{channelLink}/participant/observer")
     public ResponseEntity enterChannel(@PathVariable("channelLink") String channelLink){
 
-        ParticipantChannelDto participantChannelDto = participantService.participateChannel(channelLink);
+        ParticipantChannelDto participantChannelDto = participantManagementService.participateChannel(channelLink);
 
         return new ResponseEntity<>(participantChannelDto, OK);
     }
@@ -136,7 +138,7 @@ public class ParticipantCommandController {
     @DeleteMapping("/{channelLink}")
     public ResponseEntity leaveChannel(@PathVariable("channelLink") String channelLink){
 
-        participantService.leaveChannel(channelLink);
+        participantManagementService.leaveChannel(channelLink);
 
         return new ResponseEntity<>("Leave this Channel", OK);
     }
@@ -159,7 +161,7 @@ public class ParticipantCommandController {
     public void disqualifiedParticipant(@DestinationVariable("channelLink") String channelLink,
                                         @DestinationVariable("matchIdStr") String matchIdStr,
                                         @Payload ParticipantIdDto message) {
-        ParticipantIdResponseDto participantIdResponseDto = participantService.disqualifiedParticipant(channelLink, message);
+        ParticipantIdResponseDto participantIdResponseDto = participantManagementService.disqualifiedParticipant(channelLink, message);
 
         simpMessagingTemplate.convertAndSend("/match/" + matchIdStr, participantIdResponseDto);
     }

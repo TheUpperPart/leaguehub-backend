@@ -1,6 +1,7 @@
 package leaguehub.leaguehubbackend.service.participant;
 
 import jakarta.transaction.Transactional;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
@@ -72,6 +73,8 @@ class ParticipantServiceTest {
 
     @Autowired
     ParticipantWebClientService participantWebClientService;
+    @Autowired
+    ParticipantManagementService participantManagementService;
 
     Member getMemberId() throws Exception {
 
@@ -175,7 +178,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("서초임");
 
-        participantService.participateMatch(responseDto, channel.getChannelLink());
+        participantManagementService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
@@ -200,7 +203,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("연습용아이디가됨");
 
-        participantService.participateMatch(responseDto, channel.getChannelLink());
+        participantManagementService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
@@ -224,7 +227,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("연습용아이디가됨");
 
-        participantService.participateMatch(responseDto, channel.getChannelLink());
+        participantManagementService.participateMatch(responseDto, channel.getChannelLink());
 
         //when
 
@@ -248,7 +251,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("participantGameId2");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantDuplicatedGameIdException.class);
 
     }
@@ -263,7 +266,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("participantGameId2");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRoleException.class);
 
     }
@@ -278,7 +281,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("participantGameId1");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantAlreadyRequestedException.class);
 
     }
@@ -293,7 +296,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("participantGameId4");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantRejectedRequestedException.class);
 
     }
@@ -308,7 +311,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("연습용아이디가됨");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
 
     }
@@ -323,7 +326,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("연습용아이디가됨");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
 
     }
@@ -339,7 +342,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("서초임");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidPlayCountException.class);
 
     }
@@ -355,7 +358,7 @@ class ParticipantServiceTest {
         responseDto.setGameId("연습용아이디가됨");
 
         //when
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(ParticipantInvalidRankException.class);
     }
 
@@ -687,7 +690,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
 
         //when
-        ParticipantChannelDto participantChannelDto  = participantService.participateChannel(channel.getChannelLink());
+        ParticipantChannelDto participantChannelDto  = participantManagementService.participateChannel(channel.getChannelLink());
         //then
 
         assertThat(participantChannelDto.getChannelLink()).isEqualTo(channel.getChannelLink());
@@ -703,7 +706,7 @@ class ParticipantServiceTest {
         Channel channel = createCustomChannel(true, true, 2400, null, 20);
 
         //then
-        assertThatThrownBy(() -> participantService.participateChannel(channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateChannel(channel.getChannelLink()))
                 .isInstanceOf(ParticipantDuplicatedGameIdException.class);
 
     }
@@ -725,7 +728,7 @@ class ParticipantServiceTest {
         long count = participantRepository.count();
 
         //when
-        participantService.leaveChannel(channel.getChannelLink());
+        participantManagementService.leaveChannel(channel.getChannelLink());
 
         //then
         long deleteCount = participantRepository.count();
@@ -746,7 +749,7 @@ class ParticipantServiceTest {
 
         responseDto.setGameId("urlGuestGameId");
 
-        assertThatThrownBy(() -> participantService.participateMatch(responseDto, channel.getChannelLink()))
+        assertThatThrownBy(() -> participantManagementService.participateMatch(responseDto, channel.getChannelLink()))
                 .isInstanceOf(UnauthorizedEmailException.class);
 
     }
@@ -761,7 +764,7 @@ class ParticipantServiceTest {
                 .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
                 .peek(channel -> {
                     channelRepository.save(channel);
-                    participantService.participateChannel(channel.getChannelLink());
+                    participantManagementService.participateChannel(channel.getChannelLink());
                 })
                 .collect(Collectors.toList());
 

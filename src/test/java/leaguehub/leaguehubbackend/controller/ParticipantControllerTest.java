@@ -10,6 +10,7 @@ import leaguehub.leaguehubbackend.domain.channel.entity.ChannelBoard;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.ParticipantFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -66,6 +67,9 @@ class ParticipantControllerTest {
     ParticipantRepository participantRepository;
     @Autowired
     ChannelRuleRepository channelRuleRepository;
+
+    @Autowired
+    ParticipantManagementService participantManagementService;
 
     @Autowired
     ObjectMapper mapper;
@@ -597,7 +601,7 @@ class ParticipantControllerTest {
                 .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
                 .peek(channel -> {
                     channelRepository.save(channel);
-                    participantService.participateChannel(channel.getChannelLink());
+                    participantManagementService.participateChannel(channel.getChannelLink());
                 })
                 .collect(Collectors.toList());
 

@@ -61,7 +61,7 @@ public class ParticipantService {
     private final ParticipantWebClientService participantWebClientService;
 
 
-    //참여자의 권한 확인하는 서비스
+    //참여자의 권한 확인하는 서비스 - > 쿼리(조회해서 그냥 넘겨주기 떄문에)
     public int findParticipantPermission(String channelLink) {
         UserDetails userDetails = SecurityUtils.getAuthenticatedUser();
         if (userDetails == null) return OBSERVER.getNum();
@@ -74,67 +74,13 @@ public class ParticipantService {
                 .orElse(OBSERVER.getNum());
     }
 
-    //해당 채널의 첫 번째 관리자를 찾는 서비스
+    //해당 채널의 첫 번째 관리자를 찾는 서비스 - 쿼리
     public String findChannelHost(String channelLink) {
         return participantRepository.findParticipantByRoleAndChannel_ChannelLinkOrderById(HOST, channelLink).get(0).getNickname();
     }
 
-    //채널을 참가하는 서비스 -> 채널 참가 & 아웃 서비스
 
-    /**
-     * 사용자가 지정한 Channel을 참가
-     *
-     * @param channelLink
-     * @return Participant participant
-     */
-    public ParticipantChannelDto participateChannel(String channelLink) {
-
-        Member member = memberService.findCurrentMember();
-
-        Channel channel = channelService.getChannel(channelLink);
-
-        //중복 검사 추가
-        duplicateParticipant(member, channelLink);
-
-        Participant participant = Participant.participateChannel(member, channel);
-        participant.newCustomChannelIndex(participantRepository.findMaxIndexByParticipant(member.getId()));
-        participantRepository.save(participant);
-
-        return new ParticipantChannelDto(
-                channel.getId(),
-                channel.getChannelLink(),
-                channel.getTitle(),
-                channel.getGameCategory().getNum(),
-                channel.getChannelImageUrl(),
-                participant.getIndex()
-        );
-    }
-
-
-    //채널을 나가는 서비스 -> 채널 참가 및 아웃 서비스
-
-    /**
-     * 해당 채널 나가기
-     *
-     * @param channelLink
-     */
-    public void leaveChannel(String channelLink) {
-        Member member = memberService.findCurrentMember();
-
-        Participant participant = getParticipant(channelLink, member);
-
-        participantRepository.deleteById(participant.getId());
-
-        List<Participant> participantAfterDelete = participantRepository.findAllByMemberIdAndAndIndexGreaterThan(
-                member.getId(), participant.getIndex());
-
-        for (Participant allParticipantByMember : participantAfterDelete) {
-            allParticipantByMember.updateCustomChannelIndex(allParticipantByMember.getIndex() - 1);
-        }
-    }
-
-
-    //채널 유저 조회 서비스 --
+    //채널 유저 조회 서비스  -> 쿼리
 
     /**
      * 해당 채널의 관전자인 유저들을 조회
@@ -155,7 +101,7 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
-    //채널 유저 조회 서비스 --
+    //채널 유저 조회 서비스 --> 쿼리
 
     /**
      * 요청을 보낸 사람들을 조회
@@ -176,7 +122,7 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
-    //채널 유저 조회 서비스 --
+    //채널 유저 조회 서비스 -->쿼리
 
     /**
      * 해당 채널의 PLAYER 역할인 유저들을 반환
@@ -195,7 +141,7 @@ public class ParticipantService {
     }
 
 
-    //관리자가 요청 참가자 승인 서비스
+    //관리자가 요청 참가자 승인 서비스 -> 커맨드
 
     /**
      * 해당 채널의 요청한 참가자를 승인해줌
@@ -217,7 +163,7 @@ public class ParticipantService {
     }
 
 
-    //관리자가 요청 참가자 거절 서비스
+    //관리자가 요청 참가자 거절 서비스 -> 커맨드
 
     /**
      * 해당 채널의 요청한 참가자를 거절함
@@ -237,20 +183,8 @@ public class ParticipantService {
         updateRealPlayerCount(channelLink, participant.getChannel());
     }
 
-    //대회 참가자 실격 & 기권 서비스
-    public ParticipantIdResponseDto disqualifiedParticipant(String channelLink, ParticipantIdDto message) {
-        if (message.getRole() == HOST.getNum()) {
-            return disqualifiedToHost(channelLink, message);
-        }
 
-        if (message.getRole() == PLAYER.getNum()) {
-            return selfDisqualified(channelLink, message);
-        }
-
-        throw new InvalidParticipantAuthException();
-    }
-
-    //관리자가 대회 참가자 실격 서비스
+    //관리자가 대회 참가자 실격 서비스 -> 커맨드
     private ParticipantIdResponseDto disqualifiedToHost(String channelLink, ParticipantIdDto message) {
         Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
         checkRole(myParticipant.getRole(), HOST);
@@ -262,7 +196,7 @@ public class ParticipantService {
         return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
     }
 
-    //대회 참가자가 기권 서비스
+    //대회 참가자가 기권 서비스 -> 커맨드
     private ParticipantIdResponseDto selfDisqualified(String channelLink, ParticipantIdDto message) {
         Participant myParticipant = findParticipantAccessToken(channelLink, message.getAccessToken());
         checkRole(myParticipant.getRole(), PLAYER);
@@ -272,7 +206,7 @@ public class ParticipantService {
         return new ParticipantIdResponseDto(message.getMatchPlayerId(), DISQUALIFICATION.getStatus());
     }
 
-    //기권 시키는 서비스
+    //기권 시키는 서비스 -> 커맨드
     private void disqualificationParticipant(Participant findParticipant) {
         findParticipant.disqualificationParticipant();
         matchPlayerRepository.findMatchPlayersByParticipantId(findParticipant.getId())
@@ -284,7 +218,7 @@ public class ParticipantService {
                 );
     }
 
-    //관리자가 관전자를 관리자로 권한 변경 서비스
+    //관리자가 관전자를 관리자로 권한 변경 서비스 -> 커맨드
 
     /**
      * 사용자를 관리자로 권한을 변경한다.
@@ -300,7 +234,7 @@ public class ParticipantService {
         findParticipant.updateHostRole();
     }
 
-    //게임 카테고리에 따른 전적 검색 서비스
+    //게임 카테고리에 따른 전적 검색 서비스 -> 쿼리
 
     /**
      * 게임 카테고리에 따라 요청 분할
@@ -319,67 +253,15 @@ public class ParticipantService {
         return userGameInfoDto;
     }
 
-    //관전자 -> 대회 참여자로 변경해달라는 요청
 
-    /**
-     * 관전자인 사용자가 해당 채널의 경기에 참가
-     *
-     * @param responseDto
-     */
-    public void participateMatch(ParticipantDto responseDto, String channelLink) {
-        Participant participant = getParticipant(channelLink);
-
-        checkParticipateMatch(participant);
-
-        ChannelRule channelRule = channelRuleRepository
-                .findChannelRuleByChannel_ChannelLink(channelLink);
-
-        checkDuplicateNickname(responseDto.getGameId(), channelLink);
-
-        ParticipantSummonerDetail participantSummonerDetail = participantWebClientService.requestUserGameInfo(responseDto.getGameId());
-        String userGameInfo = participantSummonerDetail.getUserGameInfo();
-        String puuid = participantSummonerDetail.getPuuid();
-
-        GameTier tier = participantWebClientService.searchTier(userGameInfo);
-
-        checkRule(channelRule, userGameInfo, tier);
-
-        participant.updateParticipantStatus(responseDto.getGameId(), tier.toString(), responseDto.getNickname(), puuid);
-    }
-
-    //해당 채널의 룰(티어, 참여회수) 확인 서비스
-
-    /**
-     * 해당 채널의 룰을 확인
-     *
-     * @param channelRule
-     * @param userGameInfo
-     * @param tier
-     */
-    public void checkRule(ChannelRule channelRule, String userGameInfo, GameTier tier) {
-
-        rankRuleCheck(channelRule, tier);
-        playCountRuleCheck(channelRule, userGameInfo);
-    }
-
-    //해당 사용자가 호스트인지 확인
+    //해당 사용자가 호스트인지 확인 -> 커맨드
     public void checkAdminHost(String channelLink) {
         Participant participant = getParticipant(channelLink);
         checkRole(participant.getRole(), HOST);
     }
 
-    //해당 사용자의 경기 회수 확인 서비스
-    private void playCountRuleCheck(ChannelRule channelRule, String userGameInfo) {
 
-        if (channelRule.getPlayCount()) {
-            int limitedPlayCount = channelRule.getLimitedPlayCount();
-            int userPlayCount = participantWebClientService.getPlayCount(userGameInfo);
-            if (userPlayCount < limitedPlayCount)
-                throw new ParticipantInvalidPlayCountException();
-        }
-    }
-
-    //해당 사용자의 AccessToken 확인 서비스
+    //해당 사용자의 AccessToken 확인 서비스 - 커맨드(내부 동작)
     private Participant findParticipantAccessToken(String channelLink, String accessToken) {
         String personalId = jwtService.extractPersonalId(accessToken)
                 .orElseThrow(() -> new AuthInvalidTokenException());
@@ -388,27 +270,15 @@ public class ParticipantService {
         return myParticipant;
     }
 
-    //해당 사용자의 티어 확인 서비스
-    private static void rankRuleCheck(ChannelRule channelRule, GameTier tier) {
 
-        if (channelRule.getTier()) {
-            int tierMax = channelRule.getTierMax();
-            int tierMin = channelRule.getTierMin();
-
-            int userRankScore = tier.getScore();
-            if (userRankScore > tierMax || userRankScore < tierMin) throw new ParticipantInvalidRankException();
-        }
-    }
-
-
-    //해당 채널의 경기 참여자 횟수 체크
+    //해당 채널의 경기 참여자 횟수 체크 - 커맨드
     private void checkRealPlayerCount(Channel channel) {
         if (channel.getRealPlayer() >= channel.getMaxPlayer())
             throw new ParticipantRealPlayerIsMaxException();
     }
 
 
-    //사용자의 이메일 인증인지 확인
+    //사용자의 이메일 인증인지 확인 - 내부 동작 여기 남는다
 
     /**
      * 이메일이 인증되었는지 확인
@@ -420,7 +290,7 @@ public class ParticipantService {
     }
 
 
-    //참여 채널의 순서를 커스텀
+    //참여 채널의 순서를 커스텀 - 커맨드
     public List<ParticipantChannelDto> updateCustomChannelIndex(List<ParticipantChannelDto> participantChannelDtoList) {
         Member member = memberService.findCurrentMember();
 
@@ -438,13 +308,13 @@ public class ParticipantService {
     //
 
     /**
-     * channelLink와 member로 해당 채널에서의 참가자 찾기 --
+     * channelLink와 member로 해당 채널에서의 참가자 찾기 -> 쿼리
      *
      * @param channelLink
      * @param member
      * @return
      */
-    private Participant getParticipant(String channelLink, Member member) {
+    public Participant getParticipant(String channelLink, Member member) {
         Participant participant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink)
                 .orElseThrow(ParticipantNotFoundException::new);
         return participant;
@@ -453,7 +323,7 @@ public class ParticipantService {
     //제 3자가 채널에서의 참가자 찾기
 
     /**
-     * 제 3자가 channelLink와 participantId로 해당 채널에서의 참가자 찾기 --
+     * 제 3자가 channelLink와 participantId로 해당 채널에서의 참가자 찾기 --> 쿼리
      *
      * @param channelLink
      * @param participantId
@@ -465,7 +335,7 @@ public class ParticipantService {
         return findParticipant;
     }
 
-    //현재 채널의 경기 참여자 수 업데이트
+    //현재 채널의 경기 참여자 수 업데이트 -> 커맨드
     private void updateRealPlayerCount(String channelLink, Channel channel) {
         List<Participant> playerLists = participantRepository
                 .findAllByChannel_ChannelLinkAndRoleAndRequestStatusOrderByNicknameAsc(channelLink, PLAYER, DONE);
@@ -473,7 +343,7 @@ public class ParticipantService {
         channel.updateRealPlayer(playerLists.size());
     }
 
-    //호스트 확인 및 그 사용자를 가져오는 서비스
+    //호스트 확인 및 그 사용자를 가져오는 서비스 -> 쿼리
     private Participant checkHostAndGetParticipant(String channelLink, Long participantId) {
         Participant participant = getParticipant(channelLink);
         checkRole(participant.getRole(), HOST);
@@ -482,7 +352,7 @@ public class ParticipantService {
     }
 
 
-    //자기 자신의 id를 가져오는 서비스
+    //자기 자신의 id를 가져오는 서비스 -> 내부동작 여기 남는다
 
     /**
      * 자기 자신이 participant를 찾을 때
@@ -501,7 +371,7 @@ public class ParticipantService {
         return participant;
     }
 
-    //쿼리 컨트롤러에 반환할 dto를 정제하는 서비스
+    //쿼리 컨트롤러에 반환할 dto를 정제하는 서비스 -> 쿼리 내부 메소드로 들어간다
     private ResponseStatusPlayerDto mapToResponseStatusPlayerDto(Participant participant) {
         ResponseStatusPlayerDto responsePlayerDto = new ResponseStatusPlayerDto();
         responsePlayerDto.setPk(participant.getId());
@@ -512,46 +382,8 @@ public class ParticipantService {
         return responsePlayerDto;
     }
 
-    //채널에 이미 참여했는지 확인하는 서비스
-    private void checkParticipateMatch(Participant participant) {
-
-        if (participant.getRole() != OBSERVER
-                || participant.getRequestStatus() == DONE) throw new ParticipantInvalidRoleException();
-
-        if (participant.getRequestStatus() == REQUEST) throw new ParticipantAlreadyRequestedException();
-
-        if (participant.getRequestStatus() == REJECT) throw new ParticipantRejectedRequestedException();
-
-    }
-
-    //참여 닉네임 중복 체크
-    public void checkDuplicateNickname(String gameId, String channelLink) {
-        List<Participant> participantList = participantRepository.findAllByChannel_ChannelLink(channelLink);
-
-        boolean checkDuplicate = participantList.stream()
-                .anyMatch(participant -> participant.getGameId().equals(gameId));
-
-        if (checkDuplicate) {
-            throw new ParticipantDuplicatedGameIdException();
-        }
-    }
-
-    //참여 사용자 중복 체크
-    public void duplicateParticipant(Member member, String channelLink) {
-        Optional<Participant> existingParticipant = participantRepository.findParticipantByMemberIdAndChannel_ChannelLink(member.getId(), channelLink);
-
-        if (existingParticipant.isPresent()) {
-            duplicatePlayerIdCheck();
-        }
-    }
-
-    //참여 사용자 id 중복 체크
-    private void duplicatePlayerIdCheck() {
-        throw new ParticipantDuplicatedGameIdException();
-    }
-
-    //해당 채널의 Rule이 맞는지 확인
-    private void checkRole(Role myRole, Role checkRole) {
+    //해당 채널의 Rule이 맞는지 확인 -> 여기에 남는다
+    public void checkRole(Role myRole, Role checkRole) {
         if (myRole != checkRole) {
             throw new InvalidParticipantAuthException();
         }
