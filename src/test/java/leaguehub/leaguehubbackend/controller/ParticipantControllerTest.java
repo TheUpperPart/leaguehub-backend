@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import leaguehub.leaguehubbackend.domain.participant.controller.ParticipantController;
 import leaguehub.leaguehubbackend.domain.channel.dto.CreateChannelDto;
 import leaguehub.leaguehubbackend.domain.channel.dto.ParticipantChannelDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
@@ -11,6 +10,8 @@ import leaguehub.leaguehubbackend.domain.channel.entity.ChannelBoard;
 import leaguehub.leaguehubbackend.domain.channel.entity.ChannelRule;
 import leaguehub.leaguehubbackend.domain.member.entity.Member;
 import leaguehub.leaguehubbackend.domain.participant.entity.Participant;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
+import leaguehub.leaguehubbackend.domain.participant.service.ParticipantRoleAndPermissionService;
 import leaguehub.leaguehubbackend.fixture.ChannelFixture;
 import leaguehub.leaguehubbackend.fixture.ParticipantFixture;
 import leaguehub.leaguehubbackend.fixture.UserFixture;
@@ -50,8 +51,6 @@ class ParticipantControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    ParticipantController participantController;
 
     @Autowired
     ParticipantService participantService;
@@ -69,6 +68,11 @@ class ParticipantControllerTest {
     ParticipantRepository participantRepository;
     @Autowired
     ChannelRuleRepository channelRuleRepository;
+
+    @Autowired
+    ParticipantManagementService participantManagementService;
+    @Autowired
+    ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
     @Autowired
     ObjectMapper mapper;
@@ -537,7 +541,7 @@ class ParticipantControllerTest {
             dummyParticipant.approveParticipantMatch();
         }
         Participant dummy = getParticipant("DummyName1", channel, "DummyGameId1", "DummyNickname1");
-        participantService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
+        participantRoleAndPermissionService.approveParticipantRequest(channel.getChannelLink(), dummy.getId());
 
         Participant dummy1 = getParticipant("DummyName2", channel, "DummyGameId2", "DummyNickname2");
 
@@ -600,7 +604,7 @@ class ParticipantControllerTest {
                 .mapToObj(i -> createCustomChannel(false, false, 800, null, 100))
                 .peek(channel -> {
                     channelRepository.save(channel);
-                    participantService.participateChannel(channel.getChannelLink());
+                    participantManagementService.participateChannel(channel.getChannelLink());
                 })
                 .collect(Collectors.toList());
 
