@@ -2,7 +2,6 @@ package leaguehub.leaguehubbackend.domain.participant.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,8 +13,6 @@ import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ParticipantIdResponseDto;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantManagementService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantRoleAndPermissionService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,21 +26,15 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
 
-@Tag(name = "Participants-Command-Controller", description = "참가자 명령 관련 API")
+@Tag(name = "Participants-Management-Controller", description = "참가자 관리 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ParticipantCommandController {
+public class ParticipantManagementController {
 
-    /*
-    * 롤토체스 경기에 참가 요청
-    *
-     */
 
-    private final ParticipantService participantService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ParticipantManagementService participantManagementService;
-    private final ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
 
     @Operation(summary = "경기에 참가요청(TFT 만)", description = "관전자가 게임에 참가 요청")
@@ -58,61 +49,6 @@ public class ParticipantCommandController {
         participantManagementService.participateMatch(responseDto, channelLink);
 
         return new ResponseEntity<>("Update Participant ROLE", OK);
-    }
-
-
-    @Operation(summary = "참가요청 승인", description = "관리자가 해당 게임 참가요청자(request)를 승인")
-    @Parameters(value = {
-            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "participantId", description = "해당 채널 참가자의 고유 Id", example = "1")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "승인 성공"),
-            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/{channelLink}/{participantId}/player")
-    public ResponseEntity approveParticipantRequest(@PathVariable("channelLink") String channelLink,
-                                                    @PathVariable("participantId") Long participantId){
-
-        participantRoleAndPermissionService.approveParticipantRequest(channelLink, participantId);
-
-        return new ResponseEntity<>("approve participant", OK);
-    }
-
-    @Operation(summary = "참가요청 거절", description = "관리자가 해당 게임 참가요청자(request)를 거절")
-    @Parameters(value = {
-            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "participantId", description = "해당 채널 참가자의 고유 Id", example = "1")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "거절 성공"),
-            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/{channelLink}/{participantId}/observer")
-    public ResponseEntity rejectParticipantRequest(@PathVariable("channelLink") String channelLink,
-                                                   @PathVariable("participantId") Long participantId){
-
-        participantRoleAndPermissionService.rejectedParticipantRequest(channelLink, participantId);
-
-        return new ResponseEntity<>("reject participant", OK);
-    }
-
-    @Operation(summary = "관리자 권한 부여", description = "관리자가 관전자에게 권한을 부여")
-    @Parameters(value = {
-            @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88"),
-            @Parameter(name = "participantId", description = "해당 채널 참가자의 고유 Id", example = "1")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "관리자 권한 부여 성공"),
-            @ApiResponse(responseCode = "404", description = "채널 참가자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping("/{channelLink}/{participantId}/host")
-    public ResponseEntity updateHostParticipant(@PathVariable("channelLink") String channelLink,
-                                                @PathVariable("participantId") Long participantId){
-
-        participantRoleAndPermissionService.updateHostRole(channelLink, participantId);
-
-        return new ResponseEntity<>("update HOST", OK);
     }
 
     @Operation(summary = "채널 참가", description = "채널 링크를 통하여 해당 채널 참가")

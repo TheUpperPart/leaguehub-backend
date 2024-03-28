@@ -11,12 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseStatusPlayerDto;
 import leaguehub.leaguehubbackend.domain.participant.dto.ResponseUserGameInfoDto;
 import leaguehub.leaguehubbackend.domain.participant.service.ParticipantQueryService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantRoleAndPermissionService;
-import leaguehub.leaguehubbackend.domain.participant.service.ParticipantService;
 import leaguehub.leaguehubbackend.global.exception.global.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,16 +29,8 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api")
 public class ParticipantQueryController {
 
-    private final ParticipantService participantService;
     private final ParticipantQueryService participantQueryService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final ParticipantRoleAndPermissionService participantRoleAndPermissionService;
 
-    /*
-    * 참가 x인 티어 검색
-    * 롤토체스 경기에 참가 요청
-    *
-     */
 
     @Operation(summary = "티어 검색 (참가 x)", description = "검색 버튼을 누르면 해당 카테고리와 게임 닉네임을 가지고 티어 검색 (참가 x)")
     @Parameters(value = {
@@ -103,19 +92,7 @@ public class ParticipantQueryController {
         return new ResponseEntity<>(responsePlayers, OK);
     }
 
-    @Operation(summary = "관리자 권한 확인", description = "관리자인지 확인하는 기능")
-    @Parameter(name = "channelLink", description = "해당 채널의 링크", example = "42aa1b11ab88")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Admin Check"),
-            @ApiResponse(responseCode = "401", description = "해당 권한이 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @GetMapping("/channel/{channelLink}/permission")
-    public ResponseEntity checkHost(@PathVariable("channelLink") String channelLink){
 
-        participantRoleAndPermissionService.checkAdminHost(channelLink);
-
-        return new ResponseEntity<>("Admin Check", OK);
-    }
 
 
 }
